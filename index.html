@@ -1,79 +1,96 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<title>ðŸ“‚ Dashboard Sistemas</title>
-<style>
-    body { font-family: Arial, sans-serif; background: #f8f9fa; margin: 0; }
-    h1 { text-align: center; padding: 20px; background: #007bff; color: white; margin: 0; }
-    .container { display: flex; flex-wrap: wrap; justify-content: center; padding: 20px; }
-    .card {
-        border-radius: 12px; width: 200px; margin: 10px; padding: 15px;
-        text-align: center; box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-        transition: transform 0.2s ease-in-out; cursor: pointer; color: white;
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard Sistemas</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background: #f5f5f5;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
     }
-    .card:hover { transform: scale(1.05); }
-    .card h2 { font-size: 18px; margin: 0 0 10px 0; }
-    .search { text-align: center; padding: 15px; }
-    .search input {
-        padding: 10px; width: 80%; border-radius: 8px; border: 1px solid #ccc;
+    header {
+      background: #007bff;
+      color: white;
+      padding: 1rem;
+      text-align: center;
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+    #lista-sistemas {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      padding: 20px;
+      justify-content: center;
+    }
+    .bloco-sistema {
+      background: white;
+      border-radius: 10px;
+      padding: 20px;
+      min-width: 180px;
+      max-width: 200px;
+      text-align: center;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      transition: transform 0.2s;
+    }
+    .bloco-sistema:hover {
+      transform: scale(1.05);
+    }
+    .bloco-sistema a {
+      text-decoration: none;
+      font-weight: bold;
+      color: #333;
     }
     footer {
-        background: #007bff; color: white; text-align: center; padding: 20px;
+      background: blue;
+      color: white;
+      padding: 15px;
+      text-align: center;
+      font-size: 0.9rem;
+      margin-top: auto;
     }
-    footer h2 { margin: 0; }
-</style>
+    footer h2 {
+      margin: 0;
+    }
+  </style>
 </head>
 <body>
+  <header>Dashboard Sistemas</header>
 
-<h1>“Dashboard Sistemas</h1>
-<div class="search">
-    <input type="text" id="search" placeholder=" Buscar aplicação..." onkeyup="filtrar()">
-</div>
-<div class="container" id="apps"></div>
+  <section id="lista-sistemas">
+    <!-- Blocos dos sistemas vÃ£o aparecer aqui -->
+  </section>
 
-<footer>
-    <h2>Desenvolvido por EdsonC.S.F.<br>
-    Contato: edsony1@gmail.com<br>
-    Criação: Julho de 2025<br>
-    Versão: 1.0 &copy; 2025. Todos os direitos reservados.</h2>
-</footer>
+  <footer>
+    <h2>
+      Desenvolvido por EdsonC.S.F. <br>
+      Contato: edsony1@gmail.com <br>
+      CriaÃ§Ã£o: Julho de 2025 <br>
+      VersÃ£o: 1.0 Â© 2025. Todos os direitos reservados.
+    </h2>
+  </footer>
 
-<script>
-const externos = [
-    { nome: "Servidor GManhwa", url: "https://Chronosblue.gamer.gd" },
-    { nome: "Nuvem Publica", url: "https://Escalafolgas.fwh.is" }
-];
-
-const cores = ["#28a745", "#17a2b8", "#ffc107", "#dc3545", "#6f42c1", "#fd7e14"];
-
-async function carregarApps() {
-    const res = await fetch("/.netlify/functions/lista");
-    const arquivos = await res.json();
-    const lista = document.getElementById("apps");
-
-    let todos = arquivos.map(a => ({ nome: a.replace(".html", ""), url: a }))
-                .concat(externos);
-
-    todos.forEach((item, i) => {
-        const card = document.createElement("div");
-        card.className = "card";
-        card.style.background = cores[i % cores.length];
-        card.innerHTML = `<h2>${item.nome}</h2><p>Clique para abrir</p>`;
-        card.onclick = () => window.open(item.url, "_blank");
-        lista.appendChild(card);
-    });
-}
-
-function filtrar() {
-    let input = document.getElementById("search").value.toLowerCase();
-    document.querySelectorAll(".card").forEach(card => {
-        card.style.display = card.innerText.toLowerCase().includes(input) ? "" : "none";
-    });
-}
-
-carregarApps();
-</script>
-
+  <script>
+    fetch('sistemas.json')
+      .then(response => response.json())
+      .then(data => {
+        const lista = document.getElementById('lista-sistemas');
+        data.forEach((sistema, index) => {
+          const item = document.createElement('div');
+          item.className = 'bloco-sistema';
+          // Cores diferentes por bloco
+          const cores = ['#FFD700', '#90EE90', '#FF7F7F', '#87CEFA', '#FFB6C1', '#FFA500'];
+          item.style.background = cores[index % cores.length];
+          item.innerHTML = `<a href="${sistema.arquivo}" target="_blank">${sistema.nome}</a>`;
+          lista.appendChild(item);
+        });
+      })
+      .catch(error => console.error('Erro ao carregar sistemas:', error));
+  </script>
 </body>
 </html>
