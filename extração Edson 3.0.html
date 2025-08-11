@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cálculo Extração por Edson 3.0</title>
+    <style>
+        /* Cores Verdes */
+        :root {
+            --primary-color: #28a745; /* Verde principal */
+            --primary-dark-color: #218838; /* Verde mais escuro para hover */
+            --secondary-color: #e9ffe9; /* Verde claro para fundos */
+            --border-color: #a3d9a3; /* Verde para bordas */
+            --text-color: #333;
+            --light-bg: #f4f4f4;
+            --white-bg: #fff;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: var(--light-bg);
+            color: var(--text-color);
+        }
+        .container {
+            background-color: var(--white-bg);
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h1, h2 {
+            color: var(--primary-color);
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        .section {
+            margin-bottom: 30px;
+            border: 1px solid var(--border-color);
+            padding: 20px;
+            border-radius: 5px;
+            background-color: var(--secondary-color);
+        }
+
+        /* Estilo para cada bloco de cálculo individual */
+        .calculation-entry {
+            display: flex;
+            flex-direction: column; /* Empilha as duas linhas internas */
+            margin-bottom: 20px; /* Espaço entre cada bloco de cálculo */
+            padding: 15px;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            background-color: var(--white-bg);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .input-fields-row, .formula-output-row {
+            display: flex;
+            align-items: center;
+            width: 100%;
+        }
+
+        .input-fields-row {
+            margin-bottom: 10px; /* Espaço entre a linha de inputs e a linha de fórmula/resultado */
+            justify-content: flex-start; /* Alinha os itens ao início */
+        }
+
+        /* Estilo para cada par label-input dentro da linha de campos de entrada */
+        .input-pair {
+            display: flex;
+            align-items: center;
+            margin-right: 15px; /* Espaço entre os pares de input */
+        }
+        /* Remove a margem do último par para evitar espaço extra */
+        .input-pair:last-child {
+            margin-right: 0;
+        }
+
+        .input-pair label {
+            margin-right: 5px; /* Espaço entre o label e o input */
+            font-weight: bold;
+            white-space: nowrap; /* Evita que o label quebre a linha */
+        }
+
+        .input-pair input[type="number"] {
+            width: 80px; /* Largura fixa para os inputs */
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        
+        .formula-output-row {
+            justify-content: flex-end; /* Empurra a fórmula e o resultado para a direita */
+        }
+
+        .formula-output-row .formula {
+            margin-right: 15px; /* Espaço entre a fórmula e o resultado */
+            font-weight: bold;
+            color: #555;
+        }
+
+        .formula-output-row .result {
+            font-weight: bold;
+            color: var(--primary-color); /* Resultado em verde */
+            min-width: 100px; /* Garante espaço suficiente para o resultado */
+            text-align: right;
+        }
+
+        .add-row-button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background-color: var(--primary-color); /* Cor verde para o botão de adicionar */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1em;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: background-color 0.3s ease;
+        }
+        .add-row-button:hover {
+            background-color: var(--primary-dark-color);
+        }
+        .add-row-button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+
+        .total-section {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 2px solid var(--primary-color);
+            text-align: center;
+        }
+        .total-section h3 {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+        #totalResult {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: var(--primary-dark-color); /* Total em verde mais escuro */
+            background-color: var(--secondary-color);
+            padding: 10px 20px;
+            border-radius: 5px;
+            display: inline-block;
+            min-width: 200px;
+            text-align: center;
+        }
+        .unit {
+            font-size: 1.1em;
+            color: #555;
+            margin-top: 5px;
+        }
+        button.calculate-button { /* Estilo para o botão principal de cálculo */
+            display: block;
+            width: 100%;
+            padding: 15px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.2em;
+            cursor: pointer;
+            margin-top: 30px;
+            transition: background-color 0.3s ease;
+        }
+        button.calculate-button:hover {
+            background-color: var(--primary-dark-color);
+        }
+
+        /* Ajustes para telas menores (mobile) */
+        @media (max-width: 600px) {
+            .input-fields-row {
+                flex-direction: column; /* Empilha os pares de input verticalmente */
+                align-items: flex-start;
+            }
+            .input-pair {
+                margin-right: 0;
+                margin-bottom: 10px; /* Espaço entre os pares empilhados */
+                width: 100%; /* Ocupa a largura total disponível */
+            }
+            .input-pair input[type="number"] {
+                width: 100%; /* Inputs ocupam a largura total do par */
+            }
+            .formula-output-row {
+                justify-content: flex-start; /* Alinha fórmula/resultado à esquerda em telas pequenas */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Cálculo Extração por Edson 3.0</h1>
+
+        <div class="section">
+            <h2>Cálculo Rodando</h2>
+            <p>(Peso) x (Velocidade) x 1440</p>
+            <div id="rodandoInputs">
+                <!-- Linhas de cálculo Rodando serão geradas aqui pelo JS -->
+            </div>
+            <button id="addRodandoBtn" class="add-row-button" onclick="addRodandoRow()">+ Adicionar Linha Rodando</button>
+        </div>
+
+        <div class="section">
+            <h2>Cálculo Drenando</h2>
+            <p>(Peso) x 6 x 1440</p>
+            <div id="drenandoInputs">
+                <!-- Linhas de cálculo Drenando serão geradas aqui pelo JS -->
+            </div>
+            <button id="addDrenandoBtn" class="add-row-button" onclick="addDrenandoRow()">+ Adicionar Linha Drenando</button>
+        </div>
+
+        <button class="calculate-button" onclick="calcularTudo()">Calcular Tudo</button>
+
+        <div class="total-section">
+            <h3>Total Geral</h3>
+            <span id="totalResult">0,00</span>
+            <div class="unit">toneladas</div>
+        </div>
+    </div>
+
+    <script>
+        const MAX_LINHAS = 10; // Máximo de linhas permitidas
+        let rodandoRowCount = 0; // Contador de linhas Rodando
+        let drenandoRowCount = 0; // Contador de linhas Drenando
+
+        // Função para formatar números no padrão brasileiro (milhares com ponto, decimal com vírgula)
+        function formatarNumeroBR(numero) {
+            const numStr = numero.toFixed(2);
+            const partes = numStr.split('.');
+            let parteInteira = partes[0];
+            const parteDecimal = partes[1];
+
+            parteInteira = parteInteira.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+
+            return parteInteira + ',' + parteDecimal;
+        }
+
+        // Função para adicionar uma nova linha de cálculo Rodando
+        function addRodandoRow() {
+            if (rodandoRowCount < MAX_LINHAS) {
+                const rodandoDiv = document.getElementById('rodandoInputs');
+                const newRowHtml = `
+                    <div class="calculation-entry">
+                        <div class="input-fields-row">
+                            <div class="input-pair">
+                                <label for="pesoRodando${rodandoRowCount}">Peso ${rodandoRowCount + 1}:</label>
+                                <input type="number" id="pesoRodando${rodandoRowCount}" value="0" step="0.01" oninput="calcularTudo()">
+                            </div>
+                            <div class="input-pair">
+                                <label for="velocidadeRodando${rodandoRowCount}">Velocidade ${rodandoRowCount + 1}:</label>
+                                <input type="number" id="velocidadeRodando${rodandoRowCount}" value="0" step="0.01" oninput="calcularTudo()">
+                            </div>
+                        </div>
+                        <div class="formula-output-row">
+                            <span class="formula">x 1440 =</span>
+                            <span class="result" id="resultadoRodando${rodandoRowCount}">0,00</span>
+                        </div>
+                    </div>
+                `;
+                rodandoDiv.insertAdjacentHTML('beforeend', newRowHtml);
+                rodandoRowCount++;
+                if (rodandoRowCount >= MAX_LINHAS) {
+                    document.getElementById('addRodandoBtn').disabled = true;
+                }
+                calcularTudo(); // Recalcula ao adicionar nova linha
+            }
+        }
+
+        // Função para adicionar uma nova linha de cálculo Drenando
+        function addDrenandoRow() {
+            if (drenandoRowCount < MAX_LINHAS) {
+                const drenandoDiv = document.getElementById('drenandoInputs');
+                const newRowHtml = `
+                    <div class="calculation-entry">
+                        <div class="input-fields-row">
+                            <div class="input-pair">
+                                <label for="pesoDrenando${drenandoRowCount}">Peso ${drenandoRowCount + 1}:</label>
+                                <input type="number" id="pesoDrenando${drenandoRowCount}" value="0" step="0.01" oninput="calcularTudo()">
+                            </div>
+                        </div>
+                        <div class="formula-output-row">
+                            <span class="formula">x 6 x 1440 =</span>
+                            <span class="result" id="resultadoDrenando${drenandoRowCount}">0,00</span>
+                        </div>
+                    </div>
+                `;
+                drenandoDiv.insertAdjacentHTML('beforeend', newRowHtml);
+                drenandoRowCount++;
+                if (drenandoRowCount >= MAX_LINHAS) {
+                    document.getElementById('addDrenandoBtn').disabled = true;
+                }
+                calcularTudo(); // Recalcula ao adicionar nova linha
+            }
+        }
+
+        // Função principal de cálculo
+        function calcularTudo() {
+            let totalGeral = 0;
+
+            // Cálculos Rodando
+            for (let i = 0; i < rodandoRowCount; i++) {
+                const pesoInput = document.getElementById(`pesoRodando${i}`);
+                const velocidadeInput = document.getElementById(`velocidadeRodando${i}`);
+                
+                const peso = parseFloat(pesoInput ? pesoInput.value : 0);
+                const velocidade = parseFloat(velocidadeInput ? velocidadeInput.value : 0);
+                
+                let resultado = 0;
+                if (!isNaN(peso) && !isNaN(velocidade)) {
+                    resultado = peso * velocidade * 1440;
+                }
+                const resultadoElement = document.getElementById(`resultadoRodando${i}`);
+                if (resultadoElement) {
+                    resultadoElement.textContent = formatarNumeroBR(resultado);
+                }
+                totalGeral += resultado;
+            }
+
+            // Cálculos Drenando
+            for (let i = 0; i < drenandoRowCount; i++) {
+                const pesoInput = document.getElementById(`pesoDrenando${i}`);
+                const peso = parseFloat(pesoInput ? pesoInput.value : 0);
+                
+                let resultado = 0;
+                if (!isNaN(peso)) {
+                    resultado = peso * 6 * 1440;
+                }
+                const resultadoElement = document.getElementById(`resultadoDrenando${i}`);
+                if (resultadoElement) {
+                    resultadoElement.textContent = formatarNumeroBR(resultado);
+                }
+                totalGeral += resultado;
+            }
+
+            document.getElementById('totalResult').textContent = formatarNumeroBR(totalGeral);
+        }
+
+        // Adiciona a primeira linha de cada tipo ao carregar a página
+        document.addEventListener('DOMContentLoaded', () => {
+            addRodandoRow(); // Adiciona a primeira linha Rodando
+            addDrenandoRow(); // Adiciona a primeira linha Drenando
+        });
+    </script>
+</body>
+</html>

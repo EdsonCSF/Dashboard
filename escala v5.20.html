@@ -1,0 +1,1507 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Controle de Escala v5.20 - Gráfico de Rosca</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --cor-folga-bg: #f8d7da; /* Vermelho claro */
+            --cor-ferias-bg: #cce5ff; /* Azul claro */
+            --cor-atestado-bg: #fff3cd; /* Amarelo claro */
+            --cor-lider-bg: #e2d9f3; /* Roxo claro */
+            --cor-trabalho-bg: #d4edda; /* Verde claro */
+            
+            --cor-folga-txt: #721c24; /* Texto vermelho escuro para folga */
+            --cor-ferias-txt: #004085; /* Texto azul escuro para férias */
+            --cor-atestado-txt: #856404; /* Texto amarelo escuro para atestado */
+            --cor-lider-txt: #492a7c; /* Texto roxo escuro para líder */
+            --cor-trabalho-txt: #155724; /* Texto verde escuro para trabalho */
+
+            --cor-cell-hover: #e9f5ff; 
+            --cor-fim-semana-bg: lightsteelblue; 
+            --cor-dia-semana-bg: #e9ecef;
+            --cor-detalhes-header: #f8f9fa; 
+
+            /* Cores para os gráficos de rosca */
+            --cor-grafico-trabalho: #42f5e3; /* Ciano claro/aqua */
+            --cor-grafico-folga: #ff6384; /* Rosa */
+
+            /* Nova cor para OP2 */
+            --cor-op2-txt: #007bff; /* Azul vibrante */
+        }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 10px; background-color: #f0f2f5; }
+        h1, h2 { color: #1c1e21; text-align: center; }
+        .container { max-width: 1300px; margin: auto; background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .section { border: 1px solid #ddd; border-radius: 8px; padding: 15px; margin-bottom: 20px; }
+        input, select, button { padding: 10px; margin: 5px 0; border-radius: 6px; border: 1px solid #ccc; width: 100%; box-sizing: border-box; font-size: 16px; }
+        button { background-color: #007bff; color: white; cursor: pointer; font-weight: bold; border: none; }
+        button:hover { background-color: #0056b3; }
+        .btn-add { background-color: #28a745; }
+        .btn-delete { background-color: #dc3545; padding: 5px 10px; font-size: 14px; width: auto; }
+        .btn-edit { background-color: #ffc107; color: #333; padding: 5px 10px; font-size: 14px; width: auto; margin-right: 5px; } 
+        .btn-edit:hover { background-color: #e0a800; }
+        .btn-toggle-view { background-color: #6f42c1; margin-bottom: 15px; }
+        .btn-edit-mode { background-color: #fd7e14; }
+        .btn-edit-mode.active { background-color: #e83e8c; }
+        .btn-chart { background-color: #17a2b8; margin-top: 10px; }
+        .btn-chart:hover { background-color: #138496; }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 14px; }
+        th, td { border: 1px solid #dee2e6; padding: 8px; text-align: center; }
+        th { background-color: var(--cor-detalhes-header); color: #495057; } 
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; align-items: flex-end; }
+        
+        #calendar-view-container { display: block; }
+        #edit-view-container { display: none; }
+        #main-container.view-mode-edit #edit-view-container { display: block; }
+        #main-container.view-mode-edit #calendar-view-container { display: none; }
+        .calendar-header { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; flex-wrap: wrap; }
+        .calendar-nav-btn { width: 90px; font-size: 16px; margin: 5px; }
+        
+        .calendar { 
+            display: flex; 
+            flex-wrap: wrap; 
+            border: 1px solid #ddd;
+        }
+        .calendar-day-name, .calendar-day { 
+            flex: 1; 
+            min-width: 0; 
+            box-sizing: border-box; 
+            border: 1px solid #ddd; 
+            padding: 5px; 
+        }
+        .calendar-day-name { 
+            font-weight: bold; text-align: center; 
+            background-color: var(--cor-dia-semana-bg); 
+            font-size: 14px; 
+            padding: 8px; 
+        }
+        .calendar-day-name.saturday, .calendar-day-name.sunday {
+            background-color: var(--cor-fim-semana-bg); 
+        }
+
+        .calendar-day { 
+            min-height: 135px; 
+            position: relative; cursor: pointer; transition: background-color 0.2s; 
+            background-color: #ffffff; color: #000000; 
+        }
+
+        .calendar-day.other-month { background-color: #f0f0f0; color: #aaa; cursor: default; }
+        .calendar-day:not(.other-month):hover { background-color: var(--cor-cell-hover); }
+        .calendar-day.saturday, .calendar-day.sunday { background-color: var(--cor-fim-semana-bg); }
+        .calendar-day.saturday:not(.other-month):hover,
+        .calendar-day.sunday:not(.other-month):hover { background-color: var(--cor-cell-hover); }
+
+        .day-number { font-weight: bold; font-size: 14px; margin-bottom: 5px; }
+        .day-entries { 
+            max-height: 106px; 
+            overflow-y: auto; font-size: 12px; 
+        }
+        .day-entry { font-size: 10px; padding: 2px 4px; border-radius: 4px; margin-bottom: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: default; }
+        
+        .calendar.edit-mode-active .calendar-day:not(.other-month) { 
+            cursor: pointer; 
+            border: 1px dashed #e83e8c; 
+            background-color: rgba(232, 62, 140, 0.05); 
+        }
+        .calendar.edit-mode-active .calendar-day:not(.other-month):hover {
+            background-color: rgba(232, 62, 140, 0.15); 
+        }
+        .calendar.edit-mode-active .calendar-day:not(.other-month) .day-entry:not(.default-status):hover {
+            background-color: rgba(232, 62, 140, 0.3);
+        }
+
+        .day-entry.F  { color: var(--cor-folga-txt); background-color: var(--cor-folga-bg); }
+        .day-entry.FE { color: var(--cor-ferias-txt); background-color: var(--cor-ferias-bg); }
+        .day-entry.A  { color: var(--cor-atestado-txt); background-color: var(--cor-atestado-bg); }
+        .day-entry.Lider { color: var(--cor-lider-txt); background-color: var(--cor-lider-bg); font-weight: bold; }
+        .day-entry.T { color: var(--cor-trabalho-txt); background-color: var(--cor-trabalho-bg); } 
+        .day-entry.default-status { 
+            color: #666; 
+            background-color: transparent; 
+            border: none;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        #day-details-container { margin-top: 15px; }
+        #day-details-container h3 { text-align: left; }
+        .edit-mode-info { padding: 15px; text-align: center; background-color: #fff3cd; border: 1px solid #ffeeba; border-radius: 6px; }
+        
+        /* Ajustes para as cores das linhas da tabela de detalhes */
+        .details-row.F  { background-color: var(--cor-folga-bg); }
+        .details-row.FE { background-color: var(--cor-ferias-bg); }
+        .details-row.A  { background-color: var(--cor-atestado-bg); }
+        .details-row.Lider { background-color: var(--cor-lider-bg); } /* A cor do texto Líder será aplicada no span abaixo */
+        .details-row.T { background-color: var(--cor-trabalho-bg); }
+        .details-row:hover { filter: brightness(95%); cursor: default; } 
+
+        /* Novo estilo para o texto OP2 na tabela de detalhes */
+        .details-row .cargo-op2 {
+            color: var(--cor-op2-txt); /* Aplica a cor apenas no texto do cargo OP2 */
+            font-weight: bold;
+        }
+        /* Estilo para o texto LIDER na tabela de detalhes, se necessário */
+        .details-row .cargo-lider {
+            color: var(--cor-lider-txt); /* Aplica a cor apenas no texto do cargo Lider */
+            font-weight: bold;
+        }
+
+        /* Estilo para o resumo de capacidade do dia */
+        .day-summary {
+            background-color: #e9f5ff; /* Um azul claro */
+            padding: 10px 15px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #004085;
+            border: 1px solid #b3d9ff;
+        }
+        .day-summary div {
+            padding: 5px 10px;
+        }
+
+
+        @media (max-width: 768px) {
+            body { padding: 5px; }
+            .container { max-width: 100%; padding: 8px; }
+            .calendar { 
+                width: 100%; 
+            }
+            .calendar-day-name, .calendar-day { 
+                flex-basis: calc(100% / 7); 
+                max-width: calc(100% / 7); 
+                min-height: 85px; 
+                padding: 3px; 
+            }
+            .day-number { font-size: 11px; margin-bottom: 3px; }
+            .day-entries { 
+                max-height: 60px; 
+                font-size: 9px; 
+            }
+            .day-entry { padding: 1px 3px; margin-bottom: 1px; }
+            .calendar-nav-btn { width: 60px; font-size: 10px; padding: 6px; margin: 2px; }
+            .calendar-header h2 { font-size: 16px; margin: 0; }
+            .calendar-header { flex-direction: column; align-items: center; }
+            .form-grid { grid-template-columns: 1fr; }
+            .legend { font-size: 10px; padding: 5px; text-align: center; }
+            .legend-item { margin-right: 8px; display: inline-flex; align-items: center; }
+            .legend-color { width: 12px; height: 12px; }
+            input, select, button { padding: 8px; font-size: 14px; }
+            .section { padding: 10px; margin-bottom: 15px; }
+            .modal-content { max-width: 95%; margin: 10% auto; padding: 10px; }
+            .modal-content h3 { font-size: 14px; }
+            .day-summary { font-size: 0.9em; flex-direction: column; align-items: center;}
+        }
+
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000; }
+        .modal-content { background-color: white; padding: 15px; border-radius: 6px; max-width: 350px; width: 90%; box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
+        .modal-content h3 { margin-top: 0; font-size: 16px; }
+        .modal-content label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 14px; } 
+        .modal-content input, .modal-content select { margin-bottom: 10px; font-size: 14px; }
+        .modal-content .btn-cancel { background-color: #6c757d; }
+        .modal-content .btn-confirm { background-color: #28a745; }
+        .modal-content .btn-cancel:hover { background-color: #5a6268; }
+        .modal-content .btn-confirm:hover { background-color: #218838; }
+        
+        .legend { margin: 10px 0; padding: 10px; border: 1px solid #ddd; border-radius: 6px; background-color: #f8f9fa; display: flex; flex-wrap: wrap; justify-content: center;}
+        .legend-item { display: inline-block; margin: 5px 10px; font-size: 13px; font-weight: bold; } 
+        .legend-color { display: inline-block; width: 18px; height: 18px; vertical-align: middle; margin-right: 6px; border-radius: 4px; border: 1px solid #ccc; } 
+
+        .backup-section {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 15px;
+        }
+        .backup-section button {
+            width: auto;
+            flex-grow: 1;
+            min-width: 150px;
+        }
+
+        #success-message {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #28a745;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 5px;
+            z-index: 1001;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        #success-message.show {
+            opacity: 1;
+        }
+
+        /* Estilos para o gráfico de rosca */
+        #capacity-chart-container {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+            display: flex; /* Flexbox para alinhar os gráficos */
+            flex-wrap: wrap; /* Quebra de linha para gráficos */
+            justify-content: center; /* Centraliza os gráficos */
+            gap: 20px; /* Espaço entre os gráficos */
+            align-items: flex-start; /* Alinha os gráficos no topo */
+            display: none; /* Escondido por padrão */
+        }
+        #capacity-chart-container h3 {
+            width: 100%; /* Garante que o título ocupe a largura total */
+            margin-bottom: 20px;
+            text-align: center;
+            color: #1c1e21;
+        }
+
+        .turma-chart-wrapper {
+            padding: 10px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            background-color: #fff;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            /* Tamanho flexível para 2, 3 ou 4 colunas */
+            flex: 0 0 calc(25% - 20px); /* 25% da largura do container - gap */
+            max-width: 200px; /* Limite de largura para manter os gráficos razoáveis */
+            box-sizing: border-box; /* Inclui padding e border na largura */
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+        }
+
+        @media (max-width: 1024px) { /* 3 colunas em tablets */
+            .turma-chart-wrapper {
+                flex-basis: calc(33.33% - 20px);
+                max-width: 250px;
+            }
+        }
+        @media (max-width: 768px) { /* 2 colunas em tablets menores */
+            .turma-chart-wrapper {
+                flex-basis: calc(50% - 20px);
+                max-width: 300px;
+            }
+        }
+        @media (max-width: 480px) { /* 1 coluna em celulares */
+            .turma-chart-wrapper {
+                flex-basis: calc(100% - 20px);
+                max-width: 350px;
+            }
+        }
+
+        .turma-chart-wrapper h4 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+            color: #333;
+        }
+
+        .chart-canvas-container {
+            position: relative;
+            width: 150px; /* Largura fixa para o canvas do gráfico */
+            height: 150px; /* Altura fixa para o canvas do gráfico */
+            margin-bottom: 10px;
+        }
+
+        .chart-data-summary {
+            font-size: 0.9em;
+            color: #555;
+            margin-top: 5px;
+        }
+        .chart-data-summary div {
+            margin-bottom: 3px;
+        }
+        .chart-data-summary .label {
+            font-weight: bold;
+            margin-right: 5px;
+        }
+        .chart-data-summary .trabalho-color { color: var(--cor-grafico-trabalho); }
+        .chart-data-summary .folga-color { color: var(--cor-grafico-folga); }
+        
+        /* Estilos para o rodapé movido */
+        .system-info {
+            text-align: center;
+            font-size: 0.85em;
+            color: #6c757d;
+            margin-bottom: 20px; /* Espaço abaixo do info */
+        }
+        .system-info a {
+            color: #007bff;
+            text-decoration: none;
+        }
+        .system-info a:hover {
+            text-decoration: underline;
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="container" id="main-container">
+    <h1>Controle de Escala Profissional v5.20</h1>
+    <div class="system-info">
+        <p>Contato para suporte: <a href="mailto:edsony1@gmail.com">edsony1@gmail.com</a></p>
+        <p>Criação: Julho/2025</p>
+    </div>
+    <button id="toggle-view-btn" class="btn-toggle-view" aria-label="Alternar entre visualização de escala e gerenciamento">Gerenciar Turmas e Funcionários</button>
+
+    <div id="edit-view-container">
+        <div class="section">
+            <h2>Configurações e Dados</h2>
+            <div class="backup-section">
+                <button id="save-backup-btn" aria-label="Salvar backup dos dados">Salvar Backup (JSON)</button>
+                <button id="load-backup-btn" aria-label="Carregar backup dos dados">Carregar Backup (JSON)</button>
+                <input type="file" id="backup-file-input" accept=".json" style="display: none;">
+            </div>
+            <div style="text-align: center; margin-top: 10px; font-size: 0.8em; color: #666;">
+                Use o backup para salvar e restaurar seus dados de funcionários e escalas.
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>1. Gerenciar Turmas</h2>
+            <form id="form-turma" class="form-grid">
+                <input type="text" id="turma-nome" placeholder="Nome da Turma (ex: T1)" required aria-label="Nome da turma">
+                <input type="number" id="turma-inicio-folga" placeholder="1º Dia de Folga em Janeiro (1-31)" min="1" max="31" required aria-label="Primeiro dia de folga da turma">
+            </form>
+            <button id="btn-add-turma" class="btn-add" style="margin-top: 10px;" aria-label="Adicionar nova turma">Adicionar Turma</button>
+            <div id="lista-turmas-container" style="margin-top: 15px;"></div>
+        </div>
+        <div class="section">
+            <h2>2. Adicionar Funcionário</h2>
+            <form id="form-funcionario" class="form-grid">
+                <input type="text" id="func-nome" placeholder="Nome do Funcionário" required aria-label="Nome do funcionário">
+                <input type="text" id="func-drt" placeholder="DRT (Opcional)" aria-label="DRT do funcionário">
+                <select id="func-cargo" required aria-label="Cargo do funcionário">
+                    <option value="OP1">OP1</option>
+                    <option value="OP2">OP2</option>
+                    <option value="Lider">Líder</option>
+                </select>
+                <select id="func-turma" required aria-label="Turma do funcionário"><option value="">Selecione uma turma...</option></select>
+                <select id="func-mes-ferias" aria-label="Mês de férias programadas do funcionário">
+                    <option value="">Mês de Férias Programadas (Opcional)</option>
+                    <option value="Janeiro">Janeiro</option><option value="Fevereiro">Fevereiro</option>
+                    <option value="Março">Março</option><option value="Abril">Abril</option>
+                    <option value="Maio">Maio</option><option value="Junho">Junho</option>
+                    <option value="Julho">Julho</option><option value="Agosto">Agosto</option>
+                    <option value="Setembro">Setembro</option><option value="Outubro">Outubro</option>
+                    <option value="Novembro">Novembro</option><option value="Dezembro">Dezembro</option>
+                </select>
+            </form>
+            <button id="btn-add-func" class="btn-add" style="margin-top: 10px;" aria-label="Adicionar novo funcionário">Adicionar Funcionário</button>
+        </div>
+        <div class="section">
+            <h2>3. Funcionários Cadastrados</h2>
+            <div id="lista-funcionarios-container"></div>
+        </div>
+    </div>
+
+    <div id="calendar-view-container">
+        <div class="calendar-header">
+            <button id="prev-month-btn" class="calendar-nav-btn" aria-label="Mês anterior">Anterior</button>
+            <h2 id="calendar-month-year"></h2>
+            <button id="next-month-btn" class="calendar-nav-btn" aria-label="Próximo mês">Próximo</button>
+        </div>
+        <div class="legend">
+            <span class="legend-item"><span class="legend-color" style="background-color: var(--cor-trabalho-bg);"></span>Trabalho (T)</span>
+            <span class="legend-item"><span class="legend-color" style="background-color: var(--cor-folga-bg);"></span>Folga (F)</span>
+            <span class="legend-item"><span class="legend-color" style="background-color: var(--cor-ferias-bg);"></span>Férias (FE)</span>
+            <span class="legend-item"><span class="legend-color" style="background-color: var(--cor-atestado-bg);"></span>Atestado (A)</span>
+            <span class="legend-item"><span class="legend-color" style="background-color: var(--cor-lider-bg);"></span>Líder</span>
+        </div>
+        <button id="edit-mode-btn" class="btn-edit-mode" aria-label="Ativar modo de edição para adicionar férias ou atestado">Adicionar Férias/Atestado</button>
+        <button id="show-chart-btn" class="btn-chart" aria-label="Ver gráfico de capacidade por turma">Ver Gráfico de Capacidade</button>
+        <div class="calendar" id="calendar-grid"></div>
+        <div id="day-details-container"></div>
+        <div id="capacity-chart-container"></div>
+    </div>
+
+    <div id="full-exception-modal" class="modal">
+        <div class="modal-content">
+            <h3>Adicionar/Editar Exceção</h3>
+            <form id="full-exception-form">
+                <label for="exception-func-select">Funcionário:</label>
+                <select id="exception-func-select" required aria-label="Selecione o funcionário"></select>
+                
+                <label for="exception-type">Tipo de Exceção:</label>
+                <select id="exception-type" required aria-label="Tipo de exceção">
+                    <option value="FE">Férias (FE)</option>
+                    <option value="A">Atestado (A)</option>
+                    <option value="P">Padrão da Turma (P)</option>
+                </select>
+                <p style="font-size: 0.8em; color: #666; margin-top: -5px; margin-bottom: 10px;">
+                    "Padrão da Turma" remove a exceção e retorna ao status normal da escala 6x2.
+                </p>
+                
+                <div id="exception-date-fields">
+                    <label for="exception-start-date">Data de Início:</label>
+                    <input type="date" id="exception-start-date" required aria-label="Data de início da exceção">
+
+                    <div id="exception-date-range-group"> 
+                        <label for="exception-end-date">Data de Término:</label>
+                        <input type="date" id="exception-end-date" required aria-label="Data de término da exceção">
+                    </div>
+
+                    <div id="exception-days-group" style="display: none;">
+                        <label for="exception-days">Quantos dias?</label>
+                        <input type="number" id="exception-days" min="1" value="1" required aria-label="Número de dias da exceção">
+                    </div>
+                </div>
+
+                <div style="text-align: right; margin-top: 10px;">
+                    <button type="button" class="btn-cancel" aria-label="Cancelar">Cancelar</button>
+                    <button type="submit" class="btn-confirm" aria-label="Confirmar exceção">Confirmar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="edit-employee-modal" class="modal">
+        <div class="modal-content">
+            <h3>Editar Funcionário</h3>
+            <form id="edit-employee-form">
+                <input type="hidden" id="edit-func-id">
+                
+                <label for="edit-func-nome">Nome:</label>
+                <input type="text" id="edit-func-nome" required aria-label="Nome do funcionário">
+                
+                <label for="edit-func-drt">DRT:</label>
+                <input type="text" id="edit-func-drt" aria-label="DRT do funcionário">
+                
+                <label for="edit-func-cargo">Cargo:</label>
+                <select id="edit-func-cargo" required aria-label="Cargo do funcionário">
+                    <option value="OP1">OP1</option>
+                    <option value="OP2">OP2</option>
+                    <option value="Lider">Líder</option>
+                </select>
+                
+                <label for="edit-func-turma">Turma:</label>
+                <select id="edit-func-turma" required aria-label="Turma do funcionário"></select>
+
+                <label for="edit-func-mes-ferias">Mês de Férias Programadas:</label>
+                <select id="edit-func-mes-ferias" aria-label="Mês de férias programadas do funcionário">
+                    <option value="">Nenhum</option>
+                    <option value="Janeiro">Janeiro</option><option value="Fevereiro">Fevereiro</option>
+                    <option value="Março">Março</option><option value="Abril">Abril</option>
+                    <option value="Maio">Maio</option><option value="Junho">Junho</option>
+                    <option value="Julho">Julho</option><option value="Agosto">Agosto</option>
+                    <option value="Setembro">Setembro</option><option value="Outubro">Outubro</option>
+                    <option value="Novembro">Novembro</option><option value="Dezembro">Dezembro</option>
+                </select>
+                
+                <div style="text-align: right; margin-top: 10px;">
+                    <button type="button" class="btn-cancel" aria-label="Cancelar">Cancelar</button>
+                    <button type="submit" class="btn-confirm" aria-label="Salvar alterações">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="success-message"></div>
+
+</div>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // --- ELEMENTOS DO DOM ---
+    const mainContainer = document.getElementById('main-container');
+    const toggleViewBtn = document.getElementById('toggle-view-btn');
+    const calendarGrid = document.getElementById('calendar-grid');
+    const dayDetailsContainer = document.getElementById('day-details-container');
+    const btnAddTurma = document.getElementById('btn-add-turma');
+    const listaTurmasContainer = document.getElementById('lista-turmas-container');
+    const btnAddFunc = document.getElementById('btn-add-func');
+    const selectFuncTurma = document.getElementById('func-turma');
+    const selectFuncMesFerias = document.getElementById('func-mes-ferias'); 
+    const listaFuncionariosContainer = document.getElementById('lista-funcionarios-container');
+    const editModeBtn = document.getElementById('edit-mode-btn');
+    const showChartBtn = document.getElementById('show-chart-btn'); 
+    const capacityChartContainer = document.getElementById('capacity-chart-container'); 
+    
+    const exceptionModal = document.getElementById('full-exception-modal'); 
+    const exceptionForm = document.getElementById('full-exception-form');
+    const exceptionType = document.getElementById('exception-type');
+    const exceptionDaysInput = document.getElementById('exception-days'); 
+    const exceptionFuncSelect = document.getElementById('exception-func-select');
+    const exceptionStartDate = document.getElementById('exception-start-date'); 
+    // Renomeado para clarificar que é um grupo de datas
+    const exceptionDateRangeGroup = document.getElementById('exception-date-range-group'); 
+    const exceptionEndDate = document.getElementById('exception-end-date'); 
+    const exceptionDaysGroup = document.getElementById('exception-days-group'); 
+
+    // Elementos do Modal de Edição de Funcionário
+    const editEmployeeModal = document.getElementById('edit-employee-modal');
+    const editEmployeeForm = document.getElementById('edit-employee-form');
+    const editFuncId = document.getElementById('edit-func-id');
+    const editFuncNome = document.getElementById('edit-func-nome');
+    const editFuncDrt = document.getElementById('edit-func-drt');
+    const editFuncCargo = document.getElementById('edit-func-cargo');
+    const editFuncTurma = document.getElementById('edit-func-turma');
+    const editFuncMesFerias = document.getElementById('edit-func-mes-ferias'); 
+
+    // Elementos de Backup/Restauração
+    const saveBackupBtn = document.getElementById('save-backup-btn');
+    const loadBackupBtn = document.getElementById('load-backup-btn');
+    const backupFileInput = document.getElementById('backup-file-input');
+    const successMessage = document.getElementById('success-message'); 
+
+    // --- ESTADO DA APLICAÇÃO ---
+    let turmas = [];
+    let funcionarios = [];
+    let escala = {}; // Armazena exceções { "funcId-AAAA-M-D": "status" }
+    let dataNavegacao = new Date(); // Mês atual exibido no calendário
+    let isEditMode = false;
+    let activeCharts = {}; // Objeto para armazenar as instâncias de Chart.js
+
+    let currentSelectedDateString = null; // A data da célula clicada no calendário
+
+    // --- FUNÇÕES DE UTILIDADE ---
+    function formatarDataParaInput(date) {
+        const d = new Date(date);
+        const year = d.getFullYear();
+        const month = (d.getMonth() + 1).toString().padStart(2, '0');
+        const day = d.getDate().toString().padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    }
+
+    function showSuccessMessage(message) {
+        successMessage.textContent = message;
+        successMessage.classList.add('show');
+        setTimeout(() => {
+            successMessage.classList.remove('show');
+        }, 3000); // Mensagem desaparece após 3 segundos
+    }
+
+    // --- FUNÇÕES DE DADOS ---
+    function carregarDadosLocais() {
+        try {
+            // A chave foi alterada para refletir a nova lógica de escala base
+            turmas = JSON.parse(localStorage.getItem('turmas_v5_8')) || []; 
+            // Remover propriedade 'capacidade' de turmas ao carregar dados antigos para evitar inconsistências
+            turmas.forEach(turma => delete turma.capacidade);
+
+            funcionarios = JSON.parse(localStorage.getItem('funcionarios_v5_8')) || [];
+            escala = JSON.parse(localStorage.getItem('escala_v5_8')) || {};
+            console.log('Dados carregados - turmas:', turmas, 'funcionarios:', funcionarios, 'escala:', escala);
+        } catch (e) {
+            console.error('Erro ao carregar dados do localStorage:', e);
+            alert('Erro ao carregar dados salvos. Dados podem estar corrompidos e foram reiniciados.');
+            turmas = []; funcionarios = []; escala = {};
+        }
+    }
+
+    function verificarTamanhoLocalStorage() {
+        let total = 0;
+        for (let x in localStorage) {
+            if (localStorage.hasOwnProperty(x)) {
+                total += ((localStorage[x].length + x.length) * 2); 
+            }
+        }
+        const limite = 5 * 1024 * 1024; // 5MB
+        if (total > limite * 0.9) {
+            alert('Atenção: O armazenamento local está quase cheio. Considere exportar os dados ou limpar exceções antigas.');
+        }
+    }
+
+    function salvarDadosLocais() {
+        try {
+            // A chave foi alterada para refletir a nova lógica de escala base
+            localStorage.setItem('turmas_v5_8', JSON.stringify(turmas)); 
+            localStorage.setItem('funcionarios_v5_8', JSON.stringify(funcionarios));
+            localStorage.setItem('escala_v5_8', JSON.stringify(escala));
+            verificarTamanhoLocalStorage();
+        } catch (e) {
+            console.error('Erro ao salvar dados no localStorage:', e);
+            alert('Erro ao salvar dados. O armazenamento pode estar cheio.');
+        }
+    }
+
+    function diasNoMes(ano, mes) {
+        return new Date(ano, mes + 1, 0).getDate();
+    }
+
+    // --- LÓGICA CENTRAL DE STATUS (SEMPRE APLICADA A UM FUNCIONÁRIO ESPECÍFICO) ---
+    function getStatus(func, dataAlvo) {
+        const data = new Date(dataAlvo.getFullYear(), dataAlvo.getMonth(), dataAlvo.getDate());
+        const chaveExcecao = `${func.id}-${data.getFullYear()}-${data.getMonth()}-${data.getDate()}`;
+        
+        if (escala[chaveExcecao]) {
+            return escala[chaveExcecao]; // Retorna a exceção se existir
+        }
+        
+        const turmaDoFunc = turmas.find(t => t.nome === func.turma);
+        if (!turmaDoFunc) {
+            return 'T'; // Se não tiver turma, assume trabalho padrão
+        }
+
+        // --- Lógica de cálculo da escala 6x2 consistente ao longo do ano ---
+        // Ano base para o início do ciclo 6x2.
+        // O ciclo da turma começa no dia 'inicioFolga' de Janeiro do ano base (2024 fixo).
+        // Isso garante que a escala seja contínua anualmente, independente dos dias de cada mês.
+        const anoBaseCiclo = 2024; // Definido como 2024, conforme solicitado
+        const dataReferenciaCiclo = new Date(anoBaseCiclo, 0, turmaDoFunc.inicioFolga); // Mês 0 é Janeiro
+
+        // Calcular a diferença total de dias entre a data alvo e a data de referência do ciclo
+        // É importante que dataAlvo e dataReferenciaCiclo sejam no mesmo fuso horário ou ajustadas para UTC
+        // para evitar problemas com Daylight Saving Time. Usar 'T12:00:00' para normalizar.
+        const dataAlvoNormalizada = new Date(data.getFullYear(), data.getMonth(), data.getDate(), 12, 0, 0);
+        const dataReferenciaNormalizada = new Date(dataReferenciaCiclo.getFullYear(), dataReferenciaCiclo.getMonth(), dataReferenciaCiclo.getDate(), 12, 0, 0);
+
+        const diffTime = dataAlvoNormalizada.getTime() - dataReferenciaNormalizada.getTime();
+        const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24)); 
+        
+        const cicloTotal = 8; // 6 trabalho + 2 folga
+        // Garantir que o resultado do módulo seja sempre positivo
+        const diaNoCiclo = (diffDays % cicloTotal + cicloTotal) % cicloTotal; 
+
+        // Folga nos dias 0 e 1 do ciclo (0 e 1 dias de diferença em relação à dataReferenciaCiclo)
+        return (diaNoCiclo === 0 || diaNoCiclo === 1) ? 'F' : 'T'; 
+    }
+
+    // FUNÇÃO REVISADA: Calcular dias de trabalho e folga para a TURMA
+    // Baseado na escala do PRIMEIRO funcionário da turma (para representar a escala da turma em si)
+    function calcularCapacidadeTurmaParaMes(turma, ano, mes) {
+        let trabalho = 0;
+        let folga = 0;
+        const diasMes = diasNoMes(ano, mes);
+        
+        // Encontra o primeiro funcionário da turma para usar como "modelo" da escala
+        // Isso é para garantir que a capacidade da turma seja baseada na sua escala 6x2
+        // e não nas exceções individuais de cada funcionário.
+        const primeiroFuncDaTurma = funcionarios.find(f => f.turma === turma.nome);
+
+        if (!primeiroFuncDaTurma) {
+            // Se não houver funcionários na turma, a capacidade é 0
+            return { trabalho: 0, folga: 0 };
+        }
+
+        for (let i = 1; i <= diasMes; i++) {
+            const dataAtual = new Date(ano, mes, i);
+            // IMPORTANTE: getStatusNaEscala ignora as exceções de 'escala'
+            const statusNaEscalaDaTurma = getStatusNaEscala(primeiroFuncDaTurma, dataAtual);
+
+            if (statusNaEscalaDaTurma === 'F') {
+                folga++;
+            } else if (statusNaEscalaDaTurma === 'T') {
+                trabalho++;
+            }
+            // Atestado e Férias não são considerados para a capacidade BASE da turma
+        }
+        return { trabalho, folga };
+    }
+
+    // NOVA FUNÇÃO: Obtém o status base de escala 6x2, ignorando exceções em "escala"
+    function getStatusNaEscala(func, dataAlvo) {
+        const data = new Date(dataAlvo.getFullYear(), dataAlvo.getMonth(), dataAlvo.getDate());
+        const turmaDoFunc = turmas.find(t => t.nome === func.turma);
+        
+        if (!turmaDoFunc) {
+            return 'T'; 
+        }
+
+        // --- Lógica de cálculo da escala 6x2 consistente ao longo do ano (mesma de getStatus) ---
+        const anoBaseCiclo = 2024; // Definido como 2024, conforme solicitado
+        const dataReferenciaCiclo = new Date(anoBaseCiclo, 0, turmaDoFunc.inicioFolga); // Mês 0 é Janeiro
+
+        const dataAlvoNormalizada = new Date(data.getFullYear(), data.getMonth(), data.getDate(), 12, 0, 0);
+        const dataReferenciaNormalizada = new Date(dataReferenciaCiclo.getFullYear(), dataReferenciaCiclo.getMonth(), dataReferenciaCiclo.getDate(), 12, 0, 0);
+        
+        const diffTime = dataAlvoNormalizada.getTime() - dataReferenciaNormalizada.getTime();
+        const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24)); 
+        
+        const cicloTotal = 8; 
+        const diaNoCiclo = (diffDays % cicloTotal + cicloTotal) % cicloTotal; 
+
+        return (diaNoCiclo === 0 || diaNoCiclo === 1) ? 'F' : 'T';
+    }
+
+
+    // --- RENDERIZAÇÃO ---
+    function renderizarTudo() {
+        renderizarTabelaTurmas();
+        renderizarSelectTurmas();
+        renderizarTabelaFuncionarios();
+        renderizarCalendario();
+        capacityChartContainer.style.display = 'none'; // Esconde o gráfico ao renderizar tudo
+        showChartBtn.textContent = 'Ver Gráfico de Capacidade'; // Reseta texto do botão do gráfico
+        dayDetailsContainer.innerHTML = ''; // Limpa detalhes do dia
+        destruirGraficosAtivos(); // Destrói gráficos antigos para evitar lixo
+        console.log('renderizarTudo executado');
+    }
+
+    function renderizarTabelaTurmas() {
+        if (turmas.length === 0) {
+            listaTurmasContainer.innerHTML = '<p>Nenhuma turma cadastrada.</p>';
+            return;
+        }
+        let tableHtml = `<table><thead><tr><th>Nome da Turma</th><th>1º Dia de Folga em Janeiro</th><th>Ação</th></tr></thead><tbody>`;
+        turmas.forEach((turma, index) => {
+            tableHtml += `<tr><td>${turma.nome}</td><td>${turma.inicioFolga}</td><td><button class="btn-delete" data-index="${index}" data-tipo="turma" aria-label="Excluir turma ${turma.nome}">Excluir</button></td></tr>`;
+        });
+        tableHtml += '</tbody></table>';
+        listaTurmasContainer.innerHTML = tableHtml;
+    }
+
+    function renderizarSelectTurmas() {
+        selectFuncTurma.innerHTML = '<option value="">Selecione uma turma...</option>';
+        turmas.forEach(turma => {
+            selectFuncTurma.innerHTML += `<option value="${turma.nome}">${turma.nome}</option>`;
+        });
+
+        editFuncTurma.innerHTML = '<option value="">Selecione uma turma...</option>';
+        turmas.forEach(turma => {
+            const option = document.createElement('option');
+            option.value = turma.nome;
+            option.textContent = turma.nome;
+            editFuncTurma.appendChild(option);
+        });
+    }
+
+    function renderizarTabelaFuncionarios() {
+        if (funcionarios.length === 0) {
+            listaFuncionariosContainer.innerHTML = '<p>Nenhum funcionário cadastrado.</p>';
+            return;
+        }
+        let tableHtml = `<table><thead><tr><th>Nome</th><th>DRT</th><th>Cargo</th><th>Turma</th><th>Férias Prog.</th><th>Ação</th></tr></thead><tbody>`;
+        funcionarios.sort((a, b) => a.turma.localeCompare(b.turma) || a.nome.localeCompare(b.nome));
+        funcionarios.forEach((func, index) => {
+            tableHtml += `<tr>
+                <td>${func.nome}</td>
+                <td>${func.drt || '-'}</td>
+                <td>${func.cargo}</td>
+                <td>${func.turma}</td>
+                <td>${func.mesFerias || '-'}</td>
+                <td>
+                    <button class="btn-edit" data-func-id="${func.id}" aria-label="Editar funcionário ${func.nome}">Editar</button>
+                    <button class="btn-delete" data-index="${index}" data-tipo="funcionario" aria-label="Excluir funcionário ${func.nome}">X</button>
+                </td>
+            </tr>`;
+        });
+        tableHtml += '</tbody></table>';
+        listaFuncionariosContainer.innerHTML = tableHtml;
+    }
+
+    function renderizarCalendario() {
+        calendarGrid.innerHTML = '';
+        const ano = dataNavegacao.getFullYear();
+        const mes = dataNavegacao.getMonth();
+        document.getElementById('calendar-month-year').textContent = `${dataNavegacao.toLocaleString('pt-BR', { month: 'long' })} de ${ano}`.toUpperCase();
+        
+        const primeiroDiaDoMes = new Date(ano, mes, 1);
+        const dataInicioGrid = new Date(primeiroDiaDoMes);
+        dataInicioGrid.setDate(dataInicioGrid.getDate() - primeiroDiaDoMes.getDay()); 
+
+        const diasDaSemana = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+        diasDaSemana.forEach((dia, index) => { 
+            const dayNameCell = document.createElement('div');
+            dayNameCell.className = 'calendar-day-name';
+            if (index === 0 || index === 6) { 
+                dayNameCell.classList.add('sunday', 'saturday');
+            }
+            dayNameCell.textContent = dia;
+            calendarGrid.appendChild(dayNameCell);
+        });
+
+        for (let i = 0; i < 42; i++) {
+            const diaAtual = new Date(dataInicioGrid);
+            diaAtual.setDate(diaAtual.getDate() + i);
+            const dateString = diaAtual.toISOString().split('T')[0];
+            const dayOfWeek = diaAtual.getDay(); 
+
+            const dayCell = document.createElement('div');
+            dayCell.className = 'calendar-day';
+            dayCell.dataset.date = dateString;
+
+            if (diaAtual.getMonth() !== mes) {
+                dayCell.classList.add('other-month');
+            } else {
+                if (dayOfWeek === 0 || dayOfWeek === 6) dayCell.classList.add('sunday', 'saturday'); 
+            }
+
+            let entriesHtml = '';
+            
+            if (funcionarios.length === 0) {
+                entriesHtml = '<div class="day-entry default-status">Adicione funcionários</div>';
+            } else {
+                const dayEntries = []; 
+                const ausentes = funcionarios.filter(func => {
+                    const status = getStatus(func, diaAtual);
+                    return status !== 'T'; 
+                });
+
+                ausentes.sort((a, b) => {
+                    const statusA = getStatus(a, diaAtual);
+                    const statusB = getStatus(b, diaAtual);
+
+                    const order = { 'Lider': 0, 'A': 1, 'FE': 2, 'F': 3 }; 
+
+                    const prioA = (a.cargo === 'Lider' && statusA !== 'A' && statusA !== 'FE') ? 'Lider' : statusA;
+                    const prioB = (b.cargo === 'Lider' && statusB !== 'A' && statusB !== 'FE') ? 'Lider' : statusB;
+
+                    if (order[prioA] !== order[prioB]) {
+                        return order[prioA] - order[prioB];
+                    }
+                    return a.nome.localeCompare(b.nome);
+                });
+
+                if (ausentes.length === 0) {
+                     entriesHtml = '<div class="day-entry default-status">Nenhum ausente</div>';
+                } else {
+                    ausentes.forEach(func => {
+                        const status = getStatus(func, diaAtual);
+                        const cargoClass = (func.cargo === 'Lider' && status !== 'A' && status !== 'FE') ? 'Lider' : ''; 
+                        
+                        const nomeAbreviado = func.nome.split(' ')[0];
+                        const displayNome = (func.cargo === 'Lider' && status !== 'A' && status !== 'FE') ? `${nomeAbreviado} (L)` : nomeAbreviado;
+
+                        dayEntries.push(`<div class="day-entry ${status} ${cargoClass}" data-func-id="${func.id}" title="${func.nome} - ${status}">
+                            ${displayNome}
+                        </div>`);
+                    });
+                    entriesHtml = dayEntries.join('');
+                }
+            }
+            
+            dayCell.innerHTML = `<div class="day-number">${diaAtual.getDate()}</div><div class="day-entries">${entriesHtml}</div>`;
+            calendarGrid.appendChild(dayCell);
+        }
+        console.log('Calendário renderizado para', dataNavegacao.toLocaleString('pt-BR', { month: 'long', year: 'numeric' }));
+    }
+
+    function renderizarDetalhesDoDia(data) {
+        dayDetailsContainer.innerHTML = `<h3>Detalhes para o dia ${data.toLocaleDateString('pt-BR')}</h3>`;
+        
+        if (funcionarios.length === 0) {
+            dayDetailsContainer.innerHTML += '<p>Nenhum funcionário cadastrado.</p>';
+            return;
+        }
+
+        let totalTrabalhando = 0;
+        let totalAusentes = 0; // Folga, Férias, Atestado
+
+        const detalhes = [];
+        const anoAtual = dataNavegacao.getFullYear();
+        const mesAtual = dataNavegacao.getMonth();
+        const diasNoMesAtual = diasNoMes(anoAtual, mesAtual);
+
+        funcionarios.forEach(func => {
+            let diasTrabalhoMes = 0; 
+            let diasAusenciaMes = 0; 
+            
+            for (let i = 1; i <= diasNoMesAtual; i++) {
+                const diaMes = new Date(anoAtual, mesAtual, i);
+                const statusNoDia = getStatus(func, diaMes);
+                if (statusNoDia === 'T') { 
+                    diasTrabalhoMes++;
+                } else { // F, FE, A
+                    diasAusenciaMes++; 
+                }
+            }
+
+            const statusHoje = getStatus(func, data);
+            if (statusHoje === 'T') {
+                totalTrabalhando++;
+            } else {
+                totalAusentes++;
+            }
+
+            detalhes.push({
+                nome: func.nome,
+                cargo: func.cargo,
+                drt: func.drt || '-',
+                turma: func.turma,
+                status: statusHoje,
+                diasTrabalhoMes: diasTrabalhoMes,
+                diasAusenciaMes: diasAusenciaMes 
+            });
+        });
+
+        // Adiciona o resumo de capacidade para o dia
+        dayDetailsContainer.innerHTML += `
+            <div class="day-summary">
+                <div>Trabalhando: ${totalTrabalhando}</div>
+                <div>Ausentes: ${totalAusentes}</div>
+            </div>
+        `;
+
+        const statusOrder = { 'Lider': 0, 'T': 1, 'F': 2, 'FE': 3, 'A': 4 };
+        detalhes.sort((a, b) => {
+            const prioA = (a.cargo === 'Lider' && a.status !== 'A' && a.status !== 'FE') ? 'Lider' : a.status;
+            const prioB = (b.cargo === 'Lider' && b.status !== 'A' && b.status !== 'FE') ? 'Lider' : b.status;
+
+            if (statusOrder[prioA] !== statusOrder[prioB]) return statusOrder[prioA] - statusOrder[prioB]; 
+            if (a.turma !== b.turma) return a.turma.localeCompare(b.turma);
+            return a.nome.localeCompare(b.nome);
+        });
+
+        let tableHtml = `<table><thead><tr><th>Nome</th><th>Cargo</th><th>Turma</th><th>DRT</th><th>Dias de Trabalho no Mês</th><th>Dias de Ausência no Mês</th></tr></thead><tbody>`;
+        detalhes.forEach(item => {
+            let rowClass = item.status; 
+            if (item.cargo === 'Lider' && item.status !== 'A' && item.status !== 'FE') {
+                rowClass += ' Lider'; 
+            }
+            // Adiciona classe para destaque do OP2 e Líder
+            const cargoDisplay = item.cargo === 'OP2' ? `<span class="cargo-op2">${item.cargo}</span>` : 
+                                 (item.cargo === 'Lider' ? `<span class="cargo-lider">${item.cargo}</span>` : item.cargo);
+
+            tableHtml += `<tr class="details-row ${rowClass.trim()}">
+                <td>${item.nome}</td>
+                <td>${cargoDisplay}</td>
+                <td>${item.turma}</td>
+                <td>${item.drt}</td>
+                <td>${item.diasTrabalhoMes}</td>
+                <td>${item.diasAusenciaMes}</td>
+            </tr>`;
+        });
+        tableHtml += '</tbody></table>';
+        dayDetailsContainer.innerHTML += tableHtml;
+
+        dayDetailsContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function preencherSelectFuncionariosModal() {
+        exceptionFuncSelect.innerHTML = '<option value="">Selecione um funcionário...</option>';
+        funcionarios.sort((a,b) => a.nome.localeCompare(b.nome)).forEach(func => {
+            exceptionFuncSelect.innerHTML += `<option value="${func.id}">${func.nome} (${func.turma} - ${func.cargo})</option>`;
+        });
+    }
+
+    function abrirFullExceptionModal(dateString, funcIdToPreselect = null) {
+        currentSelectedDateString = dateString;
+        preencherSelectFuncionariosModal();
+
+        exceptionStartDate.value = dateString;
+        // Definir data final padrão para a mesma data de início para os casos de FE e P
+        exceptionEndDate.value = dateString; 
+
+        if (funcIdToPreselect) {
+            const func = funcionarios.find(f => f.id === funcIdToPreselect);
+            exceptionFuncSelect.value = funcIdToPreselect;
+            if (func) {
+                const dataObj = new Date(dateString + 'T12:00:00');
+                const chave = `${func.id}-${dataObj.getFullYear()}-${dataObj.getMonth()}-${dataObj.getDate()}`;
+                if (escala[chave]) {
+                    exceptionType.value = escala[chave];
+                } else {
+                    // Se não houver exceção específica, verificar status base para preencher P (Padrão)
+                    // Se o status base for F (folga), sugerir P (Padrão)
+                    // Se o status base for T (trabalho), sugerir FE (Férias) ou A (Atestado)
+                    const statusBase = getStatusNaEscala(func, dataObj);
+                    exceptionType.value = (statusBase === 'F') ? 'P' : 'FE'; 
+                }
+            } else {
+                exceptionType.value = 'FE';
+            }
+        } else {
+            exceptionFuncSelect.value = '';
+            exceptionType.value = 'FE'; 
+        }
+
+        ajustarCamposExcecao();
+        
+        exceptionModal.style.display = 'flex';
+    }
+
+    function ajustarCamposExcecao() {
+        const tipo = exceptionType.value;
+        exceptionDateRangeGroup.style.display = 'none'; // Esconde grupo de datas de início/fim
+        exceptionDaysGroup.style.display = 'none';    // Esconde campo de "quantos dias"
+        exceptionDaysInput.required = false;
+        exceptionEndDate.required = false;
+
+        if (tipo === 'FE' || tipo === 'P') { // Férias e Padrão usam período
+            exceptionDateRangeGroup.style.display = 'block';
+            exceptionEndDate.required = true;
+            // Garante que a data final seja pelo menos a data de início ao mudar o tipo
+            if (exceptionEndDate.value < exceptionStartDate.value) {
+                exceptionEndDate.value = exceptionStartDate.value;
+            }
+            exceptionDaysInput.value = ''; // Limpa se estava preenchido
+        } else if (tipo === 'A') { // Atestado usa número de dias
+            exceptionDaysGroup.style.display = 'block';
+            exceptionDaysInput.required = true;
+            exceptionDaysInput.value = 1; // Default para 1 dia
+            exceptionEndDate.value = ''; // Limpa a data final
+        }
+    }
+
+    function aplicarExcecao(funcId, dataInicioStr, tipo, dias, dataFimStr = null) {
+        if (!funcId) {
+            alert('Selecione um funcionário.');
+            return;
+        }
+        if (!['FE', 'A', 'P'].includes(tipo)) {
+            alert('Tipo de exceção inválido. Use FE, A ou P.');
+            return;
+        }
+
+        const dataInicio = new Date(dataInicioStr + 'T12:00:00'); 
+        let dataFim = null;
+        let numDias = 0; // Inicializa com 0 para ser calculado
+
+        if (tipo === 'FE' || tipo === 'P') { // Férias e Padrão (remover) usam data de término
+            if (!dataFimStr) { alert('Data de término é obrigatória.'); return; }
+            dataFim = new Date(dataFimStr + 'T12:00:00');
+            if (dataFim < dataInicio) { alert('Data de término não pode ser anterior à data de início.'); return; }
+            numDias = Math.round((dataFim.getTime() - dataInicio.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+        } else if (tipo === 'A') { // Atestado usa número de dias
+            numDias = dias;
+            if (isNaN(numDias) || numDias <= 0) { alert('Número de dias deve ser um valor positivo para Atestado.'); return; }
+            // Para atestado, calcular dataFim apenas para iteração
+            dataFim = new Date(dataInicio);
+            dataFim.setDate(dataFim.getDate() + numDias - 1);
+        }
+
+        for (let i = 0; i < numDias; i++) {
+            const dataAtual = new Date(dataInicio);
+            dataAtual.setDate(dataAtual.getDate() + i);
+            const chave = `${funcId}-${dataAtual.getFullYear()}-${dataAtual.getMonth()}-${dataAtual.getDate()}`;
+            
+            if (tipo === 'P') {
+                delete escala[chave]; 
+            } else {
+                escala[chave] = tipo; 
+            }
+        }
+        salvarDadosLocais();
+        renderizarTudo(); // Re-renderiza tudo, incluindo o calendário
+    }
+
+    // --- FUNÇÕES DO NOVO MODAL DE EDIÇÃO DE FUNCIONÁRIO ---
+    function abrirEditEmployeeModal(funcId) {
+        const func = funcionarios.find(f => f.id === funcId);
+        if (!func) {
+            alert('Funcionário não encontrado.');
+            return;
+        }
+
+        editFuncId.value = func.id;
+        editFuncNome.value = func.nome;
+        editFuncDrt.value = func.drt;
+        editFuncCargo.value = func.cargo;
+        editFuncMesFerias.value = func.mesFerias || ''; 
+
+        // Repopulate and select the current turma for edit
+        editFuncTurma.innerHTML = '<option value="">Selecione uma turma...</option>';
+        turmas.forEach(turma => {
+            const option = document.createElement('option');
+            option.value = turma.nome;
+            option.textContent = turma.nome;
+            if (turma.nome === func.turma) {
+                option.selected = true;
+            }
+            editFuncTurma.appendChild(option);
+        });
+
+        editEmployeeModal.style.display = 'flex';
+    }
+
+    // --- FUNÇÕES DO GRÁFICO (GRÁFICO DE ROSCA) ---
+    // Função para destruir gráficos Chart.js existentes
+    function destruirGraficosAtivos() {
+        for (const chartId in activeCharts) {
+            if (activeCharts[chartId]) {
+                activeCharts[chartId].destroy();
+                delete activeCharts[chartId];
+            }
+        }
+    }
+
+    function renderizarGraficoCapacidade() {
+        destruirGraficosAtivos(); // Destrói gráficos anteriores para evitar duplicatas
+        capacityChartContainer.innerHTML = '<h3>Proporção de Trabalho vs. Folga (Baseada na Escala 6x2)</h3>';
+        const ano = dataNavegacao.getFullYear();
+        const mes = dataNavegacao.getMonth();
+
+        if (turmas.length === 0) {
+            capacityChartContainer.innerHTML += '<p style="width: 100%; text-align: center;">Nenhuma turma cadastrada para exibir o gráfico.</p>';
+            capacityChartContainer.style.display = 'flex'; 
+            capacityChartContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            return;
+        }
+
+        // Ordena as turmas pelo nome
+        turmas.sort((a, b) => a.nome.localeCompare(b.nome));
+
+        turmas.forEach(turma => {
+            const capacidadeBase = calcularCapacidadeTurmaParaMes(turma, ano, mes);
+            const diasTrabalhoTurma = capacidadeBase.trabalho;
+            const diasFolgaTurma = capacidadeBase.folga;
+            const totalDiasTurma = diasTrabalhoTurma + diasFolgaTurma;
+
+            // Criar o wrapper para cada gráfico
+            const chartWrapper = document.createElement('div');
+            chartWrapper.className = 'turma-chart-wrapper';
+            chartWrapper.innerHTML = `<h4>Turma ${turma.nome}</h4>
+                                      <div class="chart-canvas-container">
+                                          <canvas id="chart-${turma.nome}"></canvas>
+                                      </div>
+                                      <div class="chart-data-summary">
+                                          <div class="trabalho-color"><span class="label">Dias Trabalhando:</span> ${diasTrabalhoTurma}</div>
+                                          <div class="folga-color"><span class="label">Dias de Folga:</span> ${diasFolgaTurma}</div>
+                                          <div><span class="label">Total Dias/Mês:</span> ${totalDiasTurma}</div>
+                                      </div>`;
+            capacityChartContainer.appendChild(chartWrapper);
+
+            // Obter o contexto do canvas para Chart.js
+            const ctx = document.getElementById(`chart-${turma.nome}`).getContext('2d');
+
+            // Criar o gráfico de rosca
+            activeCharts[turma.nome] = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Trabalho', 'Folga'],
+                    datasets: [{
+                        data: [diasTrabalhoTurma, diasFolgaTurma],
+                        backgroundColor: [
+                            getComputedStyle(document.documentElement).getPropertyValue('--cor-grafico-trabalho'),
+                            getComputedStyle(document.documentElement).getPropertyValue('--cor-grafico-folga')
+                        ],
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false, // Permite controlar a altura/largura
+                    cutout: '70%', // Tamanho do furo para ser um "donut"
+                    plugins: {
+                        legend: {
+                            display: false // Esconde a legenda padrão do Chart.js
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed !== null) {
+                                        label += context.parsed;
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    },
+                }
+            });
+        });
+
+        capacityChartContainer.style.display = 'flex'; // Importante para o flexbox
+        capacityChartContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+
+    // --- EVENT LISTENERS ---
+    btnAddTurma.addEventListener('click', () => {
+        const nome = document.getElementById('turma-nome').value.trim().toUpperCase();
+        const inicioFolgaInput = document.getElementById('turma-inicio-folga').value;
+        const inicioFolga = parseInt(inicioFolgaInput);
+        
+        if (!nome || nome.length < 2) {
+            alert('O nome da turma deve ter pelo menos 2 caracteres.');
+            return;
+        }
+        if (isNaN(inicioFolga) || inicioFolga < 1 || inicioFolga > 31) { 
+            alert(`O 1º dia de folga em Janeiro deve ser entre 1 e 31.`); // Ajuste no texto
+            return;
+        }
+        
+        if (turmas.find(t => t.nome === nome)) {
+            alert('Já existe uma turma com este nome.');
+            return;
+        }
+        turmas.push({ nome, inicioFolga }); 
+        salvarDadosLocais();
+        renderizarTudo();
+        document.getElementById('form-turma').reset();
+    });
+
+    btnAddFunc.addEventListener('click', () => {
+        const nomeTurma = document.getElementById('func-turma').value;
+        const nome = document.getElementById('func-nome').value.trim();
+        if (!nome || nome.length < 2) {
+            alert('O nome do funcionário deve ter pelo menos 2 caracteres.');
+            return;
+        }
+        if (!turmas.find(t => t.nome === nomeTurma)) {
+            alert('Selecione uma turma válida.');
+            return;
+        }
+        const novoFunc = {
+            id: Date.now(),
+            nome,
+            drt: document.getElementById('func-drt').value.trim(),
+            cargo: document.getElementById('func-cargo').value,
+            turma: nomeTurma,
+            mesFerias: selectFuncMesFerias.value || '' 
+        };
+        funcionarios.push(novoFunc);
+        salvarDadosLocais();
+        renderizarTudo();
+        document.getElementById('form-funcionario').reset();
+    });
+
+    document.addEventListener('click', (e) => {
+        if (e.target.matches('.btn-delete')) {
+            const index = parseInt(e.target.dataset.index);
+            const tipo = e.target.dataset.tipo;
+            if (tipo === 'turma') {
+                const nomeTurma = turmas[index].nome;
+                if (funcionarios.some(f => f.turma === nomeTurma)) {
+                    alert(`Não é possível excluir a turma ${nomeTurma} pois existem funcionários associados a ela. Exclua os funcionários primeiro.`);
+                    return;
+                }
+                if (confirm(`Tem certeza que deseja excluir a turma ${nomeTurma}? Isso também removerá todas as exceções de escala relacionadas.`)) {
+                    turmas.splice(index, 1);
+                }
+            } else if (tipo === 'funcionario') {
+                const funcParaExcluir = funcionarios[index];
+                if (confirm(`Tem certeza que deseja excluir ${funcParaExcluir.nome}? Isso removerá todas as exceções de escala relacionadas a este funcionário.`)) {
+                    Object.keys(escala).forEach(key => {
+                        if (key.startsWith(`${funcParaExcluir.id}-`)) {
+                            delete escala[key];
+                        }
+                    });
+                    funcionarios.splice(index, 1);
+                }
+            }
+            salvarDadosLocais();
+            renderizarTudo();
+        }
+        if (e.target.matches('.btn-cancel')) {
+            exceptionModal.style.display = 'none'; 
+            editEmployeeModal.style.display = 'none'; 
+        }
+        if (e.target.matches('.btn-edit')) {
+            const funcId = parseInt(e.target.dataset.funcId);
+            abrirEditEmployeeModal(funcId);
+        }
+    });
+
+    editEmployeeForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const funcId = parseInt(editFuncId.value);
+        const funcIndex = funcionarios.findIndex(f => f.id === funcId);
+
+        if (funcIndex === -1) {
+            alert('Erro: Funcionário não encontrado para edição.');
+            editEmployeeModal.style.display = 'none';
+            return;
+        }
+
+        funcionarios[funcIndex].nome = editFuncNome.value.trim();
+        funcionarios[funcIndex].drt = editFuncDrt.value.trim();
+        funcionarios[funcIndex].cargo = editFuncCargo.value;
+        funcionarios[funcIndex].turma = editFuncTurma.value;
+        funcionarios[funcIndex].mesFerias = editFuncMesFerias.value || ''; 
+
+        // Repopulate and select the current turma for edit
+        editFuncTurma.innerHTML = '<option value="">Selecione uma turma...</option>';
+        turmas.forEach(turma => {
+            const option = document.createElement('option');
+            option.value = turma.nome;
+            option.textContent = turma.nome;
+            if (turma.nome === funcionarios[funcIndex].turma) { // Use o valor atualizado aqui
+                option.selected = true;
+            }
+            editFuncTurma.appendChild(option);
+        });
+
+        salvarDadosLocais();
+        renderizarTudo();
+        editEmployeeModal.style.display = 'none';
+    });
+
+
+    toggleViewBtn.addEventListener('click', () => {
+        mainContainer.classList.toggle('view-mode-edit');
+        const isEditModeView = mainContainer.classList.contains('view-mode-edit');
+        toggleViewBtn.textContent = isEditModeView ? 'Ver Escala no Calendário' : 'Gerenciar Turmas e Funcionários';
+        if (!isEditModeView) { 
+            isEditMode = false;
+            editModeBtn.classList.remove('active');
+            calendarGrid.classList.remove('edit-mode-active');
+            dayDetailsContainer.innerHTML = ''; 
+            capacityChartContainer.style.display = 'none'; 
+            showChartBtn.textContent = 'Ver Gráfico de Capacidade'; 
+            renderizarCalendario(); 
+            destruirGraficosAtivos(); // Garante que gráficos são destruídos ao sair da visualização de edição
+        } else {
+             calendarGrid.innerHTML = '';
+             dayDetailsContainer.innerHTML = '';
+             capacityChartContainer.style.display = 'none'; 
+             showChartBtn.textContent = 'Ver Gráfico de Capacidade';
+             document.getElementById('calendar-month-year').textContent = '';
+             destruirGraficosAtivos(); // Garante que gráficos são destruídos ao entrar na visualização de edição
+        }
+    });
+
+    editModeBtn.addEventListener('click', () => {
+        isEditMode = !isEditMode;
+        editModeBtn.classList.toggle('active', isEditMode);
+        calendarGrid.classList.toggle('edit-mode-active', isEditMode);
+        if (isEditMode) {
+            dayDetailsContainer.innerHTML = `<div class="edit-mode-info"><b>Modo de Edição Ativo:</b> Clique em qualquer dia para adicionar/editar exceções.</div>`;
+            capacityChartContainer.style.display = 'none'; 
+            showChartBtn.textContent = 'Ver Gráfico de Capacidade';
+            destruirGraficosAtivos(); // Destrói gráficos ao entrar no modo de edição
+        } else {
+            dayDetailsContainer.innerHTML = ''; 
+            exceptionModal.style.display = 'none'; 
+            renderizarCalendario(); 
+        }
+    });
+
+    showChartBtn.addEventListener('click', () => {
+        if (capacityChartContainer.style.display === 'flex') {
+            capacityChartContainer.style.display = 'none';
+            showChartBtn.textContent = 'Ver Gráfico de Capacidade';
+            destruirGraficosAtivos(); // Destrói os gráficos quando escondidos
+        } else {
+            renderizarGraficoCapacidade();
+            dayDetailsContainer.innerHTML = ''; 
+            showChartBtn.textContent = 'Esconder Gráfico';
+        }
+    });
+
+    document.getElementById('prev-month-btn').addEventListener('click', () => {
+        dataNavegacao.setMonth(dataNavegacao.getMonth() - 1);
+        renderizarCalendario();
+        capacityChartContainer.style.display = 'none'; 
+        showChartBtn.textContent = 'Ver Gráfico de Capacidade';
+        dayDetailsContainer.innerHTML = '';
+        destruirGraficosAtivos(); // Destrói gráficos ao mudar o mês
+    });
+
+    document.getElementById('next-month-btn').addEventListener('click', () => {
+        dataNavegacao.setMonth(dataNavegacao.getMonth() + 1);
+        renderizarCalendario();
+        capacityChartContainer.style.display = 'none'; 
+        showChartBtn.textContent = 'Ver Gráfico de Capacidade';
+        dayDetailsContainer.innerHTML = '';
+        destruirGraficosAtivos(); // Destrói gráficos ao mudar o mês
+    });
+
+    calendarGrid.addEventListener('click', (e) => {
+        const dayCell = e.target.closest('.calendar-day');
+        if (!dayCell || dayCell.classList.contains('other-month')) return; 
+
+        const dateString = dayCell.dataset.date;
+        const data = new Date(dateString + 'T12:00:00');
+
+        if (isEditMode) {
+            const entry = e.target.closest('.day-entry');
+            let funcIdToPreselect = null;
+            if (entry && !entry.classList.contains('default-status')) { 
+                funcIdToPreselect = parseInt(entry.dataset.funcId);
+            }
+            abrirFullExceptionModal(dateString, funcIdToPreselect);
+        } else {
+            renderizarDetalhesDoDia(data);
+            capacityChartContainer.style.display = 'none'; 
+            showChartBtn.textContent = 'Ver Gráfico de Capacidade';
+            destruirGraficosAtivos(); // Destrói gráficos ao ver detalhes do dia
+        }
+    });
+
+    exceptionType.addEventListener('change', ajustarCamposExcecao);
+
+    exceptionForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const funcId = parseInt(exceptionFuncSelect.value);
+        const tipo = exceptionType.value;
+        const dataInicioStr = exceptionStartDate.value;
+        let dias = 0;
+        let dataFimStr = null;
+
+        // Lógica de validação e atribuição de datas/dias baseada no tipo
+        if (tipo === 'FE' || tipo === 'P') { // Férias e Padrão (remover)
+            dataFimStr = exceptionEndDate.value;
+            if (!dataFimStr) {
+                alert('Por favor, selecione a data de término.');
+                return;
+            }
+        } else if (tipo === 'A') { // Atestado
+            dias = parseInt(exceptionDaysInput.value);
+            if (isNaN(dias) || dias <= 0) {
+                alert('Por favor, insira um número válido de dias para o atestado.');
+                return;
+            }
+        }
+        
+        aplicarExcecao(funcId, dataInicioStr, tipo, dias, dataFimStr);
+        exceptionModal.style.display = 'none';
+    });
+
+    saveBackupBtn.addEventListener('click', function() {
+        const data = {
+            turmas: turmas,
+            funcionarios: funcionarios,
+            escala: escala
+        };
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        const now = new Date();
+        const filename = `escala_backup_${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}-${now.getDate().toString().padStart(2, '0')}.json`;
+        a.download = filename;
+        a.click();
+        URL.revokeObjectURL(a.href);
+        showSuccessMessage('Backup salvo com sucesso!');
+    });
+
+    loadBackupBtn.addEventListener('click', () => backupFileInput.click());
+
+    backupFileInput.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            try {
+                const loadedData = JSON.parse(event.target.result);
+                if (loadedData.turmas && loadedData.funcionarios && loadedData.escala) {
+                    if (confirm('Carregar este backup irá sobrescrever seus dados atuais. Tem certeza?')) {
+                        // Ao carregar, garantir que a propriedade 'capacidade' seja removida se presente
+                        loadedData.turmas.forEach(t => delete t.capacidade); 
+                        turmas = loadedData.turmas;
+                        funcionarios = loadedData.funcionarios;
+                        escala = loadedData.escala;
+                        salvarDadosLocais(); 
+                        renderizarTudo();
+                        showSuccessMessage('Backup carregado com sucesso!');
+                    }
+                } else {
+                    alert('Arquivo de backup inválido. Conteúdo esperado: turmas, funcionarios, escala.');
+                }
+            } catch (error) {
+                console.error('Erro ao ler ou parsear o arquivo de backup:', error);
+                alert('Erro ao carregar o backup. Verifique se o arquivo está no formato correto (JSON).');
+            }
+        };
+        reader.readAsText(file);
+        this.value = ''; 
+    });
+
+    // --- INICIALIZAÇÃO ---
+    carregarDadosLocais();
+    renderizarTudo();
+});
+</script>
+</body>
+</html>

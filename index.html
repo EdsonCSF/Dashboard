@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>ðŸ“‚ Dashboard Sistemas</title>
+<style>
+    body { font-family: Arial, sans-serif; background: #f8f9fa; margin: 0; }
+    h1 { text-align: center; padding: 20px; background: #007bff; color: white; margin: 0; }
+    .container { display: flex; flex-wrap: wrap; justify-content: center; padding: 20px; }
+    .card {
+        border-radius: 12px; width: 200px; margin: 10px; padding: 15px;
+        text-align: center; box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        transition: transform 0.2s ease-in-out; cursor: pointer; color: white;
+    }
+    .card:hover { transform: scale(1.05); }
+    .card h2 { font-size: 18px; margin: 0 0 10px 0; }
+    .search { text-align: center; padding: 15px; }
+    .search input {
+        padding: 10px; width: 80%; border-radius: 8px; border: 1px solid #ccc;
+    }
+    footer {
+        background: #007bff; color: white; text-align: center; padding: 20px;
+    }
+    footer h2 { margin: 0; }
+</style>
+</head>
+<body>
+
+<h1>“Dashboard Sistemas</h1>
+<div class="search">
+    <input type="text" id="search" placeholder=" Buscar aplicação..." onkeyup="filtrar()">
+</div>
+<div class="container" id="apps"></div>
+
+<footer>
+    <h2>Desenvolvido por EdsonC.S.F.<br>
+    Contato: edsony1@gmail.com<br>
+    Criação: Julho de 2025<br>
+    Versão: 1.0 &copy; 2025. Todos os direitos reservados.</h2>
+</footer>
+
+<script>
+const externos = [
+    { nome: "Servidor GManhwa", url: "https://Chronosblue.gamer.gd" },
+    { nome: "Nuvem Publica", url: "https://Escalafolgas.fwh.is" }
+];
+
+const cores = ["#28a745", "#17a2b8", "#ffc107", "#dc3545", "#6f42c1", "#fd7e14"];
+
+async function carregarApps() {
+    const res = await fetch("/.netlify/functions/lista");
+    const arquivos = await res.json();
+    const lista = document.getElementById("apps");
+
+    let todos = arquivos.map(a => ({ nome: a.replace(".html", ""), url: a }))
+                .concat(externos);
+
+    todos.forEach((item, i) => {
+        const card = document.createElement("div");
+        card.className = "card";
+        card.style.background = cores[i % cores.length];
+        card.innerHTML = `<h2>${item.nome}</h2><p>Clique para abrir</p>`;
+        card.onclick = () => window.open(item.url, "_blank");
+        lista.appendChild(card);
+    });
+}
+
+function filtrar() {
+    let input = document.getElementById("search").value.toLowerCase();
+    document.querySelectorAll(".card").forEach(card => {
+        card.style.display = card.innerText.toLowerCase().includes(input) ? "" : "none";
+    });
+}
+
+carregarApps();
+</script>
+
+</body>
+</html>
