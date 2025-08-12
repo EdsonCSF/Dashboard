@@ -1729,7 +1729,7 @@ card.querySelector('.btn-share').addEventListener('click', (e) => {
     const mangaToShare = mangas.find(m => m.id === mangaId);
     if (mangaToShare) {
         // Envia o card para o servidor (somente enviar, sem baixar localmente)
-        fetch("https://chronosblue.gamer.gd/htdocs/storage/GManhwa/upload-card.php", {
+        fetch("https://chronosblue.gamer.gd/upload-card.php", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ card: mangaToShare })
@@ -2330,6 +2330,7 @@ function importCardFromServer() {
     </script>
 </body>
 </html>
+
 
 
 
