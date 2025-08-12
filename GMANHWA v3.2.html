@@ -676,6 +676,648 @@
 
         .toggle-status-btn:hover {
             background-color: var(--button-card-toggle-status-hover);
+                    --gray-text-dark: #bbb;
+            /* CORES DO NOVO TÍTULO / LOGO - AJUSTADAS */
+            --logo-bg-color: #000;
+            --logo-border-color: #e74c3c;
+            /* Borda vermelha para o cabeçalho */
+            --logo-h1-color: #f1c40f;
+            /* Título principal amarelo */
+            --logo-h2-color: #e74c3c;
+            /* Subtítulo vermelho */
+            /* CORES DAS ABAS - NOVAS */
+            --tab-bg-color: #34495e;
+            /* Azul bonito para o fundo das abas */
+            --tab-border-color: #ecf0f1;
+            /* Borda branca para as abas */
+            --tab-text-color: #fff;
+            /* Texto branco nas abas */
+            --tab-active-bg-color: #ecf0f1;
+            /* Fundo branco para a aba ativa */
+            --tab-active-text-color: #2c3e50;
+            /* Texto azul escuro na aba ativa */
+            /* CORES DA BARRA DE PROGRESSO */
+            --progress-bg: #333;
+            --progress-fill: #2ecc71;
+            --progress-border: #555;
+            /* CORES DO BOTÃO DE COMPARTILHAR */
+            --button-card-share-bg: #2980b9;
+            --button-card-share-hover: #3498db;
+        }
+
+        /* Reset básico para consistência entre navegadores */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: radial-gradient(circle at center, #0a0016 0%, #000018 100%);
+            color: var(--text-color-futuristic);
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            padding: 0;
+        }
+
+        header {
+            background-color: var(--logo-bg-color);
+            color: var(--text-color-futuristic);
+            padding: 2rem 0;
+            text-align: center;
+            border-bottom: 2px solid var(--tab-border-color);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .logo-container {
+            text-align: center;
+            padding: 0;
+            background: none;
+            border: none;
+            box-shadow: none;
+            max-width: 95vw;
+            margin: 0 auto;
+            box-sizing: border-box;
+        }
+
+        .logo-container h1 {
+            font-family: 'Bangers', cursive;
+            font-size: 64px;
+            margin: 0;
+            color: var(--logo-h1-color);
+            text-shadow: 0 0 5px var(--logo-border-color);
+            letter-spacing: 2px;
+        }
+
+        .logo-container h2 {
+            font-family: 'Rock Salt', cursive;
+            font-size: 28px;
+            margin-top: 14px;
+            color: var(--logo-h2-color);
+            text-shadow: none;
+        }
+
+        /* Menu Mobile Responsivo */
+        .mobile-menu {
+            display: none;
+            background: var(--secondary-bg);
+            padding: 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .mobile-menu-btn {
+            background: none;
+            border: none;
+            color: var(--text-color-futuristic);
+            font-size: 1.8rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 4px;
+            transition: background 0.3s;
+        }
+
+        .mobile-menu-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .mobile-nav {
+            display: none;
+            flex-direction: column;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            background: var(--primary-bg);
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-color-futuristic);
+            position: relative;
+            z-index: 1000;
+        }
+
+        .mobile-nav.show {
+            display: flex;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .mobile-nav a {
+            color: var(--text-color-futuristic);
+            text-decoration: none;
+            padding: 0.8rem;
+            border-radius: 4px;
+            transition: all 0.3s;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .mobile-nav a:hover {
+            background: rgba(255, 255, 255, 0.1);
+            padding-left: 1.2rem;
+        }
+
+        .mobile-nav a.active {
+            background: var(--accent-color);
+            color: white;
+        }
+
+        /* ESTILO DAS ABAS */
+        .tabs {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            background: var(--tab-bg-color);
+            border-bottom: 2px solid var(--tab-border-color);
+            padding: 0 1rem;
+        }
+
+        .tab {
+            padding: 15px 25px;
+            cursor: pointer;
+            font-family: 'Bangers', cursive;
+            background: none;
+            border: none;
+            color: var(--tab-text-color);
+            font-size: 1.4em;
+            text-shadow: none;
+            transition: all 0.3s ease;
+            flex-grow: 1;
+            text-align: center;
+            border-right: 1px solid var(--tab-border-color);
+            border-left: 1px solid var(--tab-border-color);
+        }
+
+        .tab[data-target="favorites-list-section"] {
+            color: var(--logo-h1-color);
+        }
+
+        .tab[data-target="favorites-list-section"].active {
+            background: var(--logo-h1-color);
+            color: #000;
+        }
+
+        .tab.active {
+            background: var(--tab-active-bg-color);
+            color: var(--tab-active-text-color);
+            text-shadow: none;
+            font-weight: bold;
+            border-color: var(--tab-active-bg-color);
+        }
+
+        .tab:not(.active):hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* FIM DO ESTILO DAS ABAS */
+        main {
+            flex-grow: 1;
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 2rem auto;
+            background-color: transparent;
+            border-radius: 10px;
+            box-shadow: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
+
+        .content-section {
+            width: 100%;
+            margin-bottom: 3rem;
+            padding: 2rem;
+            background-color: transparent;
+            border-radius: 8px;
+            border: none;
+            box-shadow: none;
+        }
+
+        .content-section.hidden {
+            display: none;
+        }
+
+        .sub-section-container {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #444;
+        }
+
+        .sub-section-container.hidden {
+            display: none;
+        }
+
+        h2,
+        .content-section h3 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--logo-border-color);
+            font-size: 2em;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            text-shadow: 0 0 5px rgba(231, 76, 60, 0.5);
+        }
+
+        .section-counter {
+            font-size: 0.6em;
+            color: var(--text-color-light);
+            font-weight: normal;
+            margin-left: 10px;
+        }
+
+        .content-section h3 {
+            font-size: 1.5em;
+            margin-bottom: 1rem;
+            text-align: left;
+            text-shadow: 0 0 8px var(--logo-border-color);
+            color: var(--logo-border-color);
+        }
+
+        .content-section p {
+            margin-bottom: 15px;
+            color: var(--text-color-futuristic);
+        }
+
+        #manga-form {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            align-items: end;
+        }
+
+        .form-group {
+            margin-bottom: 0.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-color-futuristic);
+            font-weight: bold;
+        }
+
+        .form-group input[type="text"],
+        .form-group input[type="url"],
+        .form-group select,
+        textarea {
+            width: 100%;
+            padding: 1rem;
+            background-color: var(--secondary-bg);
+            border: 1px solid var(--border-color-futuristic);
+            border-radius: 5px;
+            color: var(--text-color-futuristic);
+            font-size: 1em;
+            outline: none;
+            transition: all 0.3s ease;
+            appearance: none;
+            -webkit-appearance: none;
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            background-size: 1em;
+            background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20256%20256%22%3E%3Cpath%20fill%3D%22%23e0e0e0%22%20d%3D%22M208%2096L128%20176L48%2096Z%22%2F%3E%3C%2Fsvg%3E');
+        }
+
+        .form-group input[type="text"][id$="-chapter"],
+        .modal-content .form-group input[type="text"][id^="edit-manga-"][id$="-chapter"] {
+            background-image: none;
+            text-align: center;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        textarea:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(233, 69, 96, 0.2);
+        }
+
+        .form-group input:invalid,
+        .form-group select:invalid {
+            border-color: #e74c3c;
+        }
+
+        .form-group input:valid,
+        .form-group select:valid {
+            border-color: #2ecc71;
+        }
+
+        .manga-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            padding: 0;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        #no-manga-message-reading,
+        #no-manga-message-finished,
+        #no-manga-message-future,
+        #no-manga-message-favorites,
+        #no-notes-message {
+            text-align: center;
+            grid-column: 1 / -1;
+            font-size: 1.1em;
+            color: var(--text-color-light);
+            opacity: 0.8;
+            padding: 1.5rem;
+            border: 1px dashed #555;
+            border-radius: 8px;
+            background-color: var(--card-bg-dark);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .manga-card {
+            background: linear-gradient(145deg, #1e1e2e, #2a2a3e);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            box-shadow: none;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .manga-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+            border-color: var(--accent-color);
+        }
+
+        .manga-card-image-wrapper {
+            width: 100%;
+            height: 180px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            background-color: #333;
+            position: relative;
+            color: #777;
+            font-size: 1em;
+            text-align: center;
+            padding: 5px;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .manga-card-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 4px;
+            display: block;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .manga-card-placeholder-text {
+            color: #777;
+            font-size: 1.1em;
+            font-weight: bold;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            width: 100%;
+            user-select: none;
+            line-height: 1.2;
+        }
+
+        .manga-card-placeholder-text p {
+            margin: 0;
+            padding: 0;
+        }
+
+        .manga-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1em;
+            margin: 5px 0;
+            color: var(--text-color-light);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            width: 100%;
+            padding: 0 5px;
+            font-weight: 700;
+            line-height: 1.3;
+            min-height: 2.6em;
+            letter-spacing: 0.5px;
+        }
+
+        .manga-progress-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin: 5px 0;
+            width: 100%;
+            padding: 0 5px;
+        }
+
+        .manga-progress {
+            font-size: 0.9em;
+            color: var(--gray-text-dark);
+            margin: 0;
+        }
+
+        .btn-increment-chapter {
+            background-color: var(--button-increment-bg);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            font-size: 2em;
+            font-weight: bold;
+        }
+
+        .btn-increment-chapter:hover {
+            background-color: var(--button-increment-hover);
+            transform: scale(1.1);
+        }
+
+        .manga-last-read {
+            font-size: 0.9em;
+            color: var(--gray-text-dark);
+            margin: 3px 0;
+            width: 100%;
+            padding: 0 5px;
+        }
+
+        /* Barra de Progresso */
+        .progress-bar-container {
+            width: 100%;
+            height: 8px;
+            background-color: var(--progress-bg);
+            border-radius: 4px;
+            margin: 8px 0;
+            overflow: hidden;
+            border: 1px solid var(--progress-border);
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--progress-fill), #27ae60);
+            border-radius: 3px;
+            transition: width 0.5s ease;
+            position: relative;
+        }
+
+        .progress-bar-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg,
+                    rgba(255, 255, 255, 0.2) 25%,
+                    transparent 25%,
+                    transparent 50%,
+                    rgba(255, 255, 255, 0.2) 50%,
+                    rgba(255, 255, 255, 0.2) 75%,
+                    transparent 75%,
+                    transparent);
+            background-size: 20px 20px;
+            animation: progress-animation 1s linear infinite;
+        }
+
+        @keyframes progress-animation {
+            0% {
+                background-position: 0 0;
+            }
+
+            100% {
+                background-position: 20px 20px;
+            }
+        }
+
+        .progress-percentage {
+            font-size: 0.8em;
+            color: var(--progress-fill);
+            font-weight: bold;
+            margin-top: 2px;
+        }
+
+        .manga-actions {
+            margin-top: 10px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 5px;
+            width: 100%;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.85em;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            color: white;
+            flex-grow: 1;
+            min-width: unset;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .btn::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.2);
+            transition: left 0.3s;
+            z-index: -1;
+        }
+
+        .btn:hover::before {
+            left: 0;
+        }
+
+        .btn-access {
+            background-color: var(--button-card-access-bg);
+        }
+
+        .btn-edit {
+            background-color: var(--button-card-edit-bg);
+        }
+
+        .btn-delete {
+            background-color: var(--button-card-delete-bg);
+        }
+        
+        .btn-share {
+            background-color: var(--button-card-share-bg);
+        }
+        
+        .btn-share:hover {
+            background-color: var(--button-card-share-hover);
+        }
+
+        .toggle-status-btn {
+            background-color: var(--button-card-toggle-status-bg);
+        }
+
+        .btn-move-to-reading {
+            background-color: var(--button-card-toggle-status-bg);
+        }
+
+        .btn-access:hover {
+            background-color: var(--button-card-access-hover);
+        }
+
+        .btn-edit:hover {
+            background-color: var(--button-card-edit-hover);
+        }
+
+        .btn-delete:hover {
+            background-color: var(--button-card-delete-hover);
+        }
+
+        .toggle-status-btn:hover {
+            background-color: var(--button-card-toggle-status-hover);
         }
 
         .btn-move-to-reading:hover {
@@ -2278,3 +2920,4 @@
     </script>
 </body>
 </html>
+
