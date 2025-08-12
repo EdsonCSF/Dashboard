@@ -1729,7 +1729,7 @@ card.querySelector('.btn-share').addEventListener('click', (e) => {
     const mangaToShare = mangas.find(m => m.id === mangaId);
     if (mangaToShare) {
         // Envia o card para o servidor (somente enviar, sem baixar localmente)
-        fetch("https://chronosblue.gamer.gd/upload-card.php", {
+        fetch("https://chronosblue.gamer.gd/storage/GManhwa/upload-card.php", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ card: mangaToShare })
@@ -1974,7 +1974,7 @@ card.querySelector('.btn-share').addEventListener('click', (e) => {
 
 // Função para listar e importar um card direto do servidor
 function importCardFromServer() {
-    fetch("https://chronosblue.gamer.gd/list-cards.php")
+    fetch("https://chronosblue.gamer.gd/storage/GManhwa/list-cards.php")
     .then(r => r.json())
     .then(lista => {
         if (!Array.isArray(lista) || lista.length === 0) {
@@ -1983,7 +1983,7 @@ function importCardFromServer() {
         }
         const escolha = prompt("Escolha o arquivo para importar:\n" + lista.join("\n"));
         if (!escolha) return;
-        fetch("https://chronosblue.gamer.gd/get-card.php?id=" + encodeURIComponent(escolha))
+        fetch("https://chronosblue.gamer.gd/storage/GManhwa/get-card.php?id=" + encodeURIComponent(escolha))
         .then(r => r.json())
         .then(parsedData => {
             if (Array.isArray(parsedData) && parsedData.length > 0) {
@@ -2330,3 +2330,4 @@ function importCardFromServer() {
     </script>
 </body>
 </html>
+
