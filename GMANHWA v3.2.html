@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Meu Gerenciador de Manhwa/Mangá</title>
     <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Rock+Salt&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;700&family=Orbitron:wght[400;700]&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;700&family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -62,14 +62,12 @@
             --button-card-share-bg: #2980b9;
             --button-card-share-hover: #3498db;
         }
-
         /* Reset básico para consistência entre navegadores */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-
         body {
             font-family: 'Montserrat', sans-serif;
             background: radial-gradient(circle at center, #0a0016 0%, #000018 100%);
@@ -80,7 +78,6 @@
             min-height: 100vh;
             padding: 0;
         }
-
         header {
             background-color: var(--logo-bg-color);
             color: var(--text-color-futuristic);
@@ -92,7 +89,6 @@
             justify-content: center;
             align-items: center;
         }
-
         .logo-container {
             text-align: center;
             padding: 0;
@@ -103,7 +99,6 @@
             margin: 0 auto;
             box-sizing: border-box;
         }
-
         .logo-container h1 {
             font-family: 'Bangers', cursive;
             font-size: 64px;
@@ -112,7 +107,6 @@
             text-shadow: 0 0 5px var(--logo-border-color);
             letter-spacing: 2px;
         }
-
         .logo-container h2 {
             font-family: 'Rock Salt', cursive;
             font-size: 28px;
@@ -120,7 +114,6 @@
             color: var(--logo-h2-color);
             text-shadow: none;
         }
-
         /* Menu Mobile Responsivo */
         .mobile-menu {
             display: none;
@@ -130,7 +123,6 @@
             top: 0;
             z-index: 100;
         }
-
         .mobile-menu-btn {
             background: none;
             border: none;
@@ -141,11 +133,9 @@
             border-radius: 4px;
             transition: background 0.3s;
         }
-
         .mobile-menu-btn:hover {
             background: rgba(255, 255, 255, 0.1);
         }
-
         .mobile-nav {
             display: none;
             flex-direction: column;
@@ -158,24 +148,20 @@
             position: relative;
             z-index: 1000;
         }
-
         .mobile-nav.show {
             display: flex;
             animation: slideDown 0.3s ease-out;
         }
-
         @keyframes slideDown {
             from {
                 opacity: 0;
                 transform: translateY(-10px);
             }
-
             to {
                 opacity: 1;
                 transform: translateY(0);
             }
         }
-
         .mobile-nav a {
             color: var(--text-color-futuristic);
             text-decoration: none;
@@ -187,17 +173,14 @@
             align-items: center;
             gap: 0.5rem;
         }
-
         .mobile-nav a:hover {
             background: rgba(255, 255, 255, 0.1);
             padding-left: 1.2rem;
         }
-
         .mobile-nav a.active {
             background: var(--accent-color);
             color: white;
         }
-
         /* ESTILO DAS ABAS */
         .tabs {
             display: flex;
@@ -207,7 +190,6 @@
             border-bottom: 2px solid var(--tab-border-color);
             padding: 0 1rem;
         }
-
         .tab {
             padding: 15px 25px;
             cursor: pointer;
@@ -223,16 +205,13 @@
             border-right: 1px solid var(--tab-border-color);
             border-left: 1px solid var(--tab-border-color);
         }
-
         .tab[data-target="favorites-list-section"] {
             color: var(--logo-h1-color);
         }
-
         .tab[data-target="favorites-list-section"].active {
             background: var(--logo-h1-color);
             color: #000;
         }
-
         .tab.active {
             background: var(--tab-active-bg-color);
             color: var(--tab-active-text-color);
@@ -240,17 +219,15 @@
             font-weight: bold;
             border-color: var(--tab-active-bg-color);
         }
-
         .tab:not(.active):hover {
             background: rgba(255, 255, 255, 0.1);
         }
-
         /* FIM DO ESTILO DAS ABAS */
         main {
             flex-grow: 1;
-            padding: 2rem;
+            padding: 1rem;
             max-width: 1200px;
-            margin: 2rem auto;
+            margin: 1rem auto;
             background-color: transparent;
             border-radius: 10px;
             box-shadow: none;
@@ -259,31 +236,26 @@
             align-items: center;
             width: 100%;
         }
-
         .content-section {
             width: 100%;
-            margin-bottom: 3rem;
-            padding: 2rem;
+            margin-bottom: 1rem;
+            padding: 1rem;
             background-color: transparent;
             border-radius: 8px;
             border: none;
             box-shadow: none;
         }
-
         .content-section.hidden {
             display: none;
         }
-
         .sub-section-container {
             margin-top: 20px;
             padding-top: 20px;
             border-top: 1px solid #444;
         }
-
         .sub-section-container.hidden {
             display: none;
         }
-
         h2,
         .content-section h3 {
             font-family: 'Orbitron', sans-serif;
@@ -293,14 +265,12 @@
             text-align: center;
             text-shadow: 0 0 5px rgba(231, 76, 60, 0.5);
         }
-
         .section-counter {
             font-size: 0.6em;
             color: var(--text-color-light);
             font-weight: normal;
             margin-left: 10px;
         }
-
         .content-section h3 {
             font-size: 1.5em;
             margin-bottom: 1rem;
@@ -308,30 +278,25 @@
             text-shadow: 0 0 8px var(--logo-border-color);
             color: var(--logo-border-color);
         }
-
         .content-section p {
             margin-bottom: 15px;
             color: var(--text-color-futuristic);
         }
-
         #manga-form {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 1.5rem;
             align-items: end;
         }
-
         .form-group {
             margin-bottom: 0.5rem;
         }
-
         .form-group label {
             display: block;
             margin-bottom: 0.5rem;
             color: var(--text-color-futuristic);
             font-weight: bold;
         }
-
         .form-group input[type="text"],
         .form-group input[type="url"],
         .form-group select,
@@ -352,39 +317,33 @@
             background-size: 1em;
             background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20256%20256%22%3E%3Cpath%20fill%3D%22%23e0e0e0%22%20d%3D%22M208%2096L128%20176L48%2096Z%22%2F%3E%3C%2Fsvg%3E');
         }
-
         .form-group input[type="text"][id$="-chapter"],
         .modal-content .form-group input[type="text"][id^="edit-manga-"][id$="-chapter"] {
             background-image: none;
             text-align: center;
         }
-
         .form-group input:focus,
         .form-group select:focus,
         textarea:focus {
             border-color: var(--accent-color);
             box-shadow: 0 0 0 3px rgba(233, 69, 96, 0.2);
         }
-
         .form-group input:invalid,
         .form-group select:invalid {
             border-color: #e74c3c;
         }
-
         .form-group input:valid,
         .form-group select:valid {
             border-color: #2ecc71;
         }
-
         .manga-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 15px;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 8px;
             padding: 0;
             margin: 0 auto;
             width: 100%;
         }
-
         #no-manga-message-reading,
         #no-manga-message-finished,
         #no-manga-message-future,
@@ -401,13 +360,12 @@
             background-color: var(--card-bg-dark);
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
         }
-
         .manga-card {
             background: linear-gradient(145deg, #1e1e2e, #2a2a3e);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 8px;
+            border-radius: 6px;
             box-shadow: none;
-            padding: 10px;
+            padding: 8px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -415,23 +373,22 @@
             overflow: hidden;
             transition: all 0.3s ease;
             backdrop-filter: blur(10px);
+            margin-bottom: 5px;
         }
-
         .manga-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
             border-color: var(--accent-color);
         }
-
         .manga-card-image-wrapper {
             width: 100%;
-            height: 180px;
+            height: 200px;
             display: flex;
             align-items: center;
             justify-content: center;
             overflow: hidden;
             border-radius: 4px;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             background-color: #333;
             position: relative;
             color: #777;
@@ -441,7 +398,6 @@
             flex-direction: column;
             gap: 5px;
         }
-
         .manga-card-image {
             width: 100%;
             height: 100%;
@@ -449,11 +405,9 @@
             border-radius: 4px;
             display: block;
         }
-
         .hidden {
             display: none !important;
         }
-
         .manga-card-placeholder-text {
             color: #777;
             font-size: 1.1em;
@@ -467,16 +421,14 @@
             user-select: none;
             line-height: 1.2;
         }
-
         .manga-card-placeholder-text p {
             margin: 0;
             padding: 0;
         }
-
         .manga-title {
             font-family: 'Orbitron', sans-serif;
-            font-size: 1em;
-            margin: 5px 0;
+            font-size: 0.9em;
+            margin: 3px 0;
             color: var(--text-color-light);
             overflow: hidden;
             text-overflow: ellipsis;
@@ -484,77 +436,69 @@
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
             width: 100%;
-            padding: 0 5px;
+            padding: 0 3px;
             font-weight: 700;
-            line-height: 1.3;
-            min-height: 2.6em;
+            line-height: 1.2;
+            min-height: 2.2em;
             letter-spacing: 0.5px;
         }
-
         .manga-progress-container {
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
-            margin: 5px 0;
+            gap: 5px;
+            margin: 3px 0;
             width: 100%;
-            padding: 0 5px;
+            padding: 0 3px;
         }
-
         .manga-progress {
-            font-size: 0.9em;
+            font-size: 0.8em;
             color: var(--gray-text-dark);
             margin: 0;
         }
-
         .btn-increment-chapter {
             background-color: var(--button-increment-bg);
             color: white;
             border: none;
-            border-radius: 5px;
+            border-radius: 4px;
             cursor: pointer;
-            width: 40px;
-            height: 40px;
+            width: 28px;
+            height: 28px;
             display: flex;
             align-items: center;
             justify-content: center;
             transition: all 0.3s ease;
-            font-size: 2em;
+            font-size: 1.5em;
             font-weight: bold;
         }
-
         .btn-increment-chapter:hover {
             background-color: var(--button-increment-hover);
             transform: scale(1.1);
         }
-
         .manga-last-read {
-            font-size: 0.9em;
+            font-size: 0.75em;
             color: var(--gray-text-dark);
-            margin: 3px 0;
+            margin: 2px 0;
             width: 100%;
-            padding: 0 5px;
+            padding: 0 3px;
         }
-
         /* Barra de Progresso */
         .progress-bar-container {
             width: 100%;
-            height: 8px;
+            height: 6px;
             background-color: var(--progress-bg);
-            border-radius: 4px;
-            margin: 8px 0;
+            border-radius: 3px;
+            margin: 5px 0;
             overflow: hidden;
             border: 1px solid var(--progress-border);
         }
-
         .progress-bar-fill {
             height: 100%;
             background: linear-gradient(90deg, var(--progress-fill), #27ae60);
-            border-radius: 3px;
+            border-radius: 2px;
             transition: width 0.5s ease;
             position: relative;
         }
-
         .progress-bar-fill::after {
             content: '';
             position: absolute;
@@ -573,51 +517,46 @@
             background-size: 20px 20px;
             animation: progress-animation 1s linear infinite;
         }
-
         @keyframes progress-animation {
             0% {
                 background-position: 0 0;
             }
-
             100% {
                 background-position: 20px 20px;
             }
         }
-
         .progress-percentage {
-            font-size: 0.8em;
+            font-size: 0.7em;
             color: var(--progress-fill);
             font-weight: bold;
-            margin-top: 2px;
+            margin-top: 1px;
         }
-
         .manga-actions {
-            margin-top: 10px;
+            margin-top: 5px;
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
-            gap: 5px;
+            gap: 3px;
             width: 100%;
         }
-
         .btn {
-            display: inline-block;
-            padding: 8px 12px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 5px;
             border: none;
-            border-radius: 5px;
+            border-radius: 50%;
             cursor: pointer;
-            font-size: 0.85em;
+            font-size: 0.9em;
             text-decoration: none;
             transition: all 0.3s ease;
-            white-space: nowrap;
             color: white;
-            flex-grow: 1;
-            min-width: unset;
+            width: 28px;
+            height: 28px;
             position: relative;
             overflow: hidden;
             z-index: 1;
         }
-
         .btn::before {
             content: "";
             position: absolute;
@@ -629,19 +568,19 @@
             transition: left 0.3s;
             z-index: -1;
         }
-
         .btn:hover::before {
             left: 0;
         }
-
         .btn-access {
             background-color: var(--button-card-access-bg);
+            border-radius: 4px;
+            width: auto;
+            padding: 5px 8px;
+            font-size: 0.8em;
         }
-
         .btn-edit {
             background-color: var(--button-card-edit-bg);
         }
-
         .btn-delete {
             background-color: var(--button-card-delete-bg);
         }
@@ -653,55 +592,56 @@
         .btn-share:hover {
             background-color: var(--button-card-share-hover);
         }
-
         .toggle-status-btn {
             background-color: var(--button-card-toggle-status-bg);
+            border-radius: 4px;
+            width: auto;
+            padding: 5px 8px;
+            font-size: 0.75em;
         }
-
         .btn-move-to-reading {
             background-color: var(--button-card-toggle-status-bg);
+            border-radius: 4px;
+            width: auto;
+            padding: 5px 8px;
+            font-size: 0.75em;
         }
-
         .btn-access:hover {
             background-color: var(--button-card-access-hover);
         }
-
         .btn-edit:hover {
             background-color: var(--button-card-edit-hover);
         }
-
         .btn-delete:hover {
             background-color: var(--button-card-delete-hover);
         }
-
         .toggle-status-btn:hover {
             background-color: var(--button-card-toggle-status-hover);
         }
-
         .btn-move-to-reading:hover {
             background-color: var(--button-card-toggle-status-hover);
         }
-
         .btn-favorite {
             background: none;
             border: none;
-            padding: 5px;
+            padding: 3px;
             cursor: pointer;
-            font-size: 1.2em;
+            font-size: 1em;
             transition: all 0.3s ease;
             color: var(--button-card-favorite-off);
-            flex-grow: 0;
-            min-width: unset;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
-
         .btn-favorite.active {
             color: var(--button-card-favorite-on);
         }
-
         .btn-favorite:hover {
             transform: scale(1.2);
         }
-
         footer {
             background-color: var(--secondary-bg);
             color: var(--text-color-futuristic);
@@ -712,11 +652,9 @@
             box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.3);
             font-size: 0.9em;
         }
-
         footer p:first-child {
             margin-bottom: 0.5rem;
         }
-
         .modal {
             display: none;
             position: fixed;
@@ -731,7 +669,6 @@
             -webkit-backdrop-filter: blur(5px);
             padding-top: 60px;
         }
-
         .modal-content {
             background-color: var(--primary-bg);
             margin: 5% auto;
@@ -745,11 +682,9 @@
             animation: fadeInScale 0.3s ease-out;
             color: var(--text-color-futuristic);
         }
-
         .modal-content h2 {
             color: var(--accent-color);
         }
-
         .close-button {
             color: var(--text-color-futuristic);
             position: absolute;
@@ -760,20 +695,17 @@
             cursor: pointer;
             transition: color 0.3s ease;
         }
-
         .close-button:hover,
         .close-button:focus {
             color: var(--accent-color);
             text-decoration: none;
         }
-
         .modal-content .form-group input,
         .modal-content .form-group select {
             background-color: var(--secondary-bg);
             border-color: var(--border-color-futuristic);
             color: var(--text-color-futuristic);
         }
-
         .modal-content button {
             background-color: var(--accent-color);
             color: white;
@@ -787,25 +719,21 @@
             width: 100%;
             margin-top: 1.5rem;
         }
-
         .modal-content button:hover {
             background-color: var(--hover-color-futuristic);
             transform: translateY(-2px);
         }
-
         #tools-section {
             display: flex;
             flex-direction: column;
             gap: 20px;
         }
-
         .tools-buttons-container {
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
             gap: 15px;
         }
-
         .tool-btn {
             font-family: 'Bangers', cursive;
             background-color: var(--tab-bg-color);
@@ -823,7 +751,6 @@
             text-shadow: none;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
         }
-
         .tool-btn:hover {
             background-color: var(--tab-active-bg-color);
             color: var(--tab-active-text-color);
@@ -831,14 +758,12 @@
             transform: translateY(-2px);
             box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
         }
-
         .form-action-group {
             display: flex;
             flex-direction: column;
             gap: 15px;
             margin-top: 20px;
         }
-
         .centered-content {
             display: flex;
             flex-direction: column;
@@ -846,17 +771,14 @@
             justify-content: center;
             text-align: center;
         }
-
         .centered-content .tool-btn {
             margin-top: 15px;
             max-width: 300px;
         }
-
         .centered-content p {
             max-width: 600px;
             margin: 0 auto;
         }
-
         .checkbox-container {
             display: flex;
             align-items: center;
@@ -865,7 +787,6 @@
             margin-bottom: 1rem;
             justify-content: center;
         }
-
         .checkbox-container input[type="checkbox"] {
             -webkit-appearance: none;
             -moz-appearance: none;
@@ -879,12 +800,10 @@
             position: relative;
             outline: none;
         }
-
         .checkbox-container input[type="checkbox"]:checked {
             background-color: var(--logo-border-color);
             border-color: var(--logo-border-color);
         }
-
         .checkbox-container input[type="checkbox"]:checked::after {
             content: '\2713';
             position: absolute;
@@ -894,19 +813,16 @@
             font-size: 18px;
             color: var(--logo-bg-color);
         }
-
         .checkbox-container label {
             cursor: pointer;
             font-size: 1.1em;
             font-weight: bold;
         }
-
         /* --- NOVO ESTILO PARA NOTAS --- */
         .notes-list {
             display: grid;
             gap: 20px;
         }
-
         .note-card {
             background-color: var(--secondary-bg);
             border: 1px solid var(--border-color-futuristic);
@@ -917,7 +833,6 @@
             position: relative;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
         }
-
         .note-card h4 {
             font-family: 'Orbitron', sans-serif;
             color: var(--accent-color);
@@ -926,20 +841,17 @@
             border-bottom: 1px solid var(--border-color-futuristic);
             padding-bottom: 5px;
         }
-
         .note-card p {
             color: var(--text-color-futuristic);
             font-size: 1em;
             margin-bottom: 10px;
         }
-
         .note-card .note-actions {
             display: flex;
             gap: 10px;
             justify-content: flex-end;
             margin-top: 15px;
         }
-
         .note-card .btn-edit-note,
         .note-card .btn-delete-note {
             padding: 5px 10px;
@@ -948,33 +860,27 @@
             cursor: pointer;
             transition: background-color 0.3s;
         }
-
         .note-card .btn-edit-note {
             background-color: var(--button-card-edit-bg);
             color: white;
             border: none;
         }
-
         .note-card .btn-delete-note {
             background-color: var(--button-card-delete-bg);
             color: white;
             border: none;
         }
-
         .note-card .btn-edit-note:hover {
             background-color: var(--button-card-edit-hover);
         }
-
         .note-card .btn-delete-note:hover {
             background-color: var(--button-card-delete-hover);
         }
-
         .note-timestamp {
             font-size: 0.8em;
             color: var(--gray-text-dark);
             text-align: right;
         }
-
         /* Sistema de Notificações */
         .notification {
             position: fixed;
@@ -993,19 +899,16 @@
             max-width: 300px;
             animation: slideIn 0.3s ease-out;
         }
-
         @keyframes slideIn {
             from {
                 transform: translateX(100%);
                 opacity: 0;
             }
-
             to {
                 transform: translateX(0);
                 opacity: 1;
             }
         }
-
         #close-notification {
             background: none;
             border: none;
@@ -1014,11 +917,9 @@
             cursor: pointer;
             transition: color 0.3s;
         }
-
         #close-notification:hover {
             color: var(--accent-color);
         }
-
         /* Estilos do Jogo */
         #game-sub-section {
             display: flex;
@@ -1026,7 +927,6 @@
             align-items: center;
             gap: 20px;
         }
-
         #game-container {
             position: relative;
             width: 320px;
@@ -1036,7 +936,6 @@
             overflow: hidden;
             touch-action: none;
         }
-
         .player {
             position: absolute;
             bottom: 5px;
@@ -1051,14 +950,12 @@
             height: 10px;
             background-color: #ff0000;
         }
-
         .laser {
             position: absolute;
             width: 2px;
             height: 8px;
             background-color: #00ffff;
         }
-
         #game-controls {
             display: flex;
             gap: 20px;
@@ -1080,103 +977,97 @@
         .game-control-btn:active {
             transform: translateY(2px);
         }
-
-
         /* Responsividade */
         @media (max-width: 768px) {
             .mobile-menu {
                 display: block;
             }
-
             .tabs {
                 display: none;
             }
-
             .manga-grid {
-                grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+                gap: 6px;
             }
-
             .manga-card-image-wrapper {
-                height: 200px;
+                height: 180px;
             }
-
             .manga-actions {
-                flex-direction: column;
+                flex-direction: row;
+                flex-wrap: wrap;
             }
-
             .btn {
-                min-width: unset;
-                width: 100%;
+                min-width: 28px;
+                width: 28px;
+                height: 28px;
             }
-
+            .btn-access {
+                width: auto;
+                padding: 5px 8px;
+                font-size: 0.8em;
+            }
+            .toggle-status-btn, .btn-move-to-reading {
+                width: 100%;
+                padding: 5px 8px;
+                font-size: 0.75em;
+            }
             .modal-content {
                 padding: 1.5rem;
                 margin: 10% auto;
             }
-
             .nav-button {
                 font-size: 1.2em;
                 padding: 0.8rem 1.5rem;
             }
         }
-
         @media (max-width: 600px) {
             .logo-container {
                 padding: 30px 25px;
             }
-
             .logo-container h1 {
                 font-size: 38px;
             }
-
             .logo-container h2 {
                 font-size: 18px;
             }
         }
-
         @media (max-width: 480px) {
             .manga-grid {
-                grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-                gap: 10px;
+                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+                gap: 5px;
             }
-
             .manga-card-image-wrapper {
-                height: 160px;
+                height: 150px;
             }
-
             .manga-title {
-                font-size: 0.9em;
+                font-size: 0.8em;
             }
-
             .btn {
-                font-size: 0.75em;
-                padding: 6px 8px;
+                font-size: 0.8em;
+                padding: 4px;
             }
-
             .modal-content {
                 padding: 1.5rem;
                 margin: 10% auto;
                 width: 95%;
             }
-
             .logo-container h1 {
                 font-size: 42px;
             }
-
             .logo-container h2 {
                 font-size: 20px;
             }
         }
-
         @media (min-width: 481px) and (max-width: 767px) {
             .manga-grid {
-                grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+                grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+                gap: 7px;
             }
         }
-
         @media (min-width: 768px) {
             .manga-grid {
-                grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+                grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+                gap: 8px;
             }
         }
     </style>
@@ -1199,6 +1090,7 @@
             <a href="#" data-target="future-list-section"><i class="fas fa-clock"></i> Ler Futuramente</a>
             <a href="#" data-target="favorites-list-section"><i class="fas fa-star"></i> Favoritos</a>
             <a href="#" data-target="tools-section"><i class="fas fa-tools"></i> Ferramentas</a>
+            <a href="#" data-target="hub-section"><i class="fas fa-th"></i> HUB</a>
         </nav>
     </div>
     
@@ -1208,6 +1100,7 @@
         <button class="tab" data-target="future-list-section">Ler Futuramente</button>
         <button class="tab" data-target="favorites-list-section">Favoritos</button>
         <button class="tab" data-target="tools-section">Ferramentas</button>
+        <button class="tab" data-target="hub-section">HUB</button>
     </div>
     
     <main>
@@ -1297,14 +1190,6 @@
                 <input type="file" id="file-input-backup" accept=".json" style="display: none;">
                 <button id="select-file-backup-btn" class="tool-btn">Restaurar Backup</button>
                 <span id="selected-file-name" style="margin-top: 10px; color: var(--text-color-futuristic); font-size: 0.9em;">Nenhum arquivo selecionado.</span>
-                
-                <hr style="width: 100%; border: 1px solid #444; margin-top: 40px;">
-                
-                <h3>Importar Card de Amigo</h3>
-                <p>Você recebeu um card de um amigo? Clique em "Importar Card" para adicioná-lo à sua lista. Seus dados atuais não serão afetados.</p>
-                <input type="file" id="file-input-card-import" accept=".json" style="display: none;">
-                <button id="select-file-card-import-btn" class="tool-btn">Importar Card</button>
-                <span id="selected-card-file-name" style="margin-top: 10px; color: var(--text-color-futuristic); font-size: 0.9em;">Nenhum arquivo selecionado.</span>
             </div>
             
             <div id="notes-sub-section" class="sub-section-container hidden">
@@ -1338,13 +1223,25 @@
                 </div>
             </div>
         </section>
+        <section id="hub-section" class="content-section hidden">
+            <h2>HUB</h2>
+            <div class="tools-buttons-container">
+                <button class="tool-btn" id="buscar-cards-btn">Buscar Cards</button>
+                <button class="tool-btn" id="news-btn">News Animes/Mangás</button>
+                <button class="tool-btn" data-tool-target="changelog-sub-section">Change Log</button>
+            </div>
+            <div id="changelog-sub-section" class="sub-section-container hidden">
+                <h3>Change Log</h3>
+                <div id="changelog-list" class="notes-list"></div>
+            </div>
+        </section>
     </main>
     
     <footer>
         <p>Desenvolvido por Edson C.S.F.</p>
         <p>Contato: edsony1@gmail.com</p>
         <p>Criação: Julho de 2025</p>
-        <p>Versão: V3.3</p> <p>&copy; 2025. Todos os direitos reservados.</p>
+        <p>Versão: V3.5</p> <p>&copy; 2025. Todos os direitos reservados.</p>
     </footer>
     
     <div id="editMangaModal" class="modal">
@@ -1420,11 +1317,6 @@
         const selectedFileNameSpan = document.getElementById('selected-file-name');
         const exportMangasBtn = document.getElementById('export-mangas-btn');
         
-        // Novas variáveis para Importar Card
-        const fileInputCardImport = document.getElementById('file-input-card-import');
-        const selectFileCardImportBtn = document.getElementById('select-file-card-import-btn');
-        const selectedCardFileNameSpan = document.getElementById('selected-card-file-name');
-
         const editMangaModal = document.getElementById('editMangaModal');
         const closeButton = document.querySelector('.close-button');
         const editMangaForm = document.getElementById('edit-manga-form');
@@ -1440,7 +1332,6 @@
         const notification = document.getElementById('notification');
         const notificationMessage = document.getElementById('notification-message');
         const closeNotificationBtn = document.getElementById('close-notification');
-
         // Variáveis do Jogo
         const gameContainer = document.getElementById('game-container');
         const moveLeftBtn = document.getElementById('move-left-btn');
@@ -1460,6 +1351,12 @@
         
         let mangas = JSON.parse(localStorage.getItem('mangas')) || [];
         let notes = JSON.parse(localStorage.getItem('notes')) || [];
+        let changelogs = [
+            { date: '26/08/2025', version: 'V3.5', changes: 'Redesenho completo do layout dos cards: removidas margens para melhor aproveitamento de espaço, aumentado o tamanho das imagens dos capas para melhor visualização, reorganizados os elementos dos cards (botões, barra de progresso e data da última leitura) em um layout mais compacto. Mantida todas as funcionalidades originais e compatibilidade com o sistema existente.' },
+            { date: '25/08/2025', version: 'V3.4', changes: 'Ajustado largura dos cards para melhor aproveitamento de espaço em telas mobile. Alinhados ícones no rodapé dos cards para melhor organização visual. Substituição de botões de texto por ícones para uma interface mais limpa e intuitiva.' },
+             { date: '25/08/2025', version: 'V3.3', changes: 'Adicionado HUB com botões Buscar Cards, News e Change Log. Removido botão Importar Cards e função de Compartilhar nos cards.' },
+             { date: '01/08/2025', version: 'V3.1', changes: 'Versão da última atualização antes do chabglog com funcionalidades principais.' }
+        ];
         
         // --- Funções para o sistema de notificações ---
         function showNotification(message, duration = 3000) {
@@ -1560,6 +1457,9 @@
                     startGame();
                 }
             }
+            if (targetId === 'changelog-sub-section') {
+                renderChangelog();
+            }
         }
         
         // --- Funções de Utilitário ---
@@ -1640,12 +1540,12 @@
                 <p class="progress-percentage">${progressPercentage}% completo</p>
                 <p class="manga-last-read">Última Leitura: <span id="date-${manga.id}">${manga.lastReadDate}</span></p>
                 <div class="manga-actions">
-                    <button class="btn btn-favorite ${favoriteButtonClass}" data-id="${manga.id}"><i class="fas fa-star"></i></button>
-                    <a href="${manga.link}" target="_blank" class="btn btn-access">Acessar</a>
+                    <button class="btn btn-favorite ${favoriteButtonClass}" data-id="${manga.id}" title="Favorito"><i class="fas fa-star"></i></button>
+                    <a href="${manga.link}" target="_blank" class="btn btn-access" title="Acessar"><i class="fas fa-external-link-alt"></i></a>
                     ${mainActionButton}
-                    <button class="btn btn-share" data-id="${manga.id}">Compartilhar</button>
-                    <button class="btn btn-edit" data-id="${manga.id}">Editar</button>
-                    <button class="btn btn-delete" data-id="${manga.id}">Excluir</button>
+                    <button class="btn btn-edit" data-id="${manga.id}" title="Editar"><i class="fas fa-edit"></i></button>
+                    <button class="btn btn-delete" data-id="${manga.id}" title="Excluir"><i class="fas fa-trash"></i></button>
+                    <button class="btn btn-share" data-id="${manga.id}" title="Compartilhar"><i class="fas fa-share-alt"></i></button>
                 </div>
             `;
             
@@ -1721,34 +1621,15 @@
                     }
                 });
             }
-
-            // Novo evento para o botão de Compartilhar
             
-card.querySelector('.btn-share').addEventListener('click', (e) => {
-    const mangaId = e.target.dataset.id;
-    const mangaToShare = mangas.find(m => m.id === mangaId);
-    if (mangaToShare) {
-        // Envia o card para o servidor (somente enviar, sem baixar localmente)
-        fetch("https://chronosblue.gamer.gd/storage/GManhwa/upload-card.php", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ card: mangaToShare })
-        })
-        .then(r => r.json())
-        .then(res => {
-            if (res.status === "sucesso") {
-                showNotification('Card de "' + mangaToShare.title + '" enviado para o servidor!');
-            } else {
-                showNotification('Erro ao enviar: ' + (res.mensagem || 'desconhecido'));
+            // Adicionar evento para o botão de compartilhar (sem ação)
+            const shareBtn = card.querySelector('.btn-share');
+            if (shareBtn) {
+                shareBtn.addEventListener('click', (e) => {
+                    // Sem ação por enquanto, apenas para exibir o ícone
+                    showNotification('Função de compartilhamento será implementada em breve!');
+                });
             }
-        })
-        .catch(err => {
-            console.error(err);
-            showNotification('Erro ao conectar ao servidor.');
-        });
-    }
-});
-
             
             card.querySelector('.btn-edit').addEventListener('click', (e) => {
                 const mangaId = e.target.dataset.id;
@@ -1871,6 +1752,21 @@ card.querySelector('.btn-share').addEventListener('click', (e) => {
                 });
             }
         }
+        function renderChangelog() {
+            const changelogListDiv = document.getElementById('changelog-list');
+            changelogListDiv.innerHTML = '';
+            
+            changelogs.sort((a, b) => new Date(b.date) - new Date(a.date));
+            changelogs.forEach(log => {
+                const logCard = document.createElement('div');
+                logCard.classList.add('note-card');
+                logCard.innerHTML = `
+                    <h4>${log.date} - ${log.version}</h4>
+                    <p>${log.changes}</p>
+                `;
+                changelogListDiv.appendChild(logCard);
+            });
+        }
         
         function exportMangasToFile() {
             const backupData = JSON.stringify(mangas, null, 2);
@@ -1927,94 +1823,7 @@ card.querySelector('.btn-share').addEventListener('click', (e) => {
             
             reader.readAsText(file);
         }
-
-        // Nova função para importar um único card
-        function importCardFromFile(event) {
-            const file = event.target.files[0];
-            if (!file) {
-                selectedCardFileNameSpan.textContent = 'Nenhum arquivo selecionado.';
-                return;
-            }
-
-            selectedCardFileNameSpan.textContent = `Arquivo selecionado: ${file.name}`;
-            const reader = new FileReader();
-
-            reader.onload = (e) => {
-                try {
-                    const fileContent = e.target.result;
-                    const parsedData = JSON.parse(fileContent);
-
-                    if (Array.isArray(parsedData) && parsedData.length > 0) {
-                        const newManga = parsedData[0];
-                        const existingManga = mangas.find(m => m.title === newManga.title);
-
-                        if (existingManga) {
-                            showNotification('Este mangá/manhwa já existe na sua lista. A importação foi cancelada.');
-                        } else {
-                            newManga.id = Date.now().toString(); 
-                            mangas.push(newManga);
-                            saveMangas();
-                            renderMangas();
-                            showNotification(`Card de "${newManga.title}" importado com sucesso!`);
-                            fileInputCardImport.value = '';
-                            selectedCardFileNameSpan.textContent = 'Nenhum arquivo selecionado.';
-                            showTabContent('reading-list-section');
-                        }
-                    } else {
-                        showNotification('Formato de arquivo inválido. Certifique-se de que é um JSON válido de um card.');
-                    }
-                } catch (error) {
-                    showNotification('Erro ao analisar o arquivo. Certifique-se de que o arquivo é um JSON válido.');
-                    console.error('Erro ao ler arquivo do card:', error);
-                }
-            };
-
-            reader.readAsText(file);
-        }
-
-// Função para listar e importar um card direto do servidor
-function importCardFromServer() {
-    fetch("https://chronosblue.gamer.gd/storage/GManhwa/list-cards.php")
-    .then(r => r.json())
-    .then(lista => {
-        if (!Array.isArray(lista) || lista.length === 0) {
-            showNotification('Nenhum card encontrado no servidor.');
-            return;
-        }
-        const escolha = prompt("Escolha o arquivo para importar:\n" + lista.join("\n"));
-        if (!escolha) return;
-        fetch("https://chronosblue.gamer.gd/storage/GManhwa/get-card.php?id=" + encodeURIComponent(escolha))
-        .then(r => r.json())
-        .then(parsedData => {
-            if (Array.isArray(parsedData) && parsedData.length > 0) {
-                const newManga = parsedData[0];
-                const exists = mangas.find(m => m.title === newManga.title);
-                if (exists) {
-                    showNotification('Este mangá/manhwa já existe na sua lista.');
-                } else {
-                    newManga.id = Date.now().toString();
-                    mangas.push(newManga);
-                    saveMangas();
-                    renderMangas();
-                    showNotification('Card de "' + newManga.title + '" importado com sucesso!');
-                    showTabContent('reading-list-section');
-                }
-            } else {
-                showNotification('Formato inválido do card no servidor.');
-            }
-        })
-        .catch(err => {
-            console.error(err);
-            showNotification('Erro ao baixar o card do servidor.');
-        });
-    })
-    .catch(err => {
-        console.error(err);
-        showNotification('Erro ao conectar ao servidor para listar cards.');
-    });
-}
-
-
+        
         // --- Funções do Jogo ---
         function createPlayer() {
             player = document.createElement('div');
@@ -2033,7 +1842,6 @@ function importCardFromServer() {
             }
             enemies = gameContainer.querySelectorAll('.enemy');
         }
-
         function createLaser() {
             if (!gameRunning || !player) return;
             const laser = document.createElement('div');
@@ -2050,7 +1858,6 @@ function importCardFromServer() {
         
         function updateGame() {
             if (!gameRunning) return;
-
             // Mover player
             playerX += playerMovement * 5;
             if (playerX < 0) playerX = 0;
@@ -2058,7 +1865,6 @@ function importCardFromServer() {
                 playerX = gameContainer.offsetWidth - player.offsetWidth;
             }
             player.style.left = `${playerX}px`;
-
             // Mover inimigos e verificar colisão com o jogador
             enemies.forEach(enemy => {
                 let top = parseInt(enemy.style.top) + 1;
@@ -2075,7 +1881,6 @@ function importCardFromServer() {
                     stopGame();
                 }
             });
-
             // Mover lasers e verificar colisão com inimigos
             const lasers = gameContainer.querySelectorAll('.laser');
             lasers.forEach(laser => {
@@ -2116,14 +1921,11 @@ function importCardFromServer() {
             
             createPlayer();
             createEnemies();
-
             gameInterval = setInterval(updateGame, 20); // Loop de atualização principal
             laserInterval = setInterval(createLaser, 500); // Cria um novo laser a cada 0.5s
-
             document.addEventListener('keydown', handleKeyControls);
             document.addEventListener('keyup', handleKeyUp);
         }
-
         function stopGame() {
             gameRunning = false;
             clearInterval(gameInterval);
@@ -2132,7 +1934,6 @@ function importCardFromServer() {
             document.removeEventListener('keydown', handleKeyControls);
             document.removeEventListener('keyup', handleKeyUp);
         }
-
         function handleKeyControls(e) {
             if (e.key === 'a' || e.key === 'A' || e.key === 'ArrowLeft') {
                 playerMovement = -1;
@@ -2158,7 +1959,6 @@ function importCardFromServer() {
         moveRightBtn.addEventListener('mouseup', () => { playerMovement = 0; });
         moveRightBtn.addEventListener('touchstart', (e) => { e.preventDefault(); playerMovement = 1; });
         moveRightBtn.addEventListener('touchend', () => { playerMovement = 0; });
-
         // --- Event Listeners Globais ---
         tabs.forEach(tab => {
             tab.addEventListener('click', () => {
@@ -2169,17 +1969,15 @@ function importCardFromServer() {
         toolButtons.forEach(button => {
             button.addEventListener('click', () => {
                 const targetId = button.dataset.toolTarget;
-                showToolSubSection(targetId);
+                if (targetId) {
+                    showToolSubSection(targetId);
+                }
             });
         });
         
         exportMangasBtn.addEventListener('click', exportMangasToFile);
         selectFileBackupBtn.addEventListener('click', () => { fileInputBackup.click(); });
         fileInputBackup.addEventListener('change', importMangasFromFile);
-
-        // Novos eventos para Importar Card
-        selectFileCardImportBtn.addEventListener('click', () => { importCardFromServer(); });
-        fileInputCardImport.addEventListener('change', importCardFromFile);
         
         mangaForm.addEventListener('submit', (e) => {
             e.preventDefault();
@@ -2317,6 +2115,9 @@ function importCardFromServer() {
             renderNotes();
             notesForm.reset();
         });
+        document.getElementById('news-btn').addEventListener('click', () => {
+            window.open('https://example.com', '_blank'); // Coloque o link do site de notícias aqui
+        });
         
         // --- Inicialização da Aplicação ---
         document.addEventListener('DOMContentLoaded', () => {
@@ -2330,10 +2131,3 @@ function importCardFromServer() {
     </script>
 </body>
 </html>
-
-
-
-
-
-
-
