@@ -584,11 +584,9 @@
         .btn-delete {
             background-color: var(--button-card-delete-bg);
         }
-        
         .btn-share {
             background-color: var(--button-card-share-bg);
         }
-        
         .btn-share:hover {
             background-color: var(--button-card-share-hover);
         }
@@ -919,27 +917,6 @@
         #close-notification:hover {
             color: var(--accent-color);
         }
-        /* Botão Voltar ao Topo */
-        #scrollTopBtn {
-            display: none;
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            z-index: 999;
-            font-size: 18px;
-            padding: 10px 14px;
-            border: none;
-            border-radius: 50%;
-            background: var(--accent-color);
-            color: white;
-            cursor: pointer;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-            transition: all 0.3s ease;
-        }
-        #scrollTopBtn:hover {
-            background: var(--hover-color-futuristic);
-            transform: translateY(-3px);
-        }
         /* Responsividade */
         @media (max-width: 768px) {
             .mobile-menu {
@@ -1038,6 +1015,26 @@
         }
     </style>
 <script type="module" src="firebase-cards.js"></script>
+<style>
+#scrollTopBtn {
+  display: none;
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 999;
+  font-size: 18px;
+  padding: 10px 14px;
+  border: none;
+  border-radius: 50%;
+  background: #007bff;
+  color: white;
+  cursor: pointer;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+#scrollTopBtn:hover {
+  background: #0056b3;
+}
+</style>
 </head>
 <body>
     <header>
@@ -1045,7 +1042,6 @@
             <img src="imagens/titulo.jpg" alt="Meu Gerenciador de Manhwa/Mangá">
         </div>
     </header>
-    
     <div class="mobile-menu">
         <button class="mobile-menu-btn" id="mobile-menu-btn">
             <i class="fas fa-bars"></i>
@@ -1059,7 +1055,6 @@
             <a href="#" data-target="hub-section"><i class="fas fa-th"></i> HUB</a>
         </nav>
     </div>
-    
     <div class="tabs">
         <button class="tab active" data-target="reading-list-section">Lendo</button>
         <button class="tab" data-target="finished-list-section">Lidos</button>
@@ -1068,7 +1063,6 @@
         <button class="tab" data-target="tools-section">Ferramentas</button>
         <button class="tab" data-target="hub-section">HUB</button>
     </div>
-    
     <main>
         <section id="reading-list-section" class="content-section">
             <h2>Minha Lista "Lendo" <span class="section-counter" id="reading-counter">(0)</span></h2>
@@ -1076,32 +1070,28 @@
                 <p id="no-manga-message-reading">Nenhum manhwa/mangá com status "Lendo" cadastrado ainda.</p>
             </div>
         </section>
-        
         <section id="finished-list-section" class="content-section hidden">
             <h2>Minha Lista "Lidos" <span class="section-counter" id="finished-counter">(0)</span></h2>
             <div id="finished-manga-list" class="manga-grid">
                 <p id="no-manga-message-finished">Nenhum manhwa/mangá com status "Lido" cadastrado ainda.</p>
             </div>
         </section>
-        
         <section id="future-list-section" class="content-section hidden">
             <h2>Lista de Leitura Futuramente<span class="section-counter" id="future-counter">(0)</span></h2>
             <div id="future-manga-list" class="manga-grid">
                 <p id="no-manga-message-future">Nenhum manhwa/mangá com status "Ler Futuramente" cadastrado ainda.</p>
             </div>
         </section>
-        
         <section id="favorites-list-section" class="content-section hidden">
             <h2>Lista de Favoritos <span class="section-counter" id="favorites-counter">(0)</span></h2>
             <div id="favorites-manga-list" class="manga-grid">
                 <p id="no-manga-message-favorites">Nenhum manhwa/mangá adicionado aos favoritos ainda.</p>
             </div>
         </section>
-        
         <section id="tools-section" class="content-section hidden">
             <h2>Ferramentas do Gerenciador</h2>
             <div class="tools-buttons-container">
-                <button class="tool-btn" id="add-manga-btn" data-tool-target="add-manga-sub-section">Cadastrar Manhwa/Mangá</button>
+                <button class="tool-btn" data-tool-target="add-manga-sub-section">Cadastrar Manhwa/Mangá</button>
                 <button class="tool-btn" data-tool-target="backup-restore-sub-section">Gerenciar Backup</button>
                 <button class="tool-btn" data-tool-target="notes-sub-section">Criar / Ver Notas</button>
             </div>
@@ -1145,7 +1135,6 @@
                     </div>
                 </form>
             </div>
-            
             <div id="backup-restore-sub-section" class="sub-section-container hidden centered-content">
                 <h3>Gerenciar Backup</h3>
                 <p>Clique em "Fazer Backup" para baixar seus dados em um arquivo JSON. O arquivo será salvo na sua pasta de downloads padrão.</p>
@@ -1155,7 +1144,6 @@
                 <button id="select-file-backup-btn" class="tool-btn">Restaurar Backup</button>
                 <span id="selected-file-name" style="margin-top: 10px; color: var(--text-color-futuristic); font-size: 0.9em;">Nenhum arquivo selecionado.</span>
             </div>
-            
             <div id="notes-sub-section" class="sub-section-container hidden">
                 <h3>Minhas Notas</h3>
                 <form id="notes-form" style="width: 100%;">
@@ -1185,14 +1173,12 @@
             </div>
         </section>
     </main>
-    
     <footer>
         <p>Desenvolvido por Edson C.S.F.</p>
         <p>Contato: edsony1@gmail.com</p>
         <p>Criação: Julho de 2025</p>
-        <p>Versão: V3.6d</p> <p>&copy; 2025. Todos os direitos reservados.</p>
+        <p>Versão: V3.6Final</p> <p>&copy; 2025. Todos os direitos reservados.</p>
     </footer>
-    
     <div id="editMangaModal" class="modal">
         <div class="modal-content">
             <span class="close-button">&times;</span>
@@ -1235,17 +1221,10 @@
             </form>
         </div>
     </div>
-    
     <div id="notification" class="notification">
         <span id="notification-message"></span>
         <button id="close-notification">&times;</button>
     </div>
-    
-    <!-- Botão Voltar ao Topo -->
-    <button id="scrollTopBtn" title="Voltar ao topo">
-        <i class="fas fa-arrow-up"></i>
-    </button>
-    
     <script>
         // Variáveis globais
         const tabs = document.querySelectorAll('.tab');
@@ -1255,13 +1234,11 @@
         const finishedMangaListDiv = document.getElementById('finished-manga-list');
         const futureMangaListDiv = document.getElementById('future-manga-list');
         const favoritesMangaListDiv = document.getElementById('favorites-manga-list');
-        
         // Contadores
         const readingCounter = document.getElementById('reading-counter');
         const finishedCounter = document.getElementById('finished-counter');
         const futureCounter = document.getElementById('future-counter');
         const favoritesCounter = document.getElementById('favorites-counter');
-        
         const noMangaMessageReading = document.getElementById('no-manga-message-reading');
         const noMangaMessageFinished = document.getElementById('no-manga-message-finished');
         const noMangaMessageFuture = document.getElementById('no-manga-message-future');
@@ -1270,32 +1247,23 @@
         const selectFileBackupBtn = document.getElementById('select-file-backup-btn');
         const selectedFileNameSpan = document.getElementById('selected-file-name');
         const exportMangasBtn = document.getElementById('export-mangas-btn');
-        
         const editMangaModal = document.getElementById('editMangaModal');
         const closeButton = document.querySelector('.close-button');
         const editMangaForm = document.getElementById('edit-manga-form');
-        
         const toolButtons = document.querySelectorAll('.tool-btn');
         const toolSubSections = document.querySelectorAll('.sub-section-container');
-        
         // Menu Mobile
         const mobileMenuBtn = document.getElementById('mobile-menu-btn');
         const mobileNav = document.getElementById('mobile-nav');
-        
         // Sistema de Notificações
         const notification = document.getElementById('notification');
         const notificationMessage = document.getElementById('notification-message');
         const closeNotificationBtn = document.getElementById('close-notification');
-        
-        // Botão Voltar ao Topo
-        const scrollTopBtn = document.getElementById('scrollTopBtn');
-        const addMangaBtn = document.getElementById('add-manga-btn');
-        const addMangaSection = document.getElementById('add-manga-sub-section');
-        
         let mangas = JSON.parse(localStorage.getItem('mangas')) || [];
         let notes = JSON.parse(localStorage.getItem('notes')) || [];
         let changelogs = [
-           { date: '00/00/2025', version: 'V ??', changes: ' - Aguarde novas att' },
+            { date: '00/00/2025', version: 'V ??', changes: ' - Aguarde novas att' },
+            { date: '18/09/2025', version: 'V 3.6Final', changes: ' - Adicionado botão + capítulos lancados Zica chorão' },
          { date: '31/08/2025', version: 'V3.6d', changes: ' - Mudança do título com imagem com avatar  e imagem genérica do card quando não tiver link' },
             { date: '30/08/2025', version: 'V3.6a', changes: '- Atualizaçao importar  e buscar cards na nuvem servidor firebase também evitando duplicação ao enviar e buscar ,Dica antes de testar as funções novas criar um novo backup' },
             { date: '26/08/2025', version: 'V3.5', changes: '- Redesenho completo do layout dos cards: removidas margens para melhor aproveitamento de espaço, aumentado o tamanho das imagens dos capas para melhor visualização, reorganizados os elementos dos cards (botões, barra de progresso e data da última leitura) em um layout mais compacto. Mantida todas as funcionalidades originais e compatibilidade com o sistema existente.' },
@@ -1305,32 +1273,26 @@
              { date: '01/08/2025', version: 'V3.1', changes: '- Versão da última atualização antes do chabglog com funcionalidades principais.' },
              { date: '20/07/2025', version: 'V2.0', changes: '- Implementação da barra de progresso.Adicionado suporte a diferentes status de leitura' }
         ];
-        
         // --- Funções para o sistema de notificações ---
         function showNotification(message, duration = 3000) {
             notificationMessage.textContent = message;
             notification.style.display = 'flex';
-            
             setTimeout(() => {
                 notification.style.display = 'none';
             }, duration);
         }
-        
         closeNotificationBtn.addEventListener('click', () => {
             notification.style.display = 'none';
         });
-        
         // --- Funções para o menu mobile ---
         function initMobileMenu() {
             if (!mobileMenuBtn || !mobileNav) {
                 console.error('Elementos do menu mobile não encontrados');
                 return;
             }
-            
             mobileMenuBtn.addEventListener('click', () => {
                 mobileNav.classList.toggle('show');
             });
-            
             // Correção: usar event delegation para os links do menu mobile
             mobileNav.addEventListener('click', (e) => {
                 const link = e.target.closest('a');
@@ -1342,33 +1304,27 @@
                 }
             });
         }
-        
         // --- Funções para o sistema de abas ---
         function hideAllContentSections() {
             contentSections.forEach(section => {
                 section.classList.add('hidden');
             });
         }
-        
         function removeActiveClassFromTabs() {
             tabs.forEach(tab => {
                 tab.classList.remove('active');
             });
-            
             // Remover classe ativa do menu mobile
             document.querySelectorAll('.mobile-nav a').forEach(link => {
                 link.classList.remove('active');
             });
         }
-        
         function showTabContent(targetId) {
             hideAllContentSections();
             removeActiveClassFromTabs();
-            
             const targetSection = document.getElementById(targetId);
             const targetTab = document.querySelector(`.tab[data-target="${targetId}"]`);
             const targetMobileLink = document.querySelector(`.mobile-nav a[data-target="${targetId}"]`);
-            
             if (targetSection) {
                 targetSection.classList.remove('hidden');
             }
@@ -1379,25 +1335,17 @@
                 targetMobileLink.classList.add('active');
             }
         }
-        
         // --- Funções para a aba de Ferramentas ---
         function hideAllToolSubSections() {
             toolSubSections.forEach(section => {
                 section.classList.add('hidden');
             });
         }
-        
         function showToolSubSection(targetId) {
             hideAllToolSubSections();
             const targetSubSection = document.getElementById(targetId);
             if (targetSubSection) {
                 targetSubSection.classList.remove('hidden');
-                // Rola a página para o formulário de cadastro quando aberto
-                if (targetId === 'add-manga-sub-section') {
-                    setTimeout(() => {
-                        targetSubSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                    }, 100);
-                }
             }
             // Chama a renderização das notas quando a subseção de notas é exibida
             if (targetId === 'notes-sub-section') {
@@ -1407,54 +1355,43 @@
                 renderChangelog();
             }
         }
-        
         // --- Funções de Utilitário ---
         function saveMangas() {
             localStorage.setItem('mangas', JSON.stringify(mangas));
         }
-        
         function saveNotes() {
             localStorage.setItem('notes', JSON.stringify(notes));
         }
-        
         // --- Função para calcular porcentagem de progresso ---
         function calculateProgress(lastChapter, totalChapters) {
             const last = parseFloat(lastChapter);
             const total = parseFloat(totalChapters);
-            
             if (total === 0) return 0;
             if (last >= total) return 100;
-            
             return Math.round((last / total) * 100);
         }
-        
         // --- Função para atualizar contadores ---
         function updateCounters() {
             const readingCount = mangas.filter(m => m.status === 'reading').length;
             const finishedCount = mangas.filter(m => m.status === 'finished').length;
             const futureCount = mangas.filter(m => m.status === 'future').length;
             const favoritesCount = mangas.filter(m => m.isFavorite).length;
-            
             readingCounter.textContent = `(${readingCount})`;
             finishedCounter.textContent = `(${finishedCount})`;
             futureCounter.textContent = `(${futureCount})`;
             favoritesCounter.textContent = `(${favoritesCount})`;
         }
-        
         function createMangaCard(manga) {
             const card = document.createElement('div');
             card.classList.add('manga-card');
             card.dataset.id = manga.id;
-            
             let imageContentHtml = '';
-            // Verificar se o link da imagem existe e não está vazio
             if (manga.imageLink && manga.imageLink.trim() !== '' && manga.imageLink.startsWith('http')) {
                 imageContentHtml = `<img src="${manga.imageLink}" alt="${manga.title}" class="manga-card-image" loading="lazy">`;
             } else {
                 // Usando a imagem padrão "capacard.jpg" quando não há link de imagem ou o link está vazio
-                imageContentHtml = `<img src="imagens/capacard.jpg" alt="Capa Indisponível" class="manga-card-image" loading="lazy">`;
+                imageContentHtml = `<img src="./imagens/capacard.jpg" alt="Capa Indisponível" class="manga-card-image" loading="lazy">`;
             }
-            
             let mainActionButton = '';
             if (manga.status === 'reading') {
                 mainActionButton = `<button class="btn toggle-status-btn" data-id="${manga.id}">Marcar como Lido</button>`;
@@ -1463,10 +1400,8 @@
             } else if (manga.status === 'future') {
                 mainActionButton = `<button class="btn btn-move-to-reading" data-id="${manga.id}">Mover para Lendo</button>`;
             }
-            
             const favoriteButtonClass = manga.isFavorite ? 'active' : '';
             const progressPercentage = calculateProgress(manga.lastChapter, manga.totalChapters);
-            
             card.innerHTML = `
                 <div class="manga-card-image-wrapper">
                     ${imageContentHtml}
@@ -1474,7 +1409,10 @@
                 <h3 class="manga-title">${manga.title}</h3>
                 <div class="manga-progress-container">
                     <p class="manga-progress">Lido: <span id="chapter-${manga.id}">${manga.lastChapter}</span>/<span id="total-chapters-${manga.id}">${manga.totalChapters === 0 ? '???' : manga.totalChapters}</span></p>
-                    ${manga.status === 'reading' ? `<button class="btn-increment-chapter" data-id="${manga.id}">+</button>` : ''}
+                    ${manga.status === 'reading' ? `<button class="btn-increment-chapter" data-id="${manga.id}" data-target="last">+</button>` : ''}
+                    <!-- INÍCIO DA ALTERAÇÃO -->
+                    ${manga.status === 'reading' ? `<button class="btn-increment-chapter" data-id="${manga.id}" data-target="total" style="background-color: #3498db;">+</button>` : ''}
+                    <!-- FIM DA ALTERAÇÃO -->
                 </div>
                 <div class="progress-bar-container">
                     <div class="progress-bar-fill" style="width: ${progressPercentage}%"></div>
@@ -1490,28 +1428,29 @@
                     <button class="btn btn-share" data-id="${manga.id}" title="Compartilhar"><i class="fas fa-share-alt"></i></button>
                 </div>
             `;
-            
             // Tratamento de erro para imagens externas
-            const imgElement = card.querySelector('.manga-card-image');
-            if (imgElement) {
+            if (manga.imageLink && manga.imageLink.trim() !== '' && manga.imageLink.startsWith('http')) {
+                const imgElement = card.querySelector('.manga-card-image');
                 imgElement.onerror = () => {
                     // Se a imagem externa falhar, usar a imagem padrão
-                    imgElement.src = "imagens/capacard.jpg";
+                    imgElement.src = "./imagens/capacard.jpg";
                     imgElement.alt = "Capa Indisponível";
-                    
-                    // Se mesmo a imagem padrão falhar, mostrar texto de fallback
-                    imgElement.onerror = () => {
-                        const wrapper = card.querySelector('.manga-card-image-wrapper');
-                        wrapper.innerHTML = `
-                            <div class="manga-card-placeholder-text">
-                                <p>Capa</p>
-                                <p>Indisponível</p>
-                            </div>
-                        `;
-                    };
                 };
             }
-            
+            // Garantir que a imagem padrão também tenha tratamento de erro
+            const defaultImgElement = card.querySelector('.manga-card-image[src="./imagens/capacard.jpg"]');
+            if (defaultImgElement) {
+                defaultImgElement.onerror = () => {
+                    // Se a imagem padrão também falhar, mostrar texto de fallback
+                    const wrapper = card.querySelector('.manga-card-image-wrapper');
+                    wrapper.innerHTML = `
+                        <div class="manga-card-placeholder-text">
+                            <p>Capa</p>
+                            <p>Indisponível</p>
+                        </div>
+                    `;
+                };
+            }
             // Eventos do card
             card.querySelector('.btn-favorite').addEventListener('click', (e) => {
                 const mangaId = e.currentTarget.dataset.id;
@@ -1523,7 +1462,6 @@
                     showNotification(currentManga.isFavorite ? 'Adicionado aos favoritos!' : 'Removido dos favoritos!');
                 }
             });
-            
             const toggleStatusBtn = card.querySelector('.toggle-status-btn');
             if (toggleStatusBtn) {
                  toggleStatusBtn.addEventListener('click', (e) => {
@@ -1538,7 +1476,6 @@
                     }
                 });
             }
-            
             const moveToReadingBtn = card.querySelector('.btn-move-to-reading');
             if (moveToReadingBtn) {
                 moveToReadingBtn.addEventListener('click', (e) => {
@@ -1552,26 +1489,37 @@
                     }
                 });
             }
-            
-            const chapterUpBtn = card.querySelector('.btn-increment-chapter');
-            if (chapterUpBtn) {
-                chapterUpBtn.addEventListener('click', (e) => {
-                    const mangaId = e.currentTarget.dataset.id;
-                    const currentManga = mangas.find(m => m.id === mangaId);
-                    if (currentManga) {
-                        let currentChapter = parseFloat(currentManga.lastChapter);
-                        let totalChapters = parseFloat(currentManga.totalChapters);
-                        if (currentChapter < totalChapters || totalChapters === 0) {
-                            currentChapter += 1;
-                            currentManga.lastChapter = currentChapter.toString();
-                            currentManga.lastReadDate = new Date().toLocaleDateString('pt-BR');
-                            saveMangas();
-                            renderMangas();
+            // INÍCIO DA ALTERAÇÃO
+            const chapterUpBtns = card.querySelectorAll('.btn-increment-chapter');
+            if (chapterUpBtns.length > 0) {
+                chapterUpBtns.forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const mangaId = e.currentTarget.dataset.id;
+                        const targetField = e.currentTarget.dataset.target; // 'last' ou 'total'
+                        const currentManga = mangas.find(m => m.id === mangaId);
+                        if (currentManga) {
+                            if (targetField === 'last') {
+                                let currentChapter = parseFloat(currentManga.lastChapter);
+                                let totalChapters = parseFloat(currentManga.totalChapters);
+                                if (currentChapter < totalChapters || totalChapters === 0) {
+                                    currentChapter += 1;
+                                    currentManga.lastChapter = currentChapter.toString();
+                                    currentManga.lastReadDate = new Date().toLocaleDateString('pt-BR');
+                                    saveMangas();
+                                    renderMangas();
+                                }
+                            } else if (targetField === 'total') {
+                                let totalChapters = parseFloat(currentManga.totalChapters);
+                                totalChapters += 1;
+                                currentManga.totalChapters = totalChapters.toString();
+                                saveMangas();
+                                renderMangas();
+                            }
                         }
-                    }
+                    });
                 });
             }
-            
+            // FIM DA ALTERAÇÃO
             // Adicionar evento para o botão de compartilhar (sem ação)
             const shareBtn = card.querySelector('.btn-share');
             if (shareBtn) {
@@ -1580,7 +1528,6 @@
                     compartilharCard(manga);
                 });
             }
-            
             card.querySelector('.btn-edit').addEventListener('click', (e) => {
                 const mangaId = e.target.dataset.id;
                 const mangaToEdit = mangas.find(m => m.id === mangaId);
@@ -1596,7 +1543,6 @@
                     editMangaModal.style.display = 'block';
                 }
             });
-            
             card.querySelector('.btn-delete').addEventListener('click', (e) => {
                 const mangaId = e.target.dataset.id;
                 if (confirm('Tem certeza que deseja excluir este manhwa/mangá da sua lista?')) {
@@ -1606,10 +1552,8 @@
                     showNotification('Manhwa/Mangá excluído com sucesso!');
                 }
             });
-            
             return card;
         }
-        
         function createNoteCard(note) {
             const noteCard = document.createElement('div');
             noteCard.classList.add('note-card');
@@ -1621,7 +1565,6 @@
                     <button class="btn-delete-note" data-id="${note.id}">Excluir</button>
                 </div>
             `;
-            
             noteCard.querySelector('.btn-edit-note').addEventListener('click', (e) => {
                 const noteId = e.target.dataset.id;
                 const noteToEdit = notes.find(n => n.id === noteId);
@@ -1632,7 +1575,6 @@
                     showNotification('Nota carregada para edição no formulário acima.');
                 }
             });
-            
             noteCard.querySelector('.btn-delete-note').addEventListener('click', (e) => {
                 const noteId = e.target.dataset.id;
                 if (confirm('Tem certeza que deseja excluir esta nota?')) {
@@ -1642,57 +1584,47 @@
                     showNotification('Nota excluída com sucesso!');
                 }
             });
-            
             return noteCard;
         }
-        
         function renderMangas() {
             readingMangaListDiv.innerHTML = '';
             finishedMangaListDiv.innerHTML = '';
             futureMangaListDiv.innerHTML = '';
             favoritesMangaListDiv.innerHTML = '';
-            
             const readingMangas = mangas.filter(m => m.status === 'reading').sort((a, b) => a.title.localeCompare(b.title));
             const finishedMangas = mangas.filter(m => m.status === 'finished').sort((a, b) => a.title.localeCompare(b.title));
             const futureMangas = mangas.filter(m => m.status === 'future').sort((a, b) => a.title.localeCompare(b.title));
             const favoriteMangas = mangas.filter(m => m.isFavorite).sort((a, b) => a.title.localeCompare(b.title));
-            
             if (readingMangas.length === 0) {
                 noMangaMessageReading.style.display = 'block';
             } else {
                 noMangaMessageReading.style.display = 'none';
                 readingMangas.forEach(manga => { readingMangaListDiv.appendChild(createMangaCard(manga)); });
             }
-            
             if (finishedMangas.length === 0) {
                 noMangaMessageFinished.style.display = 'block';
             } else {
                 noMangaMessageFinished.style.display = 'none';
                 finishedMangas.forEach(manga => { finishedMangaListDiv.appendChild(createMangaCard(manga)); });
             }
-            
             if (futureMangas.length === 0) {
                 noMangaMessageFuture.style.display = 'block';
             } else {
                 noMangaMessageFuture.style.display = 'none';
                 futureMangas.forEach(manga => { futureMangaListDiv.appendChild(createMangaCard(manga)); });
             }
-            
             if (favoriteMangas.length === 0) {
                 noMangaMessageFavorites.style.display = 'block';
             } else {
                 noMangaMessageFavorites.style.display = 'none';
                 favoriteMangas.forEach(manga => { favoritesMangaListDiv.appendChild(createMangaCard(manga)); });
             }
-            
             // Atualizar contadores
             updateCounters();
         }
-        
         function renderNotes() {
             const notesListDiv = document.getElementById('notes-list');
             notesListDiv.innerHTML = '';
-            
             if (notes.length === 0) {
                 notesListDiv.innerHTML = '<p id="no-notes-message">Nenhuma nota salva ainda.</p>';
             } else {
@@ -1705,7 +1637,6 @@
         function renderChangelog() {
             const changelogListDiv = document.getElementById('changelog-list');
             changelogListDiv.innerHTML = '';
-            
             changelogs.sort((a, b) => new Date(b.date) - new Date(a.date));
             changelogs.forEach(log => {
                 const logCard = document.createElement('div');
@@ -1717,7 +1648,6 @@
                 changelogListDiv.appendChild(logCard);
             });
         }
-        
         function exportMangasToFile() {
             const backupData = JSON.stringify(mangas, null, 2);
             const blob = new Blob([backupData], { type: 'application/json' });
@@ -1731,22 +1661,18 @@
             URL.revokeObjectURL(url);
             showNotification('Backup baixado com sucesso!');
         }
-        
         function importMangasFromFile(event) {
             const file = event.target.files[0];
             if (!file) {
                 selectedFileNameSpan.textContent = 'Nenhum arquivo selecionado.';
                 return;
             }
-            
             selectedFileNameSpan.textContent = `Arquivo selecionado: ${file.name}`;
             const reader = new FileReader();
-            
             reader.onload = (e) => {
                 try {
                     const fileContent = e.target.result;
                     const parsedData = JSON.parse(fileContent);
-                    
                     if (Array.isArray(parsedData)) {
                         if (confirm('Tem certeza que deseja carregar este backup? Isso substituirá todos os seus dados atuais.')) {
                             mangas = parsedData;
@@ -1765,42 +1691,18 @@
                     console.error('Erro ao carregar backup do arquivo:', error);
                 }
             };
-            
             reader.onerror = (e) => {
                 showNotification('Erro ao ler o arquivo.');
                 console.error('Erro ao ler arquivo:', e.target.error);
             };
-            
             reader.readAsText(file);
         }
-        
-        // --- Função para o botão Voltar ao Topo ---
-        function initScrollToTopButton() {
-            // Mostrar/ocultar botão conforme rolagem da página
-            window.addEventListener('scroll', () => {
-                if (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300) {
-                    scrollTopBtn.style.display = 'block';
-                } else {
-                    scrollTopBtn.style.display = 'none';
-                }
-            });
-            
-            // Rolagem suave para o topo quando clicado
-            scrollTopBtn.addEventListener('click', () => {
-                window.scrollTo({
-                    top: 0,
-                    behavior: 'smooth'
-                });
-            });
-        }
-        
         // --- Event Listeners Globais ---
         tabs.forEach(tab => {
             tab.addEventListener('click', () => {
                 showTabContent(tab.dataset.target);
             });
         });
-        
         toolButtons.forEach(button => {
             button.addEventListener('click', () => {
                 const targetId = button.dataset.toolTarget;
@@ -1809,31 +1711,24 @@
                 }
             });
         });
-        
         exportMangasBtn.addEventListener('click', exportMangasToFile);
         selectFileBackupBtn.addEventListener('click', () => { fileInputBackup.click(); });
         fileInputBackup.addEventListener('change', importMangasFromFile);
-        
         mangaForm.addEventListener('submit', (e) => {
             e.preventDefault();
             const title = document.getElementById('manga-title').value;
             const link = document.getElementById('manga-link').value;
             const imageLink = document.getElementById('manga-image-link').value;
-            
             let lastChapter = parseFloat(document.getElementById('manga-last-chapter').value.replace(',', '.')) || 0;
             let totalChapters = parseFloat(document.getElementById('manga-total-chapters').value.replace(',', '.')) || 0;
-            
             const status = document.getElementById('manga-status').value;
             const isFavorite = document.getElementById('manga-is-favorite').checked;
             const currentDate = new Date().toLocaleDateString('pt-BR');
-            
             if (totalChapters !== 0 && lastChapter > totalChapters) {
                 lastChapter = totalChapters;
             }
-            
             const formattedLastChapter = lastChapter % 1 === 0 ? parseInt(lastChapter).toString() : lastChapter.toFixed(1);
             const formattedTotalChapters = totalChapters % 1 === 0 ? parseInt(totalChapters).toString() : totalChapters.toFixed(1);
-            
             const newManga = {
                 id: Date.now().toString(),
                 title,
@@ -1845,52 +1740,41 @@
                 status,
                 isFavorite
             };
-            
             mangas.push(newManga);
             saveMangas();
             renderMangas();
-            
             mangaForm.reset();
             document.getElementById('manga-last-chapter').value = '0';
             document.getElementById('manga-total-chapters').value = '0';
             document.getElementById('manga-status').value = 'reading';
             document.getElementById('manga-is-favorite').checked = false;
-            
             showNotification('Manhwa/Mangá adicionado com sucesso!');
-            
             showTabContent(newManga.status === 'reading' ? 'reading-list-section' : 
                           (newManga.status === 'finished' ? 'finished-list-section' : 'future-list-section'));
         });
-        
         closeButton.addEventListener('click', () => {
             editMangaModal.style.display = 'none';
         });
-        
         window.addEventListener('click', (event) => {
             if (event.target == editMangaModal) {
                 editMangaModal.style.display = 'none';
             }
         });
-        
         editMangaForm.addEventListener('submit', (e) => {
             e.preventDefault();
             const mangaId = document.getElementById('edit-manga-id').value;
             const updatedTitle = document.getElementById('edit-manga-title').value;
             const updatedLink = document.getElementById('edit-manga-link').value;
             const updatedImageLink = document.getElementById('edit-manga-image-link').value;
-            
             let updatedLastChapter = parseFloat(document.getElementById('edit-manga-last-chapter').value.replace(',', '.')) || 0;
             let updatedTotalChapters = parseFloat(document.getElementById('edit-manga-total-chapters').value.replace(',', '.')) || 0;
             const updatedStatus = document.getElementById('edit-manga-status').value;
             const updatedIsFavorite = document.getElementById('edit-manga-is-favorite').checked;
-            
             if (updatedTotalChapters !== 0 && updatedLastChapter > updatedTotalChapters) {
                 updatedLastChapter = updatedTotalChapters;
             }
-            
             const formattedUpdatedLastChapter = updatedLastChapter % 1 === 0 ? parseInt(updatedLastChapter).toString() : updatedLastChapter.toFixed(1);
             const formattedUpdatedTotalChapters = updatedTotalChapters % 1 === 0 ? parseInt(updatedTotalChapters).toString() : updatedTotalChapters.toFixed(1);
-            
             const index = mangas.findIndex(m => m.id === mangaId);
             if (index !== -1) {
                 mangas[index].title = updatedTitle;
@@ -1900,13 +1784,10 @@
                 mangas[index].totalChapters = formattedUpdatedTotalChapters;
                 mangas[index].status = updatedStatus;
                 mangas[index].isFavorite = updatedIsFavorite;
-                
                 saveMangas();
                 renderMangas();
                 editMangaModal.style.display = 'none';
-                
                 showNotification('Manhwa/Mangá atualizado com sucesso!');
-                
                 const activeTab = document.querySelector('.tab.active').dataset.target;
                 if (activeTab === 'favorites-list-section') {
                     if (!updatedIsFavorite) {
@@ -1920,13 +1801,11 @@
                 }
             }
         });
-        
         const notesForm = document.getElementById('notes-form');
         notesForm.addEventListener('submit', (e) => {
             e.preventDefault();
             const content = document.getElementById('note-content').value;
             const editingId = notesForm.dataset.editingId;
-            
             if (editingId) {
                 // Modo de edição
                 const noteIndex = notes.findIndex(n => n.id === editingId);
@@ -1945,7 +1824,6 @@
                 notes.push(newNote);
                 showNotification('Nota salva com sucesso!');
             }
-            
             saveNotes();
             renderNotes();
             notesForm.reset();
@@ -1953,15 +1831,10 @@
         document.getElementById('news-btn').addEventListener('click', () => {
             window.open('https://dashboardedsoncsf.netlify.app/gmanhwanews%20v1.2'); // Coloque o link do site de notícias aqui
         });
-        
         // --- Inicialização da Aplicação ---
         document.addEventListener('DOMContentLoaded', () => {
             // Inicializar menu mobile
             initMobileMenu();
-            
-            // Inicializar botão voltar ao topo
-            initScrollToTopButton();
-            
             // Renderizar dados iniciais
             renderMangas();
             showTabContent('reading-list-section');
