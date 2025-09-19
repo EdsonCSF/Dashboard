@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>HUB Sistemas</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <style>
     :root {
       /* Cores para o modo claro */
@@ -23,7 +23,6 @@
       --bg-gradient: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
       --card-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     }
-
     [data-theme="dark"] {
       /* Cores para o modo escuro */
       --primary-color: #3b82f6;
@@ -41,13 +40,11 @@
       --bg-gradient: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
       --card-gradient: linear-gradient(135deg, #4338ca 0%, #6366f1 100%);
     }
-
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
     }
-
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background: var(--bg-gradient);
@@ -57,7 +54,6 @@
       color: var(--text-color);
       transition: all 0.3s ease;
     }
-
     header {
       background: var(--primary-color);
       color: var(--header-text);
@@ -70,11 +66,9 @@
       justify-content: space-between;
       align-items: center;
     }
-
     .header-title {
       flex: 1;
     }
-
     .header-title h1 {
       font-size: 2rem;
       font-weight: 700;
@@ -82,14 +76,12 @@
       z-index: 1;
       position: relative;
     }
-
     .header-title p {
       font-size: 1rem;
       opacity: 0.9;
       z-index: 1;
       position: relative;
     }
-
     .theme-toggle {
       background: rgba(255, 255, 255, 0.2);
       border: none;
@@ -103,17 +95,14 @@
       gap: 0.5rem;
       transition: all 0.3s ease;
     }
-
     .theme-toggle:hover {
       background: rgba(255, 255, 255, 0.3);
     }
-
     .search-container {
       max-width: 600px;
       margin: 2rem auto;
       padding: 0 1rem;
     }
-
     .search-box {
       width: 100%;
       padding: 1rem 1.5rem;
@@ -126,15 +115,12 @@
       background: var(--card-bg);
       color: var(--text-color);
     }
-
     .search-box::placeholder {
       color: var(--gray-color);
     }
-
     .search-box:focus {
       box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.3);
     }
-
     #lista-sistemas {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -144,9 +130,7 @@
       margin: 0 auto;
       width: 100%;
     }
-
     .bloco-sistema {
-      background: var(--card-bg);
       border-radius: 16px;
       padding: 2rem;
       text-align: center;
@@ -159,24 +143,17 @@
       position: relative;
       overflow: hidden;
       height: 200px;
-      cursor: pointer;
+      cursor: grab;
+      user-select: none;
     }
-
-    .bloco-sistema::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 6px;
-      background: var(--card-gradient);
+    .bloco-sistema:active {
+      cursor: grabbing;
     }
-
-    .bloco-sistema:hover {
-      transform: translateY(-8px);
-      box-shadow: var(--shadow-lg);
+    .bloco-sistema.dragging {
+      opacity: 0.5;
+      transform: scale(1.05);
+      z-index: 1000;
     }
-
     .bloco-sistema a {
       text-decoration: none;
       font-weight: 600;
@@ -189,7 +166,6 @@
       height: 100%;
       width: 100%;
     }
-
     .icon-container {
       width: 80px;
       height: 80px;
@@ -198,20 +174,13 @@
       align-items: center;
       justify-content: center;
       margin-bottom: 1.5rem;
-      background: var(--card-gradient);
       box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
       transition: all 0.3s ease;
+      font-size: 2.5rem;
     }
-
     .bloco-sistema:hover .icon-container {
       transform: scale(1.1);
     }
-
-    .bloco-sistema i {
-      font-size: 2.5rem;
-      color: white;
-    }
-
     footer {
       background: var(--footer-bg);
       color: var(--footer-text);
@@ -219,38 +188,32 @@
       text-align: center;
       margin-top: auto;
     }
-
     footer h2 {
       font-size: 1rem;
       font-weight: 400;
       margin-bottom: 1rem;
       line-height: 1.6;
     }
-
     footer .social-links {
       display: flex;
       justify-content: center;
       gap: 1rem;
       margin-top: 1rem;
     }
-
     footer .social-links a {
       color: var(--footer-text);
       font-size: 1.2rem;
       transition: color 0.3s ease;
     }
-
     footer .social-links a:hover {
       color: var(--primary-color);
     }
-
     .loading {
       display: flex;
       justify-content: center;
       align-items: center;
       height: 200px;
     }
-
     .loading-spinner {
       width: 50px;
       height: 50px;
@@ -259,11 +222,9 @@
       border-top-color: var(--primary-color);
       animation: spin 1s ease-in-out infinite;
     }
-
     @keyframes spin {
       to { transform: rotate(360deg); }
     }
-
     .notification {
       position: fixed;
       bottom: 20px;
@@ -278,40 +239,59 @@
       transition: all 0.3s ease;
       z-index: 1000;
     }
-
     .notification.show {
       transform: translateY(0);
       opacity: 1;
     }
-
+    /* Estilos Específicos para Aplicações Meleka */
+    .meleka-cinema {
+      background: linear-gradient(135deg, #ff6b35, #a12a5e);
+      color: white;
+    }
+    .meleka-cinema .icon-container {
+      background: rgba(0,0,0,0.2);
+      color: #ffd700;
+      border: 3px solid #ffd700;
+    }
+    .meleka-animes {
+      background: linear-gradient(135deg, #64b5f6, #b388ff);
+      color: white;
+    }
+    .meleka-animes .icon-container {
+      background: rgba(0,0,0,0.2);
+      color: #ffd54f;
+      border: 3px solid #ffd54f;
+    }
+    .gmanhwa-app {
+      background: linear-gradient(135deg, #ff6b9d, #ffd54f);
+      color: white;
+    }
+    .gmanhwa-app .icon-container {
+      background: rgba(0,0,0,0.2);
+      color: #ffffff;
+      border: 3px solid #ffffff;
+    }
     @media (max-width: 768px) {
       header {
         flex-direction: column;
         gap: 1rem;
       }
-      
       .header-title h1 {
         font-size: 1.5rem;
       }
-      
       #lista-sistemas {
         grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
         gap: 1rem;
         padding: 0 1rem 1.5rem;
       }
-      
       .bloco-sistema {
         height: 160px;
         padding: 1.5rem;
       }
-      
       .icon-container {
         width: 60px;
         height: 60px;
         margin-bottom: 1rem;
-      }
-      
-      .bloco-sistema i {
         font-size: 2rem;
       }
     }
@@ -321,30 +301,27 @@
   <header>
     <div class="header-title">
       <h1>HUB Sistemas</h1>
-      <p>Acesso centralizado às suas aplicações</p>
+      <p>Arraste para reorganizar seus aplicativos favoritos</p>
     </div>
     <button class="theme-toggle" id="themeToggle">
       <i class="fas fa-moon" id="themeIcon"></i>
       <span id="themeText">Modo Escuro</span>
     </button>
   </header>
-
   <div class="search-container">
     <input type="text" class="search-box" placeholder="Buscar sistemas..." id="searchInput">
   </div>
-
   <section id="lista-sistemas">
     <div class="loading">
       <div class="loading-spinner"></div>
     </div>
   </section>
-
   <footer>
     <h2>
       Desenvolvido por EdsonC.S.F. <br>
       Contato: edsony1@gmail.com <br>
       Criação: Julho de 2025 <br>
-      Versão: 1.1 © 2025. Todos os direitos reservados.
+      Versão: 2.0 © 2025. Todos os direitos reservados.
     </h2>
     <div class="social-links">
       <a href="mailto:edsony1@gmail.com" title="Email"><i class="fas fa-envelope"></i></a>
@@ -352,12 +329,13 @@
       <a href="#" title="LinkedIn"><i class="fab fa-linkedin"></i></a>
     </div>
   </footer>
-
   <div class="notification" id="notification"></div>
-
   <script>
     // Mapeamento de ícones para sistemas
     const iconMap = {
+      'meleka cinema': 'fa-film',
+      'meleka animes': 'fa-book',
+      'gmanhwa app': 'fa-book-open',
       'sistema': 'fa-desktop',
       'portal': 'fa-globe-americas',
       'relatório': 'fa-chart-line',
@@ -388,8 +366,7 @@
       'workflow': 'fa-sitemap',
       'default': 'fa-cube'
     };
-
-    // Cores para os ícones
+    // Cores para os ícones (mantido para sistemas genéricos)
     const iconColors = [
       'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
       'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
@@ -402,42 +379,48 @@
       'linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)',
       'linear-gradient(135deg, #ff8a80 0%, #ea4c89 100%)'
     ];
-
     // Função para obter ícone baseado no nome do sistema
     function getIconForSystem(systemName) {
       const lowerName = systemName.toLowerCase();
-      
       for (const [key, value] of Object.entries(iconMap)) {
         if (lowerName.includes(key)) {
           return value;
         }
       }
-      
       return iconMap['default'];
     }
-
     // Função para obter cor baseado no nome do sistema
     function getColorForSystem(systemName, index) {
       return iconColors[index % iconColors.length];
     }
-
+    // ✅ Função para aplicar estilos temáticos específicos
+    function applyThematicStyle(cardElement, systemName) {
+      const lowerName = systemName.toLowerCase();
+      if (lowerName.includes('meleka cinema')) {
+        cardElement.classList.add('meleka-cinema');
+      } else if (lowerName.includes('meleka animes')) {
+        cardElement.classList.add('meleka-animes');
+      } else if (lowerName.includes('gmanhwa') || lowerName.includes('manhwa')) {
+        cardElement.classList.add('gmanhwa-app');
+      } else {
+        // Mantém estilo padrão para outros sistemas
+        cardElement.style.background = getColorForSystem(systemName, Math.random() * 10);
+      }
+    }
     // Função para mostrar notificação
     function showNotification(message) {
       const notification = document.getElementById('notification');
       notification.textContent = message;
       notification.classList.add('show');
-      
       setTimeout(() => {
         notification.classList.remove('show');
       }, 3000);
     }
-
     // Função para filtrar sistemas
     function filterSystems() {
       const searchInput = document.getElementById('searchInput');
       const searchTerm = searchInput.value.toLowerCase();
       const systemBlocks = document.querySelectorAll('.bloco-sistema');
-      
       systemBlocks.forEach(block => {
         const systemName = block.textContent.toLowerCase();
         if (systemName.includes(searchTerm)) {
@@ -447,13 +430,11 @@
         }
       });
     }
-
     // Função para alternar tema
     function toggleTheme() {
       const body = document.body;
       const themeIcon = document.getElementById('themeIcon');
       const themeText = document.getElementById('themeText');
-      
       if (body.getAttribute('data-theme') === 'dark') {
         body.removeAttribute('data-theme');
         themeIcon.className = 'fas fa-moon';
@@ -466,29 +447,56 @@
         localStorage.setItem('theme', 'dark');
       }
     }
-
     // Verificar tema salvo
     function checkSavedTheme() {
       const savedTheme = localStorage.getItem('theme');
       const themeIcon = document.getElementById('themeIcon');
       const themeText = document.getElementById('themeText');
-      
       if (savedTheme === 'dark') {
         document.body.setAttribute('data-theme', 'dark');
         themeIcon.className = 'fas fa-sun';
         themeText.textContent = 'Modo Claro';
       }
     }
-
+    // ✅ IMPLEMENTAÇÃO DE DRAG & DROP
+    function makeCardsDraggable() {
+      const cards = document.querySelectorAll('.bloco-sistema');
+      let draggedCard = null;
+      cards.forEach(card => {
+        card.addEventListener('dragstart', () => {
+          draggedCard = card;
+          setTimeout(() => card.classList.add('dragging'), 0);
+        });
+        card.addEventListener('dragend', () => {
+          card.classList.remove('dragging');
+          draggedCard = null;
+        });
+        card.addEventListener('dragover', e => {
+          e.preventDefault();
+        });
+        card.addEventListener('drop', e => {
+          e.preventDefault();
+          if (draggedCard && draggedCard !== card) {
+            const parent = card.parentElement;
+            const cardsArray = Array.from(parent.children).filter(c => c.classList.contains('bloco-sistema'));
+            const draggedIndex = cardsArray.indexOf(draggedCard);
+            const targetIndex = cardsArray.indexOf(card);
+            if (draggedIndex < targetIndex) {
+              parent.insertBefore(draggedCard, card.nextSibling);
+            } else {
+              parent.insertBefore(draggedCard, card);
+            }
+            showNotification('Ordem atualizada!');
+          }
+        });
+      });
+    }
     // Adicionar evento de busca
     document.getElementById('searchInput').addEventListener('input', filterSystems);
-    
     // Adicionar evento de alternância de tema
     document.getElementById('themeToggle').addEventListener('click', toggleTheme);
-
     // Verificar tema salvo ao carregar a página
     checkSavedTheme();
-
     // Carregar sistemas do JSON
     fetch('sistemas.json')
       .then(response => {
@@ -500,31 +508,29 @@
       .then(data => {
         const lista = document.getElementById('lista-sistemas');
         lista.innerHTML = '';
-        
         if (data.length === 0) {
           lista.innerHTML = '<p style="text-align: center; width: 100%; padding: 2rem;">Nenhum sistema encontrado.</p>';
           return;
         }
-        
         data.forEach((sistema, index) => {
           const item = document.createElement('div');
           item.className = 'bloco-sistema';
-          
+          item.draggable = true; // ✅ Torna o card arrastável
           const iconClass = getIconForSystem(sistema.nome);
-          const iconColor = getColorForSystem(sistema.nome, index);
-          
           item.innerHTML = `
             <a href="${sistema.arquivo}" target="_blank">
-              <div class="icon-container" style="background: ${iconColor};">
+              <div class="icon-container">
                 <i class="fas ${iconClass}"></i>
               </div>
               <span>${sistema.nome}</span>
             </a>
           `;
-          
+          // ✅ Aplica estilo temático específico
+          applyThematicStyle(item, sistema.nome);
           lista.appendChild(item);
         });
-        
+        // ✅ Ativa drag & drop após renderizar
+        makeCardsDraggable();
         showNotification(`${data.length} sistemas carregados com sucesso!`);
       })
       .catch(error => {
