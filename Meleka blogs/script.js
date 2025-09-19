@@ -1,18 +1,18 @@
-const API_KEY = 'd40eb0d5d00c65022d9ecaf3678c39f2'; //  NÃO ESQUEÇA DE SUBSTITUIR!
+const API_KEY = 'd40eb0d5d00c65022d9ecaf3678c39f2'; //  SUBSTITUA PELA SUA CHAVE REAL!
 const BASE_URL = 'https://api.themoviedb.org/3';
 const IMG_BASE_URL = 'https://image.tmdb.org/t/p/w500';
 
-// Estrutura para armazenar estado de paginação de cada seção
+// Estado de paginaÃ§Ã£o para cada seÃ§Ã£o
 const paginationState = {
-    launches: { page: 1, hasMore: true, endpoint: '/discover/movie?primary_release_date.gte=2025-04-01&primary_release_date.lte=2025-04-30' },
-    trending: { page: 1, hasMore: true, endpoint: '/trending/all/day' },
-    topRated: { page: 1, hasMore: true, endpoint: '/movie/top_rated' },
-    filterResults: { page: 1, hasMore: true, items: [] }
+    launches: { page: 1, hasMore: true, endpoint: '/discover/movie?primary_release_date.gte=2025-04-01&primary_release_date.lte=2025-04-30&sort_by=popularity.desc', mediaType: 'movie' },
+    trending: { page: 1, hasMore: true, endpoint: '/trending/all/day', mediaType: null },
+    topRated: { page: 1, hasMore: true, endpoint: '/movie/top_rated', mediaType: 'movie' },
+    filterResults: { page: 1, hasMore: true, endpoint: '', mediaType: null, isFiltered: false }
 };
 
 let allItems = [];
 
-// Carrega gêneros
+// Carrega gÃªneros
 async function loadGenres() {
     try {
         const [movies, tvs] = await Promise.all([
@@ -28,20 +28,15 @@ async function loadGenres() {
             select.appendChild(opt);
         });
     } catch (err) {
-        console.error("Erro ao carregar gêneros:", err);
+        console.error("Erro ao carregar gÃªneros:", err);
     }
 }
 
-// Busca dados da API com paginação
+// Busca dados da API
 async function fetchData(endpoint, page = 1) {
     try {
-        const url = `${BASE_URL}${endpoint}&page=${page}&api_key=${API_KEY}&language=pt-BR`;
-        const res = await fetch(url);
-        
-        if (!res.ok) {
-            throw new Error(`HTTP ${res.status}: ${res.statusText}`);
-        }
-        
+        const res = await fetch(`${BASE_URL}${endpoint}&page=${page}&api_key=${API_KEY}&language=pt-BR`);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
         return await res.json();
     } catch (err) {
         console.error("Erro na API:", err);
@@ -49,72 +44,58 @@ async function fetchData(endpoint, page = 1) {
     }
 }
 
-// Renderiza cards (append ou replace)
+// Renderiza cards
 function renderCards(items, containerId, append = false) {
     const container = document.getElementById(containerId);
-    
-    if (!append) {
-        container.innerHTML = '';
-    }
+    if (!append) container.innerHTML = '';
 
-    if (!items || items.length === 0) {
-        if (!append) {
-            container.innerHTML = `<div class="no-results">Nenhum item encontrado.</div>`;
-        }
+    if (!items.length) {
+        container.innerHTML = `<div class="no-results">Nenhum resultado encontrado.</div>`;
         return;
     }
 
     items.forEach((item, index) => {
-        const isMovie = !item.media_type || (item.title ? true : false);
+        const isMovie = item.media_type === 'movie' || (item.title && !item.name);
         const date = isMovie ? item.release_date : item.first_air_date;
-        const formattedDate = date ? new Date(date).toLocaleDateString('pt-BR') : 'Indisponível';
+        const formattedDate = date ? new Date(date).toLocaleDateString('pt-BR') : 'IndisponÃ­vel';
         const vote = item.vote_average ? item.vote_average.toFixed(1) : 'N/A';
-        const title = item.title || item.name || 'Sem título';
+        const title = item.title || item.name || 'Sem tÃ­tulo';
 
         const card = document.createElement('div');
         card.className = 'card-hq';
         card.dataset.id = item.id;
         card.dataset.type = isMovie ? 'movie' : 'tv';
         card.innerHTML = `
-            <img class="card-poster" src="${IMG_BASE_URL}${item.poster_path || '/fallback.jpg'}" alt="${title}" onerror="this.src='https://via.placeholder.com/500x750/333/fff?text=SEM+POSTER'">
+            <img class="card-poster" src="${IMG_BASE_URL}${item.poster_path || ''}" alt="${title}" onerror="this.src='https://via.placeholder.com/500x750/333/fff?text=SEM+POSTER'">
             <h3 class="card-title">${title}</h3>
             <div class="card-info">
-                <i class="fas fa-calendar"></i> ${formattedDate} • ${isMovie ? ' Filme' : ' Série'}
+                <i class="fas fa-calendar"></i> ${formattedDate} â€¢ ${isMovie ? ' Filme' : ' SÃ©rie'}
             </div>
-            <p class="card-synopsis">${item.overview || 'Sinopse indisponível.'}</p>
+            <p class="card-synopsis">${item.overview || 'Sinopse indisponÃ­vel.'}</p>
             <div class="card-rating">
                 <i class="fas fa-star"></i> ${vote}/10
             </div>
         `;
         container.appendChild(card);
 
-        // Anima com delay
         setTimeout(() => {
-            gsap.to(card, {
-                duration: 0.6,
-                y: 0,
-                opacity: 1,
-                ease: "power2.out",
-                delay: index * 0.1
-            });
+            gsap.to(card, { duration: 0.6, y: 0, opacity: 1, ease: "power2.out", delay: index * 0.1 });
         }, 100);
 
-        // Abre modal ao clicar
         card.addEventListener('click', () => openModal(item, isMovie ? 'movie' : 'tv'));
     });
 }
 
-// Carrega mais dados para uma seção específica
+// Carrega mais para uma seÃ§Ã£o
 async function loadMore(sectionKey) {
     const state = paginationState[sectionKey];
     if (!state.hasMore) return;
 
     state.page++;
     const data = await fetchData(state.endpoint, state.page);
-    
     const items = data.results.map(item => ({
         ...item,
-        media_type: sectionKey === 'topRated' || sectionKey === 'launches' ? 'movie' : (item.title ? 'movie' : 'tv')
+        media_type: state.mediaType || (item.title ? 'movie' : 'tv')
     }));
 
     state.hasMore = state.page < data.total_pages;
@@ -132,42 +113,13 @@ async function loadMore(sectionKey) {
     }
 }
 
-// Filtra por tipo (tab)
-async function filterByType(type) {
-    let endpoint = '';
-    let mediaType = null;
-
-    switch(type) {
-        case 'movie':
-            endpoint = '/discover/movie?sort_by=popularity.desc';
-            break;
-        case 'tv':
-            endpoint = '/discover/tv?sort_by=popularity.desc';
-            break;
-        case 'upcoming':
-            endpoint = '/movie/upcoming';
-            mediaType = 'movie';
-            break;
-        case 'trending':
-            endpoint = '/trending/all/day';
-            break;
-        case 'top_rated':
-            endpoint = '/movie/top_rated';
-            mediaType = 'movie';
-            break;
-        default:
-            resetPagination();
-            await Promise.all([
-                loadSection('launches'),
-                loadSection('trending'),
-                loadSection('topRated')
-            ]);
-            return;
-    }
-
-    paginationState.filterResults.page = 1;
-    paginationState.filterResults.hasMore = true;
-    paginationState.filterResults.endpoint = endpoint;
+//  CORREÃ‡ÃƒO PRINCIPAL: FunÃ§Ã£o que carrega dados da API para cada filtro
+async function loadFilteredContent(endpoint, mediaType = null, containerId = 'filter-results') {
+    const state = paginationState.filterResults;
+    state.page = 1;
+    state.endpoint = endpoint;
+    state.mediaType = mediaType;
+    state.isFiltered = true;
 
     const data = await fetchData(endpoint, 1);
     const items = data.results.map(item => ({
@@ -175,58 +127,85 @@ async function filterByType(type) {
         media_type: mediaType || (item.title ? 'movie' : 'tv')
     }));
 
-    paginationState.filterResults.items = items;
-    paginationState.filterResults.hasMore = data.page < data.total_pages;
+    state.items = items;
+    state.hasMore = data.page < data.total_pages;
 
     const resultsSection = document.getElementById('filter-results-section');
     resultsSection.style.display = 'block';
     resultsSection.scrollIntoView({ behavior: 'smooth' });
 
-    renderCards(items, 'filter-results', false);
+    renderCards(items, containerId, false);
 }
 
-// Aplica filtros avançados
-function applyAdvancedFilters() {
-    const genre = document.getElementById('filter-genre').value;
-    const rating = parseFloat(document.getElementById('filter-rating').value) || 0;
+//  CORREÃ‡ÃƒO: Filtra por tipo (cada botÃ£o agora busca o endpoint correto)
+function filterByType(type) {
+    let endpoint = '';
+    let mediaType = null;
+    let containerId = 'filter-results';
 
-    let filtered = [...allItems];
-
-    if (genre) {
-        filtered = filtered.filter(item => item.genre_ids && item.genre_ids.includes(parseInt(genre)));
+    switch(type) {
+        case 'movie':
+            endpoint = '/discover/movie?sort_by=popularity.desc';
+            mediaType = 'movie';
+            break;
+        case 'tv':
+            endpoint = '/discover/tv?sort_by=popularity.desc';
+            mediaType = 'tv';
+            break;
+        case 'upcoming':
+            endpoint = '/movie/upcoming';
+            mediaType = 'movie';
+            break;
+        case 'trending':
+            endpoint = '/trending/all/day';
+            mediaType = null;
+            break;
+        case 'top_rated':
+            endpoint = '/movie/top_rated';
+            mediaType = 'movie';
+            break;
+        case 'all':
+        default:
+            // Volta para as seÃ§Ãµes iniciais
+            resetToInitialSections();
+            return;
     }
 
-    if (rating) {
-        filtered = filtered.filter(item => item.vote_average >= rating);
-    }
-
-    paginationState.filterResults.page = 1;
-    paginationState.filterResults.items = filtered;
-    paginationState.filterResults.hasMore = false;
-
-    const resultsSection = document.getElementById('filter-results-section');
-    resultsSection.style.display = 'block';
-    resultsSection.scrollIntoView({ behavior: 'smooth' });
-
-    renderCards(filtered, 'filter-results', false);
+    // Carrega os dados da API para o filtro selecionado
+    loadFilteredContent(endpoint, mediaType, containerId);
 }
 
-// Carrega seção inicial (página 1)
+// Carrega seÃ§Ã£o inicial
 async function loadSection(sectionKey) {
     const state = paginationState[sectionKey];
     state.page = 1;
-    state.hasMore = true;
-
     const data = await fetchData(state.endpoint, 1);
     const items = data.results.map(item => ({
         ...item,
-        media_type: sectionKey === 'topRated' || sectionKey === 'launches' ? 'movie' : (item.title ? 'movie' : 'tv')
+        media_type: state.mediaType || (item.title ? 'movie' : 'tv')
     }));
 
     state.hasMore = data.page < data.total_pages;
     allItems = [...allItems, ...items];
-
     renderCards(items, sectionKey, false);
+}
+
+// Reseta para seÃ§Ãµes iniciais
+async function resetToInitialSections() {
+    const resultsSection = document.getElementById('filter-results-section');
+    resultsSection.style.display = 'none';
+
+    // Reinicia paginaÃ§Ã£o
+    for (let key of ['launches', 'trending', 'topRated']) {
+        paginationState[key].page = 1;
+        paginationState[key].hasMore = true;
+    }
+
+    await Promise.all([
+        loadSection('launches'),
+        loadSection('trending'),
+        loadSection('topRated')
+    ]);
 }
 
 // Modal de detalhes
@@ -236,9 +215,8 @@ async function openModal(item, type) {
 
     try {
         const details = await fetchData(`/${type}/${item.id}?append_to_response=credits,videos`);
-
         const releaseDate = type === 'movie' ? details.release_date : details.first_air_date;
-        const formattedDate = releaseDate ? new Date(releaseDate).toLocaleDateString('pt-BR') : 'Não disponível';
+        const formattedDate = releaseDate ? new Date(releaseDate).toLocaleDateString('pt-BR') : 'NÃ£o disponÃ­vel';
 
         modalBody.innerHTML = `
             <img class="modal-poster" src="${IMG_BASE_URL}${details.poster_path || details.backdrop_path || ''}" alt="${details.title || details.name}" onerror="this.src='https://via.placeholder.com/800x1200/444/fff?text=POSTER+INDISPON%C3%8DVEL'">
@@ -251,7 +229,7 @@ async function openModal(item, type) {
                 ${details.episode_run_time?.[0] ? `<span><i class="fas fa-clock"></i> ${details.episode_run_time[0]} min/ep</span>` : ''}
             </div>
             <h3>Sinopse</h3>
-            <p class="modal-synopsis">${details.overview || 'Sinopse indisponível.'}</p>
+            <p class="modal-synopsis">${details.overview || 'Sinopse indisponÃ­vel.'}</p>
             ${details.videos?.results?.[0] ? `
                 <h3>Trailer</h3>
                 <div class="modal-trailer">
@@ -267,7 +245,7 @@ async function openModal(item, type) {
 }
 
 // Fecha modal
-document.addEventListener('DOMContentLoaded', () => {
+function setupModal() {
     document.querySelector('.close')?.addEventListener('click', () => {
         document.getElementById('modal').style.display = 'none';
     });
@@ -278,69 +256,40 @@ document.addEventListener('DOMContentLoaded', () => {
             modal.style.display = 'none';
         }
     });
-});
-
-// Reseta paginação
-function resetPagination() {
-    for (let key in paginationState) {
-        paginationState[key].page = 1;
-        paginationState[key].hasMore = true;
-    }
 }
 
-//  FUNÇÃO CRÍTICA: Remove splash mesmo se API falhar
+// ForÃ§a remoÃ§Ã£o do splash apÃ³s timeout
 function forceRemoveSplash() {
     const splash = document.getElementById('splash');
     if (splash) {
         splash.style.opacity = '0';
-        setTimeout(() => {
-            splash.remove();
-            
-            // Mostra mensagem de erro se API falhou
-            if (allItems.length === 0) {
-                document.body.insertAdjacentHTML('afterbegin', `
-                    <div style="text-align: center; padding: 2rem; background: #a12a5e; margin: 1rem; border-radius: 15px; color: white; font-family: 'Luckiest Guy', cursive;">
-                        <h3> Ops! Algo deu errado</h3>
-                        <p>Verifique se sua chave da API do TMDb está correta no arquivo script.js</p>
-                        <p>Ou tente recarregar a página.</p>
-                    </div>
-                `);
-            }
-        }, 500);
+        setTimeout(() => splash.remove(), 500);
     }
-
-    // Anima o título principal
-    gsap.from(".logo-container h1", {
-        duration: 1,
-        y: -50,
-        opacity: 0,
-        ease: "bounce.out"
-    });
+    gsap.from(".logo-container h1", { duration: 1, y: -50, opacity: 0, ease: "bounce.out" });
 }
 
-// Inicializa tudo
+//  INICIALIZAÃ‡ÃƒO COMPLETA
 document.addEventListener('DOMContentLoaded', async () => {
+    setupModal();
     await loadGenres();
 
-    //  DEFINE UM TEMPO LIMITE PARA REMOVER O SPLASH (3.5 segundos)
+    // Timeout de seguranÃ§a para remover splash
     setTimeout(forceRemoveSplash, 3500);
 
-    // Tenta carregar as seções
+    // Carrega seÃ§Ãµes iniciais
     try {
         await Promise.all([
             loadSection('launches'),
             loadSection('trending'),
             loadSection('topRated')
         ]);
-        
-        // Se chegar aqui, remove o splash imediatamente
         forceRemoveSplash();
     } catch (err) {
-        console.error("Erro ao carregar seções:", err);
-        // O splash será removido pelo timeout acima
+        console.error("Erro ao carregar seÃ§Ãµes iniciais:", err);
+        forceRemoveSplash();
     }
 
-    // Eventos dos tabs
+    //  EVENTOS DOS BOTÃ•ES DE FILTRO â€” CORRIGIDOS!
     document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -349,13 +298,39 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     });
 
-    // Filtros avançados
-    document.getElementById('filter-genre').addEventListener('change', applyAdvancedFilters);
-    document.getElementById('filter-rating').addEventListener('change', applyAdvancedFilters);
+    // Filtros avanÃ§ados
+    document.getElementById('filter-genre')?.addEventListener('change', applyAdvancedFilters);
+    document.getElementById('filter-rating')?.addEventListener('change', applyAdvancedFilters);
 
-    // Botões "Carregar Mais"
+    // BotÃµes "Carregar Mais"
     document.getElementById('load-more-launches')?.addEventListener('click', () => loadMore('launches'));
     document.getElementById('load-more-trending')?.addEventListener('click', () => loadMore('trending'));
     document.getElementById('load-more-top-rated')?.addEventListener('click', () => loadMore('topRated'));
     document.getElementById('load-more-filter')?.addEventListener('click', () => loadMore('filterResults'));
 });
+
+// Aplica filtros avanÃ§ados (gÃªnero + nota)
+function applyAdvancedFilters() {
+    const genre = document.getElementById('filter-genre').value;
+    const rating = parseFloat(document.getElementById('filter-rating').value) || 0;
+
+    let filtered = [...allItems];
+
+    if (genre) {
+        filtered = filtered.filter(item => item.genre_ids?.includes(parseInt(genre)));
+    }
+    if (rating) {
+        filtered = filtered.filter(item => item.vote_average >= rating);
+    }
+
+    const state = paginationState.filterResults;
+    state.page = 1;
+    state.items = filtered;
+    state.hasMore = false;
+
+    const resultsSection = document.getElementById('filter-results-section');
+    resultsSection.style.display = 'block';
+    resultsSection.scrollIntoView({ behavior: 'smooth' });
+
+    renderCards(filtered, 'filter-results', false);
+}
