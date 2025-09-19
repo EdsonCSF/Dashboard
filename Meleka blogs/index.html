@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meleka Cinema</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@700&family=Luckiest+Guy&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
+</head>
+<body>
+    <!-- Splash Simples -->
+    <div id="splash" class="splash">
+        <h1 class="splash-title">🎬 Meleka <span>Cinema</span></h1>
+        <p class="splash-subtitle">Preparando a pipoca...</p>
+    </div>
+
+    <header class="header-hq">
+        <div class="logo-container">
+            <h1><span class="meleka">Meleka</span> <span class="cinema">Cinema</span></h1>
+            <p>Seu portal de filmes e séries, estilo HQ!</p>
+        </div>
+
+        <!-- Filtros Rápidos por Tabs -->
+        <div class="filter-tabs">
+            <button data-filter="movie" class="tab-btn">🎬 Filmes</button>
+            <button data-filter="tv" class="tab-btn">📺 Séries</button>
+            <button data-filter="upcoming" class="tab-btn">🔜 Futuros Lançamentos</button>
+            <button data-filter="trending" class="tab-btn">🔥 Em Alta</button>
+            <button data-filter="top_rated" class="tab-btn">⭐ Melhores Avaliados</button>
+        </div>
+
+        <!-- ✅ BOTÃO "PÁGINA MELEKA ANIMES" — NÍTIDO E FUNCIONAL -->
+        <div class="anime-cta">
+            <a href="https://dashboardedsoncsf.netlify.app/gmanhwanews%20v1.2" target="_blank" class="btn-anime-large">
+                <i class="fas fa-book-open"></i> Página Meleka Animes
+            </a>
+        </div>
+    </header>
+
+    <!-- Seção de Resultados do Filtro -->
+    <section id="filter-results-section" class="highlight-section" style="display: none;">
+        <h2 class="section-title">🔍 Resultados da Busca</h2>
+        <div id="filter-results" class="cards-grid"></div>
+        <button id="load-more-filter" class="btn-load-more">Carregar Mais</button>
+    </section>
+
+    <!-- Seção Principal: Lançamentos da Semana -->
+    <main class="container">
+        <section class="highlight-section">
+            <h2 class="section-title">🎬 Lançamentos Recentes</h2>
+            <div id="launches" class="cards-grid"></div>
+            <button id="load-more-launches" class="btn-load-more">Carregar Mais</button>
+        </section>
+    </main>
+
+    <!-- Modal de Detalhes -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <div id="modal-body"></div>
+        </div>
+    </div>
+
+    <footer class="footer-hq">
+        <p>© 2025 Meleka Cinema — Feito por Edson CSF | contato edsony1@gmail.com | versão 1.5</p>
+        <p>Fonte dos dados: <a href="https://www.themoviedb.org/" target="_blank" class="source-link">The Movie Database (TMDb)</a></p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
