@@ -1,751 +1,602 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>GManhwa News</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<style>
-  :root {
-    --bg-dark: #121212; --fg-dark: #f5f5f5; --card-dark: #1e1e1e;
-    --accent-anime: #64b5f6; --accent-manga: #ff6b9d; --accent-manhwa: #b388ff;
-    --accent-manhua: #ffd54f; --accent-upcoming: #4db6ac; --accent-schedule: #ffb74d;
-    --bg-light: #f8f9fa; --fg-light: #212529; --card-light: #ffffff;
-    --accent-light-anime: #1976d2; --accent-light-manga: #c2185b; --accent-light-manhwa: #7b1fa2;
-    --accent-light-manhua: #f9a825; --accent-light-upcoming: #00796b; --accent-light-schedule: #f57c00;
-    --transition-speed: 0.3s;
-  }
-
-  * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
-
-  body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    margin: 0;
-    padding: 0;
-    background: var(--bg-dark);
-    color: var(--fg-dark);
-    transition: background-color var(--transition-speed), color var(--transition-speed);
-    line-height: 1.6;
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-  }
-
-  body.light {
-    background: var(--bg-light);
-    color: var(--fg-light);
-  }
-
-  .header {
-    background: linear-gradient(135deg, #1a237e, #4a148c, #b71c1c);
-    padding: 3rem 1rem;
-    text-align: center;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-    margin-bottom: 2rem;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .header::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-image: 
-      radial-gradient(circle at 10% 20%, rgba(255, 255, 255, 0.15) 0%, transparent 50%),
-      radial-gradient(circle at 90% 80%, rgba(255, 255, 255, 0.2) 0%, transparent 50%),
-      radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
-    animation: float 20s infinite ease-in-out;
-  }
-
-  .header::after {
-    content: "";
-    position: absolute;
-    bottom: -10px;
-    left: 0;
-    width: 100%;
-    height: 20px;
-    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="%231e1e1e" fill-opacity="1" d="M0,96L48,112C96,128,192,160,288,160C384,160,480,128,576,122.7C672,117,768,139,864,149.3C960,160,1056,160,1152,138.7C1248,117,1344,75,1392,53.3L1440,32L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>');
-    background-size: cover;
-    background-position: bottom;
-  }
-
-  @keyframes float {
-    0%, 100% { transform: translateY(0) rotate(0deg); }
-    50% { transform: translateY(-20px) rotate(5deg); }
-  }
-
-  .anime-icons {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    top: 0;
-    left: 0;
-    overflow: hidden;
-    z-index: 0;
-  }
-
-  .anime-icons i {
-    position: absolute;
-    color: rgba(255, 255, 255, 0.7);
-    font-size: 2.5rem;
-    animation: drift 15s infinite linear;
-    text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
-  }
-
-  .anime-icons i:nth-child(1) { top: 15%; left: 5%; animation-delay: 0s; font-size: 3rem; }
-  .anime-icons i:nth-child(2) { top: 65%; left: 85%; animation-delay: 2s; font-size: 2.8rem; }
-  .anime-icons i:nth-child(3) { top: 25%; left: 75%; animation-delay: 4s; font-size: 3.2rem; }
-  .anime-icons i:nth-child(4) { top: 75%; left: 15%; animation-delay: 6s; font-size: 2.7rem; }
-  .anime-icons i:nth-child(5) { top: 35%; left: 45%; animation-delay: 8s; font-size: 3.5rem; }
-  .anime-icons i:nth-child(6) { top: 10%; left: 65%; animation-delay: 10s; font-size: 2.9rem; }
-  .anime-icons i:nth-child(7) { top: 80%; left: 35%; animation-delay: 12s; font-size: 3.1rem; }
-  .anime-icons i:nth-child(8) { top: 45%; left: 25%; animation-delay: 14s; font-size: 2.6rem; }
-  .anime-icons i:nth-child(9) { top: 55%; left: 55%; animation-delay: 16s; font-size: 3.3rem; }
-  .anime-icons i:nth-child(10) { top: 20%; left: 90%; animation-delay: 18s; font-size: 2.8rem; }
-
-  @keyframes drift {
-    0% { transform: translateY(0) translateX(0) rotate(0deg); opacity: 0; }
-    10% { opacity: 0.7; }
-    90% { opacity: 0.7; }
-    100% { transform: translateY(-150px) translateX(100px) rotate(360deg); opacity: 0; }
-  }
-
-  .particles {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    top: 0;
-    left: 0;
-    overflow: hidden;
-    z-index: 0;
-  }
-
-  .particle {
-    position: absolute;
-    background-color: rgba(255, 255, 255, 0.6);
-    border-radius: 50%;
-    animation: float-particle 10s infinite linear;
-  }
-
-  @keyframes float-particle {
-    0% { transform: translateY(0) translateX(0); opacity: 0; }
-    10% { opacity: 0.6; }
-    90% { opacity: 0.6; }
-    100% { transform: translateY(-200px) translateX(100px); opacity: 0; }
-  }
-
-  h1 {
-    font-size: 2.8rem;
-    font-weight: 700;
-    color: white;
-    margin-bottom: 0.5rem;
-    text-shadow: 0 2px 10px rgba(0,0,0,0.3);
-    position: relative;
-    z-index: 1;
-    background: linear-gradient(to right, #ff9a9e, #fad0c4, #fad0c4, #a18cd1, #fbc2eb);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-    text-align: center;
-    animation: pulse-text 3s infinite ease-in-out;
-  }
-
-  @keyframes pulse-text {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.03); }
-  }
-
-  .subtitle {
-    font-size: 1.2rem;
-    color: rgba(255, 255, 255, 0.95);
-    max-width: 700px;
-    margin: 0 auto;
-    position: relative;
-    z-index: 1;
-    text-shadow: 0 1px 3px rgba(0,0,0,0.3);
-    animation: pulse-subtitle 4s infinite ease-in-out;
-  }
-
-  @keyframes pulse-subtitle {
-    0%, 100% { opacity: 0.95; }
-    50% { opacity: 1; }
-  }
-
-  .container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 1rem;
-    flex: 1;
-  }
-
-  #toolbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin: 1.5rem 0;
-    flex-wrap: wrap;
-    gap: 1rem;
-  }
-
-  .filter-container {
-    flex: 1;
-    min-width: 250px;
-  }
-
-  select {
-    width: 100%;
-    padding: 12px 16px;
-    border-radius: 8px;
-    border: none;
-    cursor: pointer;
-    font-weight: 500;
-    background-color: var(--card-dark);
-    color: var(--fg-dark);
-    transition: background-color var(--transition-speed), color var(--transition-speed);
-    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-    font-size: 1rem;
-  }
-
-  body.light select {
-    background-color: var(--card-light);
-    color: var(--fg-light);
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-  }
-
-  #themeToggle {
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-size: 1.5rem;
-    color: var(--fg-dark);
-    padding: 10px;
-    border-radius: 50%;
-    width: 50px;
-    height: 50px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background-color var(--transition-speed), transform 0.2s;
-  }
-
-  #themeToggle:hover {
-    background-color: rgba(255, 255, 255, 0.1);
-    transform: scale(1.1);
-  }
-
-  body.light #themeToggle {
-    color: var(--fg-light);
-  }
-
-  body.light #themeToggle:hover {
-    background-color: rgba(0, 0, 0, 0.05);
-  }
-
-  section {
-    margin-bottom: 3rem;
-  }
-
-  h2 {
-    text-align: center;
-    color: var(--accent-anime);
-    margin-bottom: 1.5rem;
-    font-size: 1.8rem;
-    font-weight: 600;
-    position: relative;
-    padding-bottom: 0.5rem;
-  }
-
-  body.light h2 {
-    color: var(--accent-light-anime);
-  }
-
-  h2::after {
-    content: "";
-    position: absolute;
-    bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 80px;
-    height: 3px;
-    background: linear-gradient(to right, var(--accent-anime), var(--accent-manhwa));
-    border-radius: 2px;
-  }
-
-  .items {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    gap: 1.5rem;
-    margin-bottom: 2.5rem;
-  }
-
-  .card {
-    background: var(--card-dark);
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-    transition: transform 0.3s, box-shadow 0.3s;
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    position: relative;
-  }
-
-  .card::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 5px;
-    background: linear-gradient(to right, var(--accent-anime), var(--accent-manhwa));
-    opacity: 0;
-    transition: opacity 0.3s;
-  }
-
-  .card:hover::before {
-    opacity: 1;
-  }
-
-  body.light .card {
-    background: var(--card-light);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-  }
-
-  .card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 8px 24px rgba(0,0,0,0.3);
-  }
-
-  body.light .card:hover {
-    box-shadow: 0 8px 24px rgba(0,0,0,0.15);
-  }
-
-  .card-img-container {
-    height: 220px;
-    overflow: hidden;
-    position: relative;
-  }
-
-  .card-img-container::after {
-    content: "";
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 40px;
-    background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
-  }
-
-  .card img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.5s;
-  }
-
-  .card:hover img {
-    transform: scale(1.05);
-  }
-
-  .card-content {
-    padding: 1rem;
-    flex-grow: 1;
-    display: flex;
-    flex-direction: column;
-  }
-
-  .card h4 {
-    font-size: 1rem;
-    margin-bottom: 0.5rem;
-    color: var(--fg-dark);
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    line-height: 1.4;
-    max-height: 2.8em;
-  }
-
-  body.light .card h4 {
-    color: var(--fg-light);
-  }
-
-  .card-info {
-    margin-top: auto;
-    font-size: 0.85rem;
-    color: rgba(255, 255, 255, 0.7);
-  }
-
-  body.light .card-info {
-    color: rgba(0, 0, 0, 0.6);
-  }
-
-  .card-info p {
-    margin: 0.25rem 0;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-
-  .card-info i {
-    font-size: 0.9rem;
-  }
-
-  .popularity-badge {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    background: rgba(0, 0, 0, 0.7);
-    color: white;
-    border-radius: 50%;
-    width: 30px;
-    height: 30px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-    font-size: 0.8rem;
-    z-index: 2;
-  }
-
-  .chart-container {
-    background: var(--card-dark);
-    border-radius: 12px;
-    padding: 1.5rem;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-    margin-top: 2rem;
-    transition: background-color var(--transition-speed);
-    position: relative;
-    max-height: 400px;
-    overflow: hidden;
-  }
-
-  body.light .chart-container {
-    background: var(--card-light);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-  }
-
-  .chart-title {
-    font-size: 1.2rem;
-    font-weight: 600;
-    margin-bottom: 1rem;
-    color: var(--accent-anime);
-    text-align: center;
-  }
-
-  body.light .chart-title {
-    color: var(--accent-light-anime);
-  }
-
-  canvas {
-    border-radius: 8px;
-    width: 100% !important;
-    max-height: 300px;
-  }
-
-  .loading {
-    text-align: center;
-    padding: 2rem;
-    font-size: 1.2rem;
-    color: var(--accent-anime);
-  }
-
-  .no-data {
-    text-align: center;
-    padding: 2rem;
-    font-size: 1.1rem;
-    color: var(--fg-dark);
-    opacity: 0.8;
-  }
-
-  body.light .no-data {
-    color: var(--fg-light);
-  }
-
-  .chart-loading {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 200px;
-  }
-
-  .chart-loading i {
-    font-size: 2rem;
-    color: var(--accent-anime);
-    animation: spin 1.5s infinite linear;
-  }
-
-  @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-  }
-
-  footer {
-    background: var(--card-dark);
-    color: var(--fg-dark);
-    padding: 2rem 0;
-    margin-top: auto;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-    transition: background-color var(--transition-speed), color var(--transition-speed);
-  }
-
-  body.light footer {
-    background: var(--card-light);
-    color: var(--fg-light);
-    border-top: 1px solid rgba(0, 0, 0, 0.1);
-  }
-
-  .footer-content {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 1rem;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-  }
-
-  .footer-section {
-    margin-bottom: 1.5rem;
-  }
-
-  .footer-section h3 {
-    font-size: 1.2rem;
-    margin-bottom: 0.8rem;
-    color: var(--accent-anime);
-  }
-
-  body.light .footer-section h3 {
-    color: var(--accent-light-anime);
-  }
-
-  .footer-section p {
-    margin: 0.3rem 0;
-    font-size: 0.95rem;
-  }
-
-  .footer-section a {
-    color: var(--accent-manhwa);
-    text-decoration: none;
-    transition: color var(--transition-speed);
-  }
-
-  .footer-section a:hover {
-    color: var(--accent-anime);
-    text-decoration: underline;
-  }
-
-  body.light .footer-section a {
-    color: var(--accent-light-manhwa);
-  }
-
-  body.light .footer-section a:hover {
-    color: var(--accent-light-anime);
-  }
-
-  .footer-divider {
-    width: 80%;
-    height: 1px;
-    background: rgba(255, 255, 255, 0.1);
-    margin: 1.5rem 0;
-  }
-
-  body.light .footer-divider {
-    background: rgba(0, 0, 0, 0.1);
-  }
-
-  .copyright {
-    font-size: 0.9rem;
-    opacity: 0.7;
-    margin-top: 1rem;
-  }
-
-  @media (max-width: 768px) {
-    h1 {
-      font-size: 2rem;
-    }
-    
-    .subtitle {
-      font-size: 1rem;
-    }
-    
-    .items {
-      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-      gap: 1rem;
-    }
-    
-    .card-img-container {
-      height: 180px;
-    }
-    
-    .footer-content {
-      text-align: left;
-      align-items: flex-start;
-    }
-    
-    .footer-section {
-      width: 100%;
-    }
-    
-    .chart-container {
-      max-height: 350px;
-    }
-    
-    .anime-icons i {
-      font-size: 1.8rem !important;
-    }
-  }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meleka Animes</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@700&family=Luckiest+Guy&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Comic Neue', cursive;
+            background: #111 url('image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect fill="%23222" width="100" height="100"/><path d="M0,0 L100,100 M100,0 L0,100" stroke="%23333" stroke-width="1"/></svg>');
+            color: #fff;
+            line-height: 1.6;
+            padding-bottom: 100px;
+            position: relative;
+        }
+
+        /* Splash Screen — COM ANIMAÇÃO DE SAÍDA GARANTIDA */
+        .splash {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #ff3040, #a12a5e, #64b5f6); /* 🔴 VERMELHO VIBRANTE no início */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            text-align: center;
+            opacity: 1;
+            /* ✅ ANIMAÇÃO CSS DE SAÍDA AUTOMÁTICA (FALLBACK) */
+            animation: splashFadeOut 2.5s forwards;
+        }
+
+        @keyframes splashFadeOut {
+            0%, 90% { opacity: 1; }
+            100% { opacity: 0; visibility: hidden; }
+        }
+
+        .splash::before {
+            content: "";
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, rgba(255,255,255,0.8) 0%, transparent 70%);
+            border-radius: 50%;
+            filter: blur(20px);
+            animation: shine 3s infinite alternate;
+        }
+
+        .splash::after {
+            content: "";
+            position: absolute;
+            bottom: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 10%, transparent 70%);
+            animation: pulse-bg 4s infinite;
+        }
+
+        @keyframes shine {
+            0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0.3; }
+            100% { transform: translate(150%, 150%) scale(1.5); opacity: 0.8; }
+        }
+
+        @keyframes pulse-bg {
+            0%, 100% { transform: scale(1); opacity: 0.3; }
+            50% { transform: scale(1.05); opacity: 0.5; }
+        }
+
+        .splash-title {
+            font-family: 'Luckiest Guy', cursive;
+            font-size: 3.5rem;
+            color: #fff;
+            text-shadow: 4px 4px 0 #000, 0 0 20px rgba(255,255,255,0.8);
+            margin-bottom: 1rem;
+            position: relative;
+            z-index: 2;
+            animation: glow 2s infinite alternate;
+        }
+
+        @keyframes glow {
+            0% { text-shadow: 4px 4px 0 #000, 0 0 10px rgba(255,48,64,0.7); } /* 🔴 VERMELHO VIBRANTE */
+            100% { text-shadow: 4px 4px 0 #000, 0 0 30px rgba(255,48,64,1); } /* 🔴 VERMELHO VIBRANTE */
+        }
+
+        /* ✅ AQUI: "Meleka" em vermelho vibrante */
+        .splash-title .meleka-highlight {
+            color: #ff3040; /* 🔴 VERMELHO VIBRANTE */
+            text-shadow: 4px 4px 0 #000, 0 0 20px rgba(255,48,64,0.8);
+        }
+
+        .splash-subtitle {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #fff;
+            margin-bottom: 30px;
+            position: relative;
+            z-index: 2;
+            text-shadow: 2px 2px 0 #000;
+        }
+
+        .progress-bar {
+            width: 80%;
+            max-width: 400px;
+            height: 10px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 50px;
+            overflow: hidden;
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.5);
+            position: relative;
+            z-index: 2;
+        }
+
+        .progress {
+            height: 100%;
+            width: 0;
+            background: linear-gradient(90deg, #ff3040, #ffd54f, #ff6b35); /* 🔴 VERMELHO no início */
+            border-radius: 50px;
+            animation: progress 2.3s ease-out forwards;
+            box-shadow: 0 0 15px rgba(255,48,64,0.8);
+        }
+
+        @keyframes progress {
+            0% { width: 0; }
+            100% { width: 100%; }
+        }
+
+        /* Header estilo HQ */
+        .header-hq {
+            background: linear-gradient(135deg, #64b5f6, #b388ff);
+            padding: 1.5rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            z-index: 10;
+        }
+
+        .header-hq::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 10%, transparent 10.5%);
+            background-size: 20px 20px;
+            animation: rotate 10s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .logo-container h1 {
+            font-family: 'Luckiest Guy', cursive;
+            font-size: 2.5rem;
+            text-shadow: 4px 4px 0 #000;
+            margin-bottom: 0.5rem;
+        }
+
+        /* ✅ AQUI TAMBÉM: "Meleka" em vermelho vibrante no header */
+        .meleka { 
+            color: #ff3040; /* 🔴 VERMELHO VIBRANTE */
+            text-shadow: 4px 4px 0 #000, 0 0 15px rgba(255,48,64,0.7);
+        }
+        .animes { color: #ffd54f; }
+
+        .logo-container p {
+            font-size: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Botão de volta para o Cinema */
+        .cinema-cta {
+            margin: 1.5rem 0 1rem;
+            text-align: center;
+        }
+
+        .btn-cinema {
+            display: inline-block;
+            padding: 1rem 2.5rem;
+            background: #ff6b35;
+            color: #000;
+            font-family: 'Luckiest Guy', cursive;
+            font-size: 1.3rem;
+            text-decoration: none;
+            border: 4px double #ffd700;
+            border-radius: 15px;
+            transition: all 0.2s;
+            box-shadow: 0 6px 0 #cc552a, 0 4px 8px rgba(0,0,0,0.3);
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-cinema:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 0 #cc552a, 0 6px 12px rgba(0,0,0,0.4);
+            background: #ff8c55;
+            border-color: #ffeb3b;
+        }
+
+        .btn-cinema:active {
+            transform: translateY(2px);
+            box-shadow: 0 3px 0 #cc552a, 0 2px 5px rgba(0,0,0,0.3);
+        }
+
+        /* Toolbar de Filtros */
+        #toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 1.5rem 0;
+            flex-wrap: wrap;
+            gap: 1rem;
+            padding: 0 1rem;
+        }
+
+        .filter-container {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        select {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 3px double #ff3040; /* 🔴 Borda vermelha vibrante */
+            background: #222;
+            color: #fff;
+            font-family: 'Comic Neue', cursive;
+            font-weight: bold;
+            border-radius: 12px;
+            cursor: pointer;
+            min-width: 120px;
+            transition: all 0.3s;
+        }
+
+        select:hover {
+            border-color: #ffd54f;
+            transform: scale(1.03);
+        }
+
+        #themeToggle {
+            background: #222;
+            border: 3px double #ff3040; /* 🔴 Borda vermelha vibrante */
+            color: #fff;
+            padding: 0.8rem;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: all 0.3s;
+        }
+
+        #themeToggle:hover {
+            background: #ff3040; /* 🔴 Fundo vermelho vibrante ao passar mouse */
+            color: #fff;
+            transform: scale(1.05);
+        }
+
+        /* Cards estilo HQ */
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        h2 {
+            font-family: 'Luckiest Guy', cursive;
+            font-size: 1.8rem;
+            margin: 2rem 0 1.5rem;
+            text-align: center;
+            text-shadow: 3px 3px 0 #000;
+            color: #ff3040; /* 🔴 Título em vermelho vibrante */
+            position: relative;
+        }
+
+        h2::after {
+            content: "🍥";
+            position: absolute;
+            right: 10%;
+            top: -10px;
+            font-size: 1.5rem;
+        }
+
+        .items {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 1.5rem;
+        }
+
+        .card-hq {
+            background: #222;
+            border: 4px double #64b5f6;
+            border-radius: 15px;
+            padding: 1rem;
+            position: relative;
+            overflow: hidden;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+        }
+
+        .card-hq:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(100, 181, 246, 0.5);
+        }
+
+        .card-hq::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(to right, #64b5f6, #b388ff, #ff3040); /* 🔴 Vermelho vibrante no final */
+        }
+
+        .card-img-container {
+            height: 350px;
+            overflow: hidden;
+            border-radius: 10px;
+            border: 3px solid #333;
+            box-shadow: 0 5px 10px rgba(0,0,0,0.5);
+            position: relative;
+        }
+
+        .card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .popularity-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.8rem;
+            z-index: 2;
+            border: 2px solid #ff3040; /* 🔴 Borda vermelha vibrante */
+        }
+
+        .card-content {
+            padding: 1rem 0 0;
+        }
+
+        .card h4 {
+            font-family: 'Luckiest Guy', cursive;
+            font-size: 1.3rem;
+            margin: 0.5rem 0;
+            color: #ffd54f;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .card-info {
+            font-size: 0.9rem;
+            color: #ccc;
+            margin: 0.5rem 0;
+        }
+
+        .card-info p {
+            margin: 0.25rem 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Loading e No Data */
+        .loading, .no-data {
+            text-align: center;
+            padding: 3rem 1rem;
+            font-size: 1.2rem;
+            color: #ff3040; /* 🔴 Cor vermelha vibrante */
+            grid-column: 1 / -1;
+        }
+
+        /* Botão Carregar Mais */
+        .btn-load-more {
+            display: block;
+            margin: 2rem auto 1rem;
+            padding: 0.8rem 2rem;
+            background: #a12a5e;
+            color: white;
+            font-family: 'Luckiest Guy', cursive;
+            font-size: 1.1rem;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 3px double #ff3040; /* 🔴 Borda vermelha vibrante */
+        }
+
+        .btn-load-more:hover {
+            background: #ff6b35;
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(255, 107, 53, 0.6);
+        }
+
+        /* Botão Voltar ao Topo */
+        .btn-back-to-top {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            background: #ff3040; /* 🔴 Fundo vermelho vibrante */
+            color: #fff;
+            border: 3px double #ffd700;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            cursor: pointer;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+            z-index: 100;
+        }
+
+        .btn-back-to-top.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .btn-back-to-top:hover {
+            background: #ff6b35;
+            transform: scale(1.1);
+            box-shadow: 0 0 15px #ff3040;
+        }
+
+        /* Footer */
+        footer {
+            background: #000;
+            color: #fff;
+            padding: 2rem 0;
+            margin-top: auto;
+            border-top: 3px dashed #ff3040; /* 🔴 Borda vermelha vibrante */
+            text-align: center;
+            font-size: 0.85rem;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        /* Responsivo */
+        @media (max-width: 768px) {
+            .splash-title { font-size: 2.5rem; }
+            .logo-container h1 { font-size: 2rem; }
+            #toolbar { flex-direction: column; align-items: stretch; }
+            .filter-container, #themeToggle { width: 100%; max-width: 320px; margin: 0 auto; }
+            h2 { font-size: 1.5rem; }
+            .items { grid-template-columns: 1fr; }
+            .card-img-container { height: 300px; }
+            .btn-back-to-top { width: 40px; height: 40px; font-size: 1rem; }
+        }
+    </style>
 </head>
 <body>
-<div class="header">
-  <div class="anime-icons">
-    <i class="fas fa-book"></i>
-    <i class="fas fa-film"></i>
-    <i class="fas fa-tv"></i>
-    <i class="fas fa-book-open"></i>
-    <i class="fas fa-video"></i>
-    <i class="fas fa-star"></i>
-    <i class="fas fa-heart"></i>
-    <i class="fas fa-gamepad"></i>
-    <i class="fas fa-dragon"></i>
-    <i class="fas fa-magic"></i>
-  </div>
-  <div class="particles" id="particles"></div>
-  <h1>GManhwa News</h1>
-  <p class="subtitle">Seu portal para as últimas atualizações de animes, mangás, manhwas e manhuas</p>
-</div>
-
-<div class="container">
-  <div id="toolbar">
-    <div class="filter-container">
-      <select id="typeFilter" aria-label="Filtrar tipo">
-        <option value="anime">Top Animes</option>
-        <option value="manga">Top Mangás</option>
-        <option value="manhwa">Top Manhwas</option>
-        <option value="manhua">Top Manhuas</option>
-        <option value="season_anime">Lançamentos da Temporada (Animes)</option>
-        <option value="season_manga">Lançamentos da Temporada (Mangás)</option>
-        <option value="recent_manga">Últimos lançamentos Mangás</option>
-        <option value="recent_manhwa">Últimos lançamentos Manhwas</option>
-        <option value="recent_manhua">Últimos lançamentos Manhuas</option>
-        <option value="upcoming_anime">Próximos lançamentos Animes</option>
-        <option value="schedule_monday">Programação Segunda</option>
-        <option value="schedule_tuesday">Programação Terça</option>
-        <option value="schedule_wednesday">Programação Quarta</option>
-        <option value="schedule_thursday">Programação Quinta</option>
-        <option value="schedule_friday">Programação Sexta</option>
-        <option value="schedule_saturday">Programação Sábado</option>
-        <option value="schedule_sunday">Programação Domingo</option>
-      </select>
+    <!-- Splash Screen — COM ANIMAÇÃO CSS DE SAÍDA GARANTIDA -->
+    <div id="splash" class="splash">
+        <h1 class="splash-title"><span class="meleka-highlight">Meleka</span> <span>Animes</span></h1>
+        <p class="splash-subtitle">Carregando o universo otaku...</p>
+        <div class="progress-bar">
+            <div class="progress"></div>
+        </div>
     </div>
-    <button id="themeToggle" aria-label="Alternar tema claro e escuro">
-      <i class="fas fa-moon"></i>
+
+    <header class="header-hq">
+        <div class="logo-container">
+            <h1><span class="meleka">Meleka</span> <span class="animes">Animes</span></h1>
+            <p>Seu portal de animes, mangás e manhwas, estilo HQ!</p>
+        </div>
+
+        <!-- Botão para Meleka Cinema -->
+        <div class="cinema-cta">
+            <a href="https://dashboardedsoncsf.netlify.app/meleka%20blogs/" target="_blank" class="btn-cinema">
+                <i class="fas fa-film"></i> Página Meleka Cinema
+            </a>
+        </div>
+    </header>
+
+    <div class="container">
+        <div id="toolbar">
+            <div class="filter-container">
+                <select id="typeFilter" aria-label="Filtrar tipo">
+                    <option value="anime">Top Animes</option>
+                    <option value="manga">Top Mangás</option>
+                    <option value="manhwa">Top Manhwas</option>
+                    <option value="manhua">Top Manhuas</option>
+                    <option value="season_anime">Lançamentos da Temporada (Animes)</option>
+                    <option value="season_manga">Lançamentos da Temporada (Mangás)</option>
+                    <option value="recent_manga">Últimos lançamentos Mangás</option>
+                    <option value="recent_manhwa">Últimos lançamentos Manhwas</option>
+                    <option value="recent_manhua">Últimos lançamentos Manhuas</option>
+                    <option value="upcoming_anime">Próximos lançamentos Animes</option>
+                    <option value="schedule_monday">Programação Segunda</option>
+                    <option value="schedule_tuesday">Programação Terça</option>
+                    <option value="schedule_wednesday">Programação Quarta</option>
+                    <option value="schedule_thursday">Programação Quinta</option>
+                    <option value="schedule_friday">Programação Sexta</option>
+                    <option value="schedule_saturday">Programação Sábado</option>
+                    <option value="schedule_sunday">Programação Domingo</option>
+                </select>
+            </div>
+            <div class="filter-container">
+                <select id="sortFilter" aria-label="Ordenar por">
+                    <option value="popularity">Ordenar por Popularidade</option>
+                    <option value="score">Ordenar por Melhor Avaliação</option>
+                    <option value="date">Ordenar por Data</option>
+                </select>
+            </div>
+            <button id="themeToggle" aria-label="Alternar tema">
+                <i class="fas fa-moon"></i>
+            </button>
+        </div>
+
+        <section>
+            <h2 id="section-title">Carregando...</h2>
+            <div class="items" id="items-container">
+                <div class="loading">
+                    <i class="fas fa-spinner fa-spin"></i> Carregando dados...
+                </div>
+            </div>
+
+            <button id="load-more" class="btn-load-more" style="display: none;">
+                Carregar Mais
+            </button>
+        </section>
+    </div>
+
+    <!-- Botão Voltar ao Topo -->
+    <button class="btn-back-to-top" id="backToTop" title="Voltar ao topo">
+        <i class="fas fa-arrow-up"></i>
     </button>
-  </div>
 
-  <section>
-    <h2 id="section-title">Carregando...</h2>
-    <div class="items" id="items-container">
-      <div class="loading">
-        <i class="fas fa-spinner fa-spin"></i> Carregando dados...
-      </div>
-    </div>
-    <div class="chart-container" id="chart-container" style="display: none;">
-      <div class="chart-title">Gráfico de Popularidade</div>
-      <div class="chart-loading" id="chart-loading">
-        <i class="fas fa-spinner"></i>
-      </div>
-      <canvas id="popularity-chart" style="display: none;"></canvas>
-    </div>
-  </section>
-</div>
+    <footer>
+        <div class="footer-content">
+            <p>© 2025 Meleka Animes — Feito por Edson CSF | contato edsony1@gmail.com | versão 1.2</p>
+            <p>Fonte de dados: <a href="https://jikan.moe/" target="_blank" style="color: #ff3040;">Jikan API</a></p> <!-- 🔴 Link em vermelho vibrante -->
+        </div>
+    </footer>
 
-<footer>
-  <div class="footer-content">
-    <div class="footer-section">
-      <h3>Desenvolvedor</h3>
-      <p>Desenvolvido por EdsonC.S.F.</p>
-      <p>Contato: <a href="mailto:edsony1@gmail.com">edsony1@gmail.com</a></p>
-      <p>Criação: Julho de 2025</p>
-      <p>Versão: 1.1 © 2025. Todos os direitos reservados.</p>
-    </div>
-    
-    <div class="footer-divider"></div>
-    
-    <div class="footer-section">
-      <h3>Fonte de Dados</h3>
-      <p>Os dados são fornecidos pela <a href="https://jikan.moe/" target="_blank">Jikan API</a></p>
-      <p>Jikan é uma API não oficial do MyAnimeList</p>
-    </div>
-    
-    <div class="copyright">
-      GManhwa News© 2025 - Todos os direitos reservados
-    </div>
-  </div>
-</footer>
+    <script>
+        const typeFilter = document.getElementById('typeFilter');
+const sortFilter = document.getElementById('sortFilter');
+const themeToggle = document.getElementById('themeToggle');
+const sectionTitle = document.getElementById('section-title');
+const itemsContainer = document.getElementById('items-container');
+const loadMoreBtn = document.getElementById('load-more');
+const backToTopBtn = document.getElementById('backToTop');
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-  const typeFilter = document.getElementById('typeFilter');
-  const themeToggle = document.getElementById('themeToggle');
-  const sectionTitle = document.getElementById('section-title');
-  const itemsContainer = document.getElementById('items-container');
-  const chartContainer = document.getElementById('chart-container');
-  const chartLoading = document.getElementById('chart-loading');
-  const popularityCanvas = document.getElementById('popularity-chart');
-  const popularityCtx = popularityCanvas.getContext('2d');
-  const particlesContainer = document.getElementById('particles');
-  
-  let chartInstance = null;
-  let currentTheme = 'dark';
-  
-  // Criar partículas animadas
-  function createParticles() {
-    const particleCount = 30;
-    
-    for (let i = 0; i < particleCount; i++) {
-      const particle = document.createElement('div');
-      particle.className = 'particle';
-      
-      // Tamanhos variados
-      const size = Math.random() * 8 + 2;
-      particle.style.width = `${size}px`;
-      particle.style.height = `${size}px`;
-      
-      // Posições aleatórias
-      particle.style.left = `${Math.random() * 100}%`;
-      particle.style.top = `${Math.random() * 100}%`;
-      
-      // Durações de animação variadas
-      const duration = Math.random() * 15 + 10;
-      particle.style.animationDuration = `${duration}s`;
-      particle.style.animationDelay = `${Math.random() * 5}s`;
-      
-      particlesContainer.appendChild(particle);
-    }
-  }
-  
-  createParticles();
-  
-  const apiUrls = {
-    anime: 'https://api.jikan.moe/v4/top/anime',
-    manga: 'https://api.jikan.moe/v4/top/manga?filter=bypopularity&type=manga',
-    manhwa: 'https://api.jikan.moe/v4/top/manga?filter=bypopularity&type=manhwa',
-    manhua: 'https://api.jikan.moe/v4/top/manga?filter=bypopularity&type=manhua',
+let currentPage = 1;
+let currentType = 'anime';
+let currentSort = 'popularity';
+let hasMore = true;
+
+// ✅ ENDPOINTS CORRIGIDOS — todos agora incluem page=1 por padrão
+const apiUrls = {
+    anime: 'https://api.jikan.moe/v4/top/anime?page=1',
+    manga: 'https://api.jikan.moe/v4/top/manga?filter=bypopularity&type=manga&page=1',
+    manhwa: 'https://api.jikan.moe/v4/top/manga?filter=bypopularity&type=manhwa&page=1',
+    manhua: 'https://api.jikan.moe/v4/top/manga?filter=bypopularity&type=manhua&page=1',
     season_anime: 'https://api.jikan.moe/v4/seasons/now',
     season_manga: 'https://api.jikan.moe/v4/seasons/manga',
-    recent_manga: 'https://api.jikan.moe/v4/manga?order_by=start_date&sort=desc&type=manga&limit=10',
-    recent_manhwa: 'https://api.jikan.moe/v4/manga?order_by=start_date&sort=desc&type=manhwa&limit=10',
-    recent_manhua: 'https://api.jikan.moe/v4/manga?order_by=start_date&sort=desc&type=manhua&limit=10',
+    recent_manga: 'https://api.jikan.moe/v4/manga?order_by=start_date&sort=desc&type=manga&page=1',
+    recent_manhwa: 'https://api.jikan.moe/v4/manga?order_by=start_date&sort=desc&type=manhwa&page=1',
+    recent_manhua: 'https://api.jikan.moe/v4/manga?order_by=start_date&sort=desc&type=manhua&page=1',
     upcoming_anime: 'https://api.jikan.moe/v4/seasons/upcoming',
     schedule_monday: 'https://api.jikan.moe/v4/schedules/monday',
     schedule_tuesday: 'https://api.jikan.moe/v4/schedules/tuesday',
@@ -754,297 +605,242 @@
     schedule_friday: 'https://api.jikan.moe/v4/schedules/friday',
     schedule_saturday: 'https://api.jikan.moe/v4/schedules/saturday',
     schedule_sunday: 'https://api.jikan.moe/v4/schedules/sunday',
-  };
-  
-  const accentColors = {
-    anime: 'rgba(100, 181, 246, 0.7)',
-    manga: 'rgba(255, 107, 157, 0.7)',
-    manhwa: 'rgba(179, 136, 255, 0.7)',
-    manhua: 'rgba(255, 213, 79, 0.7)',
-    season_anime: 'rgba(77, 182, 172, 0.7)',
-    season_manga: 'rgba(255, 183, 77, 0.7)',
-    recent_manga: 'rgba(255, 107, 157, 0.7)',
-    recent_manhwa: 'rgba(179, 136, 255, 0.7)',
-    recent_manhua: 'rgba(255, 213, 79, 0.7)',
-    upcoming_anime: 'rgba(77, 182, 172, 0.7)',
-    schedule_monday: 'rgba(255, 183, 77, 0.7)',
-    schedule_tuesday: 'rgba(255, 183, 77, 0.7)',
-    schedule_wednesday: 'rgba(255, 183, 77, 0.7)',
-    schedule_thursday: 'rgba(255, 183, 77, 0.7)',
-    schedule_friday: 'rgba(255, 183, 77, 0.7)',
-    schedule_saturday: 'rgba(255, 183, 77, 0.7)',
-    schedule_sunday: 'rgba(255, 183, 77, 0.7)',
-  };
-  
-  const borderColors = {
-    anime: 'rgba(100, 181, 246, 1)',
-    manga: 'rgba(255, 107, 157, 1)',
-    manhwa: 'rgba(179, 136, 255, 1)',
-    manhua: 'rgba(255, 213, 79, 1)',
-    season_anime: 'rgba(77, 182, 172, 1)',
-    season_manga: 'rgba(255, 183, 77, 1)',
-    recent_manga: 'rgba(255, 107, 157, 1)',
-    recent_manhwa: 'rgba(179, 136, 255, 1)',
-    recent_manhua: 'rgba(255, 213, 79, 1)',
-    upcoming_anime: 'rgba(77, 182, 172, 1)',
-    schedule_monday: 'rgba(255, 183, 77, 1)',
-    schedule_tuesday: 'rgba(255, 183, 77, 1)',
-    schedule_wednesday: 'rgba(255, 183, 77, 1)',
-    schedule_thursday: 'rgba(255, 183, 77, 1)',
-    schedule_friday: 'rgba(255, 183, 77, 1)',
-    schedule_saturday: 'rgba(255, 183, 77, 1)',
-    schedule_sunday: 'rgba(255, 183, 77, 1)',
-  };
-  
-  function setTheme(theme) {
-    currentTheme = theme;
-    if (theme === 'dark') {
-      document.body.classList.remove('light');
-      themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
-    } else {
-      document.body.classList.add('light');
-      themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
-    }
-    if (chartInstance) {
-      updateChartColors();
-    }
-  }
-  
-  themeToggle.onclick = () => {
-    setTheme(currentTheme === 'dark' ? 'light' : 'dark');
-  };
-  
-  function updateChartColors() {
-    if (chartInstance) {
-      chartInstance.data.datasets[0].backgroundColor = accentColors[typeFilter.value] || accentColors.anime;
-      chartInstance.data.datasets[0].borderColor = borderColors[typeFilter.value] || borderColors.anime;
-      chartInstance.options.plugins.legend.labels.color = currentTheme === 'dark' ? '#f5f5f5' : '#212529';
-      chartInstance.options.scales.x.ticks.color = currentTheme === 'dark' ? '#f5f5f5' : '#212529';
-      chartInstance.options.scales.y.ticks.color = currentTheme === 'dark' ? '#f5f5f5' : '#212529';
-      chartInstance.options.scales.x.grid.color = currentTheme === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
-      chartInstance.options.scales.y.grid.color = currentTheme === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
-      chartInstance.update('none'); // Atualização sem animação para melhor performance
-    }
-  }
-  
-  async function fetchTopList(type) {
+};
+
+// Ordena os itens
+function sortItems(items, sortType) {
+    return items.sort((a, b) => {
+        let valueA, valueB;
+        switch(sortType) {
+            case 'score':
+                valueA = a.score || 0;
+                valueB = b.score || 0;
+                break;
+            case 'date':
+                valueA = new Date(a.aired?.from || a.published?.from || '1970-01-01');
+                valueB = new Date(b.aired?.from || b.published?.from || '1970-01-01');
+                break;
+            default: // popularity
+                valueA = a.popularity || 0;
+                valueB = b.popularity || 0;
+        }
+        return sortType === 'date' ? valueB - valueA : valueB - valueA;
+    });
+}
+
+// ✅ FUNÇÃO CORRIGIDA — lida com paginação e fallbacks
+async function fetchTopList(type, page = 1) {
     try {
-      const res = await fetch(apiUrls[type]);
-      const json = await res.json();
-      
-      let items = [];
-      if (type === 'season_anime' && json.data?.anime) {
-        items = json.data.anime;
-      } else if (type === 'season_manga' && json.data?.manga) {
-        items = json.data.manga;
-      } else if (type.startsWith('schedule') && json.data?.length >= 0) {
-        items = json.data;
-      } else if (type === 'upcoming_anime' && json.data?.anime) {
-        items = json.data.anime;
-      } else {
-        items = json.data || [];
-      }
-      
-      // Ordenar por popularidade (do maior para o menor)
-      return items.sort((a, b) => {
-        const popularityA = a.popularity || a.score || 0;
-        const popularityB = b.popularity || b.score || 0;
-        return popularityB - popularityA;
-      });
+        // Constrói URL dinamicamente
+        let baseUrl = apiUrls[type];
+        
+        // Remove page=1 se já existir, para substituir pelo número da página atual
+        if (baseUrl.includes('page=1')) {
+            baseUrl = baseUrl.replace('page=1', `page=${page}`);
+        } else if (!baseUrl.includes('page=')) {
+            // Adiciona paginação se não tiver
+            baseUrl += baseUrl.includes('?') ? `&page=${page}` : `?page=${page}`;
+        }
+
+        console.log("Fetching URL:", baseUrl); // Para debug
+
+        const res = await fetch(baseUrl, {
+            headers: {
+                'Accept': 'application/json',
+                'User-Agent': 'MelekaAnimes/1.0'
+            }
+        });
+
+        if (!res.ok) {
+            throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+        }
+
+        const json = await res.json();
+        let items = [];
+
+        // Trata diferentes formatos de resposta
+        if (type === 'season_anime' && json.data?.anime) {
+            items = json.data.anime;
+        } else if (type === 'season_manga' && json.data?.manga) {
+            items = json.data.manga;
+        } else if (type.startsWith('schedule') && Array.isArray(json.data)) {
+            items = json.data;
+        } else if (type === 'upcoming_anime' && json.data?.anime) {
+            items = json.data.anime;
+        } else if (json.data && Array.isArray(json.data)) {
+            items = json.data;
+            // Atualiza estado de paginação
+            hasMore = json.pagination?.has_next_page || false;
+        } else {
+            console.warn("Formato inesperado da API:", json);
+            items = [];
+            hasMore = false;
+        }
+
+        return sortItems(items, currentSort);
     } catch (e) {
-      console.error('Erro ao buscar dados:', e);
-      return [];
+        console.error('Erro ao buscar dados:', e);
+        // Retorna array vazio em caso de erro, mas não quebra a interface
+        return [];
     }
-  }
-  
-  function formatDate(dateStr) {
+}
+
+// Formata data
+function formatDate(dateStr) {
     if (!dateStr) return 'Desconhecida';
     try {
-      const d = new Date(dateStr);
-      return d.toLocaleDateString('pt-BR', { year: 'numeric', month: '2-digit', day: '2-digit' });
+        const d = new Date(dateStr);
+        return d.toLocaleDateString('pt-BR', { year: 'numeric', month: '2-digit', day: '2-digit' });
     } catch {
-      return dateStr;
+        return dateStr;
     }
-  }
-  
-  function renderCards(items) {
-    itemsContainer.innerHTML = '';
-    
-    if (!items.length) {
-      itemsContainer.innerHTML = '<div class="no-data">Nenhum dado disponível.</div>';
-      chartContainer.style.display = 'none';
-      return;
+}
+
+// Renderiza cards
+function renderCards(items, append = false) {
+    if (!append) {
+        itemsContainer.innerHTML = '';
     }
-    
-    chartContainer.style.display = 'block';
-    chartLoading.style.display = 'flex';
-    popularityCanvas.style.display = 'none';
-    
+
+    if (!items.length && !append) {
+        itemsContainer.innerHTML = '<div class="no-data">Nenhum dado disponível. Tente novamente mais tarde.</div>';
+        loadMoreBtn.style.display = 'none';
+        return;
+    }
+
     items.forEach((item, index) => {
-      const title = item.title || item.name || item.entry?.title || 'Desconhecido';
-      const imageUrl = item.images?.jpg?.image_url || item.images?.jpg?.large_image_url || (item.entry?.images?.jpg?.image_url) || '';
-      const popularity = item.popularity || item.score || 'N/A';
-      const startDate = formatDate(item.aired?.from || item.published?.from || item.start_date || item.entry?.start_date) || 'Desconhecida';
-      
-      const card = document.createElement('div');
-      card.className = 'card';
-      card.title = title;
-      card.innerHTML = `
-        <div class="popularity-badge">${index + 1}</div>
-        <div class="card-img-container">
-          <img src="${imageUrl}" alt="${title}" loading="lazy">
-        </div>
-        <div class="card-content">
-          <h4>${title}</h4>
-          <div class="card-info">
-            <p><i class="fas fa-calendar-alt"></i> ${startDate}</p>
-            <p><i class="fas fa-chart-line"></i> Popularidade: ${popularity}</p>
-          </div>
-        </div>
-      `;
-      itemsContainer.appendChild(card);
+        const title = item.title || item.name || item.entry?.title || 'Desconhecido';
+        const imageUrl = item.images?.jpg?.image_url || 
+                        item.images?.jpg?.large_image_url || 
+                        (item.entry?.images?.jpg?.image_url) || 
+                        'https://via.placeholder.com/300x400/333/fff?text=SEM+IMAGEM';
+        const score = item.score || 'N/A';
+        const popularity = item.popularity || 'N/A';
+        const startDate = formatDate(item.aired?.from || item.published?.from || item.start_date || item.entry?.start_date) || 'Desconhecida';
+
+        const card = document.createElement('div');
+        card.className = 'card-hq';
+        card.innerHTML = `
+            <div class="popularity-badge">${index + 1}</div>
+            <div class="card-img-container">
+                <img src="${imageUrl}" alt="${title}" loading="lazy" onerror="this.src='https://via.placeholder.com/300x400/555/fff?text=Erro+Imagem'">
+            </div>
+            <div class="card-content">
+                <h4>${title}</h4>
+                <div class="card-info">
+                    <p><i class="fas fa-calendar-alt"></i> ${startDate}</p>
+                    <p><i class="fas fa-star"></i> Nota: ${score}</p>
+                    <p><i class="fas fa-fire"></i> Popularidade: ${popularity}</p>
+                </div>
+            </div>
+        `;
+        itemsContainer.appendChild(card);
+
+        // Animação GSAP
+        setTimeout(() => {
+            gsap.to(card, {
+                duration: 0.6,
+                y: 0,
+                opacity: 1,
+                ease: "power2.out",
+                delay: index * 0.1
+            });
+        }, 100);
     });
-  }
-  
-  function createChart(items, type) {
-    if (chartInstance) {
-      chartInstance.destroy();
-      chartInstance = null;
+
+    // Mostra ou esconde botão de carregar mais
+    loadMoreBtn.style.display = hasMore ? 'block' : 'none';
+}
+
+// Carrega dashboard
+async function loadDashboard(type = 'anime', sort = 'popularity', page = 1, append = false) {
+    currentType = type;
+    currentSort = sort;
+    currentPage = page;
+
+    if (!append) {
+        sectionTitle.textContent = `Carregando...`;
+        itemsContainer.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> Carregando dados...</div>';
     }
+
+    const items = await fetchTopList(type, page);
+    const displayType = type.charAt(0).toUpperCase() + type.slice(1).replace('_', ' ');
+    sectionTitle.textContent = `${displayType} - Ordenado por ${sort === 'score' ? 'Melhor Avaliação' : sort === 'date' ? 'Data' : 'Popularidade'}`;
     
-    if (!items.length) {
-      chartContainer.style.display = 'none';
-      return;
+    renderCards(items, append);
+}
+
+// Eventos
+typeFilter.onchange = () => {
+    currentPage = 1;
+    loadDashboard(typeFilter.value, sortFilter.value, 1, false);
+};
+
+sortFilter.onchange = () => {
+    currentPage = 1;
+    loadDashboard(currentType, sortFilter.value, 1, false);
+};
+
+loadMoreBtn.onclick = () => {
+    currentPage++;
+    loadDashboard(currentType, currentSort, currentPage, true);
+};
+
+// Botão voltar ao topo
+window.addEventListener('scroll', () => {
+    if (window.scrollY > 300) {
+        backToTopBtn.classList.add('show');
+    } else {
+        backToTopBtn.classList.remove('show');
     }
-    
-    // Limitar a 10 itens para melhor performance
-    const limitedItems = items.slice(0, 10);
-    const labels = limitedItems.map(i => i.title || i.name || i.entry?.title || 'Desconhecido');
-    const data = limitedItems.map(i => i.popularity || i.score || 0);
-    
-    // Pequeno atraso para permitir que o loading seja exibido
+});
+
+backToTopBtn.onclick = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+};
+
+// Tema (opcional)
+let currentTheme = 'dark';
+themeToggle.onclick = () => {
+    currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    if (currentTheme === 'dark') {
+        document.body.style.background = '#111 url("image/svg+xml;utf8,<svg xmlns=\\"http://www.w3.org/2000/svg\\" width=\\"100\\" height=\\"100\\" viewBox=\\"0 0 100 100\\"><rect fill=\\"%23222\\" width=\\"100\\" height=\\"100\\"/><path d=\\"M0,0 L100,100 M100,0 L0,100\\" stroke=\\"%23333\\" stroke-width=\\"1\\"/></svg>")';
+        themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+    } else {
+        document.body.style.background = '#f8f9fa';
+        document.body.style.color = '#212529';
+        themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+    }
+};
+
+// Inicializa tudo
+document.addEventListener('DOMContentLoaded', () => {
+    // Força remoção do splash
     setTimeout(() => {
-      chartLoading.style.display = 'none';
-      popularityCanvas.style.display = 'block';
-      
-      chartInstance = new Chart(popularityCtx, {
-        type: 'bar',
-        data: {
-          labels: labels,
-          datasets: [{
-            label: `Popularidade - ${type.charAt(0).toUpperCase() + type.slice(1).replace('_', ' ')}`,
-            data: data,
-            backgroundColor: accentColors[type] || accentColors.anime,
-            borderColor: borderColors[type] || borderColors.anime,
-            borderWidth: 1,
-            borderRadius: 4,
-            hoverBackgroundColor: (borderColors[type] || borderColors.anime),
-            hoverBorderWidth: 2
-          }]
-        },
-        options: {
-          indexAxis: 'y',
-          responsive: true,
-          maintainAspectRatio: false,
-          animation: {
-            duration: 800, // Reduzido para melhor performance
-            easing: 'easeOutQuart'
-          },
-          plugins: {
-            legend: { 
-              labels: { 
-                color: currentTheme === 'dark' ? '#f5f5f5' : '#212529',
-                font: {
-                  size: 12,
-                  weight: 'bold'
-                },
-                padding: 10
-              } 
-            },
-            tooltip: {
-              backgroundColor: currentTheme === 'dark' ? 'rgba(30, 30, 30, 0.9)' : 'rgba(255, 255, 255, 0.9)',
-              titleColor: currentTheme === 'dark' ? '#f5f5f5' : '#212529',
-              bodyColor: currentTheme === 'dark' ? '#f5f5f5' : '#212529',
-              borderColor: currentTheme === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
-              borderWidth: 1,
-              padding: 8,
-              cornerRadius: 6,
-              displayColors: false,
-              titleFont: {
-                size: 12,
-                weight: 'bold'
-              },
-              bodyFont: {
-                size: 11
-              },
-              callbacks: {
-                label: function(context) {
-                  return `Popularidade: ${context.raw}`;
+        const splash = document.getElementById('splash');
+        if (splash) {
+            splash.style.opacity = '0';
+            splash.style.visibility = 'hidden';
+            setTimeout(() => {
+                if (splash.parentNode) {
+                    splash.parentNode.removeChild(splash);
                 }
-              }
-            }
-          },
-          scales: {
-            x: {
-              beginAtZero: true,
-              ticks: { 
-                color: currentTheme === 'dark' ? '#f5f5f5' : '#212529',
-                font: {
-                  size: 10
-                },
-                padding: 4
-              },
-              grid: {
-                color: currentTheme === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
-                drawBorder: false
-              }
-            },
-            y: { 
-              ticks: { 
-                color: currentTheme === 'dark' ? '#f5f5f5' : '#212529',
-                font: {
-                  size: 10
-                },
-                padding: 4
-              },
-              grid: {
-                color: currentTheme === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
-                drawBorder: false
-              }
-            }
-          },
-          layout: {
-            padding: {
-              left: 5,
-              right: 10,
-              top: 5,
-              bottom: 5
-            }
-          }
+            }, 500);
         }
-      });
-    }, 300);
-  }
-  
-  async function loadDashboard(type = 'anime') {
-    sectionTitle.textContent = `Carregando ${type.charAt(0).toUpperCase() + type.slice(1).replace('_', ' ')}...`;
-    itemsContainer.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> Carregando dados...</div>';
-    
-    const items = await fetchTopList(type);
-    
-    sectionTitle.textContent = `Top ${type.charAt(0).toUpperCase() + type.slice(1).replace('_', ' ')}`;
-    renderCards(items);
-    createChart(items, type);
-  }
-  
-  typeFilter.onchange = () => {
-    loadDashboard(typeFilter.value);
-  };
-  
-  window.onload = () => {
-    setTheme(currentTheme);
-    loadDashboard(typeFilter.value);
-  };
-</script>
+        gsap.from(".logo-container h1", { duration: 1, y: -30, opacity: 0, ease: "bounce.out" });
+    }, 2500);
+
+    // ✅ CARREGA "TOP ANIMES" POR PADRÃO
+    loadDashboard('anime', 'popularity');
+
+    window.addEventListener('scroll', () => {
+        if (window.pageYOffset > 300) {
+            backToTopBtn.classList.add('show');
+        } else {
+            backToTopBtn.classList.remove('show');
+        }
+    });
+});
+    </script>
 </body>
 </html>
