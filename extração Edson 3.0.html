@@ -3,387 +3,661 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculo Extração</title>
+    <title>Sistema de Cálculos</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        /* Cores Verdes atualizadas */
+        /* === Estilos Gerais === */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+            padding: 15px;
+        }
+
+        .tabs {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            padding: 12px 24px;
+            background-color: #e0e0e0;
+            border: none;
+            border-radius: 8px 8px 0 0;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s;
+        }
+
+        .tab-btn.active {
+            background-color: #fff;
+            color: #2e7d32;
+            box-shadow: 0 -2px 6px rgba(0,0,0,0.1);
+        }
+
+        .tab-content {
+            display: none;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* === Estilos da Aba 1: Extração === */
         :root {
-            --primary-color: #2e7d32; /* Verde principal mais moderno */
-            --primary-dark-color: #1b5e20; /* Verde mais escuro para hover */
-            --primary-light-color: #4caf50; /* Verde claro para destaques */
-            --secondary-color: #e8f5e9; /* Verde muito claro para fundos */
-            --border-color: #a5d6a7; /* Verde para bordas */
+            --primary-color: #2e7d32;
+            --primary-dark-color: #1b5e20;
+            --primary-light-color: #4caf50;
+            --secondary-color: #e8f5e9;
+            --border-color: #a5d6a7;
             --text-color: #333;
             --light-bg: #f5f5f5;
             --white-bg: #fff;
             --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             --shadow-hover: 0 6px 12px rgba(0, 0, 0, 0.15);
         }
-        
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-        
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: var(--light-bg);
-            color: var(--text-color);
-            line-height: 1.6;
-        }
-        
-        .container {
-            background-color: var(--white-bg);
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: var(--shadow);
+
+        .container-extracao {
+            padding: 25px;
             max-width: 900px;
-            margin: 40px auto;
-            transition: box-shadow 0.3s ease;
+            margin: 0 auto;
         }
-        
-        .container:hover {
-            box-shadow: var(--shadow-hover);
-        }
-        
-        h1 {
-            color: var(--primary-color);
-            text-align: center;
-            margin-bottom: 15px;
-            font-size: 2.2em;
-            font-weight: 700;
-            position: relative;
-            padding-bottom: 15px;
-        }
-        
-        h1::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 80px;
-            height: 3px;
-            background-color: var(--primary-light-color);
-            border-radius: 2px;
-        }
-        
+
         .developer-credits {
             text-align: center;
-            margin-bottom: 30px;
-            padding: 15px;
+            margin: 15px 0;
+            padding: 10px;
             background-color: var(--secondary-color);
-            border-radius: 8px;
-            font-size: 0.9em;
+            border-radius: 6px;
+            font-size: 0.85em;
             color: #555;
         }
-        
+
         .developer-credits h3 {
             color: var(--primary-color);
-            margin-bottom: 8px;
-            font-size: 1.1em;
+            margin-bottom: 4px;
+            font-size: 1em;
         }
-        
+
         .developer-credits p {
-            margin: 4px 0;
+            margin: 2px 0;
         }
-        
+
         .developer-credits a {
             color: var(--primary-dark-color);
             text-decoration: none;
-            transition: color 0.2s;
         }
-        
+
         .developer-credits a:hover {
-            color: var(--primary-color);
             text-decoration: underline;
         }
-        
+
+        h1 {
+            color: var(--primary-color);
+            text-align: center;
+            margin-bottom: 12px;
+            font-size: 2em;
+        }
+
         h2 {
             color: var(--primary-color);
-            margin-bottom: 20px;
-            font-size: 1.5em;
-            padding-bottom: 8px;
+            margin: 20px 0 15px;
+            font-size: 1.4em;
+            padding-bottom: 6px;
             border-bottom: 1px solid var(--border-color);
         }
-        
+
         .section {
-            margin-bottom: 30px;
+            margin-bottom: 25px;
             border: 1px solid var(--border-color);
-            padding: 25px;
+            padding: 20px;
             border-radius: 10px;
             background-color: var(--white-bg);
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-            transition: transform 0.2s ease;
         }
-        
-        .section:hover {
-            transform: translateY(-2px);
-        }
-        
+
         .section p {
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             color: #555;
             font-style: italic;
             text-align: center;
-            font-weight: 500;
         }
-        
-        /* Estilo para cada bloco de cálculo individual */
+
         .calculation-entry {
             display: flex;
             flex-direction: column;
-            margin-bottom: 20px;
-            padding: 18px;
+            margin-bottom: 18px;
+            padding: 15px;
             border: 1px solid #e0e0e0;
             border-radius: 8px;
             background-color: var(--white-bg);
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-            transition: box-shadow 0.2s ease;
         }
-        
-        .calculation-entry:hover {
-            box-shadow: 0 3px 8px rgba(0,0,0,0.1);
-        }
-        
-        .input-fields-row, .formula-output-row {
+
+        .input-fields-row {
             display: flex;
             align-items: center;
-            width: 100%;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+            gap: 15px;
         }
-        
-        .input-fields-row {
-            margin-bottom: 12px;
-            justify-content: flex-start;
-        }
-        
+
         .input-pair {
             display: flex;
             align-items: center;
-            margin-right: 20px;
+            gap: 6px;
         }
-        
-        .input-pair:last-child {
-            margin-right: 0;
-        }
-        
+
         .input-pair label {
-            margin-right: 8px;
             font-weight: 600;
             white-space: nowrap;
             color: #444;
         }
-        
+
         .input-pair input[type="number"] {
             width: 100px;
-            padding: 10px;
+            padding: 8px;
             border: 1px solid #ccc;
             border-radius: 6px;
             font-size: 1em;
-            transition: border-color 0.2s, box-shadow 0.2s;
         }
-        
-        .input-pair input[type="number"]:focus {
-            border-color: var(--primary-light-color);
-            box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
-            outline: none;
-        }
-        
+
         .formula-output-row {
+            display: flex;
             justify-content: flex-end;
+            align-items: center;
+            gap: 10px;
         }
-        
-        .formula-output-row .formula {
-            margin-right: 15px;
+
+        .formula {
             font-weight: 600;
             color: #555;
         }
-        
-        .formula-output-row .result {
+
+        .result {
             font-weight: 700;
             color: var(--primary-color);
-            min-width: 120px;
+            min-width: 110px;
             text-align: right;
-            font-size: 1.1em;
+            font-size: 1.05em;
             background-color: var(--secondary-color);
-            padding: 5px 10px;
+            padding: 4px 8px;
             border-radius: 4px;
         }
-        
-        .add-row-button {
-            display: block;
+
+        .add-row-button, .calculate-button {
             width: 100%;
             padding: 12px;
             background-color: var(--primary-color);
             color: white;
             border: none;
             border-radius: 6px;
-            font-size: 1em;
             font-weight: 600;
             cursor: pointer;
             margin-top: 15px;
-            transition: background-color 0.3s ease, transform 0.1s ease;
         }
-        
-        .add-row-button:hover {
+
+        .add-row-button:hover, .calculate-button:hover {
             background-color: var(--primary-dark-color);
         }
-        
-        .add-row-button:active {
-            transform: scale(0.98);
-        }
-        
-        .add-row-button:disabled {
-            background-color: #cccccc;
-            cursor: not-allowed;
-            transform: none;
-        }
-        
+
         .total-section {
-            margin-top: 40px;
-            padding-top: 25px;
+            margin-top: 30px;
+            padding-top: 20px;
             border-top: 2px solid var(--primary-color);
             text-align: center;
         }
-        
-        .total-section h3 {
-            color: var(--primary-color);
-            margin-bottom: 15px;
-            font-size: 1.4em;
-        }
-        
+
         #totalResult {
-            font-size: 2em;
+            font-size: 1.8em;
             font-weight: 700;
             color: var(--primary-dark-color);
             background-color: var(--secondary-color);
-            padding: 12px 25px;
+            padding: 10px 20px;
             border-radius: 8px;
             display: inline-block;
-            min-width: 220px;
-            text-align: center;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            min-width: 200px;
         }
-        
+
         .unit {
-            font-size: 1.2em;
+            font-size: 1.1em;
             color: #555;
             margin-top: 8px;
+        }
+
+        /* === Estilos da Aba 2: Conversor de Tempo === */
+        .container-tempo {
+            padding: 25px;
+            max-width: 500px;
+            margin: 0 auto;
+            text-align: center;
+        }
+/* === Estilo restaurado para os botões da aba de conversão de tempo === */
+#tempo button {
+    background-color: #007bff !important;
+    color: white !important;
+    padding: 10px 15px !important;
+    border: none !important;
+    border-radius: 4px !important;
+    cursor: pointer !important;
+    font-size: 16px !important;
+    font-weight: normal !important;
+    transition: background-color 0.3s, box-shadow 0.2s !important;
+    margin-top: 10px !important;
+    width: auto !important;
+    min-width: 180px !important;
+    display: inline-block !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+}
+
+#tempo button:hover {
+    background-color: #0056b3 !important;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15) !important;
+}
+
+#tempo button:active {
+    transform: translateY(1px) !important;
+}
+        .modo-conversao {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+            gap: 10px;
+        }
+
+        .modo-btn {
+            background: none;
+            border: none;
+            color: #555;
+            padding: 10px 15px;
+            cursor: pointer;
+            font-weight: bold;
+            border-bottom: 3px solid transparent;
+        }
+
+        .modo-btn.ativo {
+            color: #007bff;
+            border-bottom: 3px solid #007bff;
+        }
+
+        .input-group {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .input-group input {
+            width: 100px;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            text-align: center;
+        }
+
+        .relogio-digital {
+            margin-top: 20px;
+            font-size: 2.2em;
+            font-weight: bold;
+            color: #333;
+            padding: 10px;
+            border: 2px solid #ccc;
+            border-radius: 5px;
+            background-color: #eee;
+        }
+
+        #resultado-conversao {
+            margin-top: 20px;
+            font-size: 1.4em;
+            font-weight: bold;
+            color: #28a745;
+            min-height: 30px;
+        }
+
+        /* === Estilos da Aba 3: Excêntrico === */
+        :root {
+            --bg: #0b1220;
+            --card: #0e1a2d;
+            --input-bg: rgba(255, 255, 255, 0.03);
+            --input-border: rgba(255, 255, 255, 0.08);
+            --text: #e7f6f2;
+            --text-muted: #a0c0b8;
+            --accent: #00c2a8;
+            --result-bg: rgba(0, 194, 168, 0.08);
+            --border: rgba(255, 255, 255, 0.04);
+        }
+
+        .container-excentrico {
+            max-width: 860px;
+            margin: 0 auto;
+            background: var(--card);
+            border-radius: 16px;
+            padding: 24px;
+            color: var(--text);
+            font-family: 'Inter', system-ui, sans-serif;
+        }
+
+        .container-excentrico h1 {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--accent);
+            margin-bottom: 6px;
+        }
+
+        .lead {
+            color: var(--text-muted);
+            font-size: 14px;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            color: var(--text-muted);
+            margin: 14px 0 6px;
             font-weight: 500;
         }
-        
-        button.calculate-button {
-            display: block;
+
+        /* === Estilos para inputs da Aba de Extração (fundo claro, texto escuro) === */
+#extracao input[type="number"] {
+    color: #333;
+    background-color: #fff;
+    border: 1px solid #ccc;
+}
+
+#extracao input[type="number"]:focus {
+    border-color: var(--primary-light-color);
+    outline: none;
+}
+
+/* === Estilos para inputs da Aba de Excêntrico (fundo escuro, texto claro) === */
+#excentrico input,
+#excentrico select {
+    width: 100%;
+    padding: 12px 14px;
+    background: var(--input-bg);
+    border: 1px solid var(--input-border);
+    border-radius: 10px;
+    color: var(--text);
+    font-size: 14px;
+    font-family: inherit;
+}
+
+#excentrico input:focus,
+#excentrico select:focus {
+    outline: none;
+    border-color: var(--accent);
+    background: rgba(0, 194, 168, 0.06);
+}
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--accent);
+            background: rgba(0, 194, 168, 0.06);
+        }
+
+        button.excentrico-btn {
             width: 100%;
-            padding: 15px;
-            background-color: var(--primary-color);
-            color: white;
+            padding: 12px;
+            background: var(--accent);
+            color: #042027;
+            border: none;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            margin-top: 12px;
+        }
+
+        .result {
+            margin-top: 20px;
+            padding: 16px;
+            background: var(--result-bg);
+            border-radius: 12px;
+            font-family: 'Inter', monospace;
+            white-space: pre-line;
+            line-height: 1.6;
+        }
+
+        .note {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 16px;
+            line-height: 1.5;
+        }
+
+        .note strong {
+            color: var(--accent);
+        }
+
+        .toggle-table {
+            background: rgba(255, 255, 255, 0.04);
+            color: var(--text);
+            margin-top: 16px;
+            font-size: 13px;
+            padding: 10px;
             border: none;
             border-radius: 8px;
-            font-size: 1.2em;
-            font-weight: 600;
             cursor: pointer;
-            margin-top: 30px;
-            transition: background-color 0.3s ease, transform 0.1s ease;
         }
-        
-        button.calculate-button:hover {
-            background-color: var(--primary-dark-color);
+
+        .table-box {
+            margin-top: 16px;
+            background: rgba(255, 255, 255, 0.015);
+            padding: 16px;
+            border-radius: 12px;
+            display: none;
         }
-        
-        button.calculate-button:active {
-            transform: scale(0.98);
+
+        .table-box.visible {
+            display: block;
         }
-        
-        /* Ajustes para telas menores (mobile) */
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            color: var(--text);
+        }
+
+        th, td {
+            padding: 10px 8px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            color: var(--text-muted);
+            font-weight: 600;
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+
+        /* Responsividade */
         @media (max-width: 600px) {
-            .container {
-                margin: 20px 10px;
-                padding: 20px;
-            }
-            
-            h1 {
-                font-size: 1.8em;
-            }
-            
             .input-fields-row {
                 flex-direction: column;
                 align-items: flex-start;
             }
-            
+
             .input-pair {
-                margin-right: 0;
-                margin-bottom: 12px;
                 width: 100%;
+                margin-bottom: 8px;
             }
-            
+
             .input-pair input[type="number"] {
                 width: 100%;
             }
-            
+
             .formula-output-row {
                 justify-content: flex-start;
-            }
-            
-            .formula-output-row .formula {
-                margin-right: 10px;
-            }
-            
-            #totalResult {
-                font-size: 1.6em;
-                min-width: 180px;
-                padding: 10px 20px;
             }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Calcular Extração</h1>
-        
-        <div class="developer-credits">
-            <h3>Desenvolvedor</h3>
-            <p>Desenvolvido por EdsonC.S.F.</p>
-            <p>Contato: <a href="mailto:edsony1@gmail.com">edsony1@gmail.com</a></p>
-            <p>Criação: Julho de 2025</p>
-            <p>Versão: 3.0 © 2025. Todos os direitos reservados.</p>
-        </div>
-        
-        <div class="section">
-            <h2>Cálculo Rodando</h2>
-            <p>(Peso) x (Velocidade) x 1440</p>
-            <div id="rodandoInputs">
-                <!-- Linhas de cálculo Rodando serão geradas aqui pelo JS -->
+
+    <!-- Abas de Navegação -->
+    <div class="tabs">
+        <button class="tab-btn active" onclick="abrirAba('extracao')">Extração</button>
+        <button class="tab-btn" onclick="abrirAba('tempo')">Min ↔ Horas</button>
+        <button class="tab-btn" onclick="abrirAba('excentrico')">Excêntrico</button>
+    </div>
+
+    <!-- Aba 1: Extração -->
+    <div id="extracao" class="tab-content active">
+        <div class="container-extracao">
+            <h1>Calcular Extração</h1>
+            
+            <div class="developer-credits">
+                <h3>Desenvolvedor</h3>
+                <p>EdsonC.S.F. | <a href="mailto:edsony1@gmail.com">edsony1@gmail.com</a></p>
+                <p>Criação: Julho de 2025 | Versão: 3.0 © 2025</p>
             </div>
-            <button id="addRodandoBtn" class="add-row-button" onclick="addRodandoRow()">+ Adicionar Linha Rodando</button>
-        </div>
-        
-        <div class="section">
-            <h2>Cálculo Drenando</h2>
-            <p>(Peso) x 6 x 1440</p>
-            <div id="drenandoInputs">
-                <!-- Linhas de cálculo Drenando serão geradas aqui pelo JS -->
+            
+            <div class="section">
+                <h2>Cálculo Rodando</h2>
+                <p>(Peso) x (Velocidade) x 1440</p>
+                <div id="rodandoInputs"></div>
+                <button class="add-row-button" onclick="addRodandoRow()">+ Adicionar Linha Rodando</button>
             </div>
-            <button id="addDrenandoBtn" class="add-row-button" onclick="addDrenandoRow()">+ Adicionar Linha Drenando</button>
-        </div>
-        
-        <button class="calculate-button" onclick="calcularTudo()">Calcular Tudo</button>
-        
-        <div class="total-section">
-            <h3>Total Geral</h3>
-            <span id="totalResult">0,00</span>
-            <div class="unit">toneladas</div>
+            
+            <div class="section">
+                <h2>Cálculo Drenando</h2>
+                <p>(Peso) x 6 x 1440</p>
+                <div id="drenandoInputs"></div>
+                <button class="add-row-button" onclick="addDrenandoRow()">+ Adicionar Linha Drenando</button>
+            </div>
+            
+            <button class="calculate-button" onclick="calcularTudo()">Calcular Tudo</button>
+            
+            <div class="total-section">
+                <h3>Total Geral</h3>
+                <span id="totalResult">0,00</span>
+                <div class="unit">toneladas</div>
+            </div>
         </div>
     </div>
-    
+
+    <!-- Aba 2: Conversor de Tempo -->
+    <div id="tempo" class="tab-content">
+        <div class="container-tempo">
+            <h1>Conversor de Tempo</h1>
+
+            <div class="modo-conversao">
+                <button class="modo-btn ativo" onclick="mudarModo('min_to_h')">Min\Horas</button>
+                <button class="modo-btn" onclick="mudarModo('h_to_min')">Horas\Min</button>
+            </div>
+
+            <div id="min_to_h_content">
+                <label for="minutosInput">Total de Minutos:</label><br>
+                <input type="number" id="minutosInput" value="315" placeholder="Ex: 315" min="0">
+                <button onclick="converterMinutosParaHoras()">Converter para Horas</button>
+            </div>
+
+            <div id="h_to_min_content" style="display: none;">
+                <label>Digite Horas e Minutos:</label>
+                <div class="input-group">
+                    <input type="number" id="horasInput" value="0" placeholder="Horas" min="0">
+                    <input type="number" id="minutosExtraInput" value="0" placeholder="Minutos" min="0" max="59">
+                </div>
+                <button onclick="converterHorasParaMinutos()">Converter para Minutos</button>
+            </div>
+
+            <div id="resultado-conversao">5h 15m</div>
+            <div class="relogio-digital" id="relogio"></div>
+        </div>
+    </div>
+
+    <!-- Aba 3: Excêntrico -->
+    <div id="excentrico" class="tab-content">
+        <div class="container-excentrico">
+            <h1>Calculador Excêntrico — Tesoura Gota</h1>
+            <p class="lead">Agora com correção de limites (evita sobreposição no limite entre faixas). Digite velocidade + processo ou ângulo para obter o resultado automaticamente.</p>
+
+            <label>Modo</label>
+            <select id="mode">
+                <option value="ecc">Excêntrico → Velocidade</option>
+                <option value="speed">Velocidade + Processo → Excêntrico</option>
+            </select>
+
+            <div id="ecc-panel">
+                <label>Ângulo do Excêntrico (°)</label>
+                <input id="ecc-input" type="number" min="0" max="360" placeholder="Ex: 91">
+                <button class="excentrico-btn" id="calc-ecc">Calcular pelo Excêntrico</button>
+            </div>
+
+            <div id="speed-panel" style="display: none;">
+                <label>Velocidade</label>
+                <input id="speed-input" type="number" min="0" placeholder="Ex: 70">
+                <label>Processo</label>
+                <select id="process-select">
+                    <option value="1">Simples</option>
+                    <option value="2">Dupla</option>
+                    <option value="3">Tripla</option>
+                    <option value="4">Quádrupla</option>
+                </select>
+                <button class="excentrico-btn" id="calc-speed">Calcular pela Velocidade</button>
+            </div>
+
+            <div class="result" id="result">Resultado aparecerá aqui.</div>
+
+            <button class="toggle-table" id="toggle-table">Mostrar Tabela de Referência</button>
+
+            <div class="table-box" id="table-box">
+                <strong>Tabela de Referência (Simples)</strong>
+                <table id="ref-table">
+                    <thead>
+                        <tr>
+                            <th>Excêntrico</th>
+                            <th>Velocidade</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+
+            <p class="note">
+                Observação: quando faixas da tabela compartilham um limite (ex.: 30 aparece no fim de uma faixa e no início da próxima), o sistema aplica a regra <strong>(prevMax, max]</strong> — ou seja, o limite compartilhado pertence à faixa anterior. Por isso o limite inferior exibido é ajustado (+1) para evitar sobreposição.
+            </p>
+        </div>
+    </div>
+
     <script>
-        const MAX_LINHAS = 10; // Máximo de linhas permitidas
-        let rodandoRowCount = 0; // Contador de linhas Rodando
-        let drenandoRowCount = 0; // Contador de linhas Drenando
-        
-        // Função para formatar números no padrão brasileiro (milhares com ponto, decimal com vírgula)
+        // === Sistema de Abas ===
+        function abrirAba(nomeAba) {
+            // Esconde todas as abas
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            // Remove classe ativa dos botões
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            // Mostra a aba selecionada
+            document.getElementById(nomeAba).classList.add('active');
+            // Ativa o botão
+            event.target.classList.add('active');
+        }
+
+        // === Aba 1: Extração ===
+        const MAX_LINHAS = 10;
+        let rodandoRowCount = 0;
+        let drenandoRowCount = 0;
+
         function formatarNumeroBR(numero) {
             const numStr = numero.toFixed(2);
             const partes = numStr.split('.');
@@ -392,8 +666,7 @@
             parteInteira = parteInteira.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
             return parteInteira + ',' + parteDecimal;
         }
-        
-        // Função para adicionar uma nova linha de cálculo Rodando
+
         function addRodandoRow() {
             if (rodandoRowCount < MAX_LINHAS) {
                 const rodandoDiv = document.getElementById('rodandoInputs');
@@ -418,13 +691,12 @@
                 rodandoDiv.insertAdjacentHTML('beforeend', newRowHtml);
                 rodandoRowCount++;
                 if (rodandoRowCount >= MAX_LINHAS) {
-                    document.getElementById('addRodandoBtn').disabled = true;
+                    document.querySelectorAll('.add-row-button')[0].disabled = true;
                 }
-                calcularTudo(); // Recalcula ao adicionar nova linha
+                calcularTudo();
             }
         }
-        
-        // Função para adicionar uma nova linha de cálculo Drenando
+
         function addDrenandoRow() {
             if (drenandoRowCount < MAX_LINHAS) {
                 const drenandoDiv = document.getElementById('drenandoInputs');
@@ -445,59 +717,251 @@
                 drenandoDiv.insertAdjacentHTML('beforeend', newRowHtml);
                 drenandoRowCount++;
                 if (drenandoRowCount >= MAX_LINHAS) {
-                    document.getElementById('addDrenandoBtn').disabled = true;
+                    document.querySelectorAll('.add-row-button')[1].disabled = true;
                 }
-                calcularTudo(); // Recalcula ao adicionar nova linha
+                calcularTudo();
             }
         }
-        
-        // Função principal de cálculo
+
         function calcularTudo() {
             let totalGeral = 0;
-            
-            // Cálculos Rodando
             for (let i = 0; i < rodandoRowCount; i++) {
-                const pesoInput = document.getElementById(`pesoRodando${i}`);
-                const velocidadeInput = document.getElementById(`velocidadeRodando${i}`);
-                
-                const peso = parseFloat(pesoInput ? pesoInput.value : 0);
-                const velocidade = parseFloat(velocidadeInput ? velocidadeInput.value : 0);
-                
-                let resultado = 0;
-                if (!isNaN(peso) && !isNaN(velocidade)) {
-                    resultado = peso * velocidade * 1440;
-                }
-                const resultadoElement = document.getElementById(`resultadoRodando${i}`);
-                if (resultadoElement) {
-                    resultadoElement.textContent = formatarNumeroBR(resultado);
-                }
+                const peso = parseFloat(document.getElementById(`pesoRodando${i}`)?.value || 0);
+                const velocidade = parseFloat(document.getElementById(`velocidadeRodando${i}`)?.value || 0);
+                let resultado = !isNaN(peso) && !isNaN(velocidade) ? peso * velocidade * 1440 : 0;
+                document.getElementById(`resultadoRodando${i}`).textContent = formatarNumeroBR(resultado);
                 totalGeral += resultado;
             }
-            
-            // Cálculos Drenando
             for (let i = 0; i < drenandoRowCount; i++) {
-                const pesoInput = document.getElementById(`pesoDrenando${i}`);
-                const peso = parseFloat(pesoInput ? pesoInput.value : 0);
-                
-                let resultado = 0;
-                if (!isNaN(peso)) {
-                    resultado = peso * 6 * 1440;
-                }
-                const resultadoElement = document.getElementById(`resultadoDrenando${i}`);
-                if (resultadoElement) {
-                    resultadoElement.textContent = formatarNumeroBR(resultado);
-                }
+                const peso = parseFloat(document.getElementById(`pesoDrenando${i}`)?.value || 0);
+                let resultado = !isNaN(peso) ? peso * 6 * 1440 : 0;
+                document.getElementById(`resultadoDrenando${i}`).textContent = formatarNumeroBR(resultado);
                 totalGeral += resultado;
             }
-            
             document.getElementById('totalResult').textContent = formatarNumeroBR(totalGeral);
         }
-        
-        // Adiciona a primeira linha de cada tipo ao carregar a página
+
+        // Inicializa com uma linha em cada
         document.addEventListener('DOMContentLoaded', () => {
-            addRodandoRow(); // Adiciona a primeira linha Rodando
-            addDrenandoRow(); // Adiciona a primeira linha Drenando
+            addRodandoRow();
+            addDrenandoRow();
         });
+
+        // === Aba 2: Conversor de Tempo ===
+        function formatarNumero(numero) {
+            return numero.toString().padStart(2, '0');
+        }
+
+        function converterMinutosParaHoras() {
+            const totalMinutos = parseInt(document.getElementById('minutosInput').value || 0);
+            if (isNaN(totalMinutos) || totalMinutos < 0) {
+                document.getElementById('resultado-conversao').innerText = "Valor inválido.";
+                return;
+            }
+            const horas = Math.floor(totalMinutos / 60);
+            const minutosRestantes = totalMinutos % 60;
+            const minutosFormatados = formatarNumero(minutosRestantes);
+            let resultadoFormatado = `${horas}h ${minutosFormatados}m`;
+            const totalSegundos = totalMinutos * 60;
+            resultadoFormatado += `<br><span style="font-size: 0.6em; color: #555;">(${totalSegundos.toLocaleString('pt-BR')} segundos)</span>`;
+            document.getElementById('resultado-conversao').innerHTML = resultadoFormatado;
+        }
+
+        function converterHorasParaMinutos() {
+            const horas = parseInt(document.getElementById('horasInput').value || 0);
+            const minutos = parseInt(document.getElementById('minutosExtraInput').value || 0);
+            if (isNaN(horas) || horas < 0 || isNaN(minutos) || minutos < 0 || minutos > 59) {
+                document.getElementById('resultado-conversao').innerText = "Valores inválidos.";
+                return;
+            }
+            const totalMinutos = (horas * 60) + minutos;
+            document.getElementById('resultado-conversao').innerText = `${totalMinutos} minutos`;
+        }
+
+        function mudarModo(modo) {
+            document.querySelectorAll('.modo-btn').forEach(btn => btn.classList.remove('ativo'));
+            document.getElementById('min_to_h_content').style.display = 'none';
+            document.getElementById('h_to_min_content').style.display = 'none';
+
+            if (modo === 'min_to_h') {
+                document.querySelector('.modo-btn:nth-child(1)').classList.add('ativo');
+                document.getElementById('min_to_h_content').style.display = 'block';
+                converterMinutosParaHoras();
+            } else if (modo === 'h_to_min') {
+                document.querySelector('.modo-btn:nth-child(2)').classList.add('ativo');
+                document.getElementById('h_to_min_content').style.display = 'block';
+                converterHorasParaMinutos();
+            }
+        }
+
+        function atualizarRelogio() {
+            const agora = new Date();
+            const horas = formatarNumero(agora.getHours());
+            const minutos = formatarNumero(agora.getMinutes());
+            const segundos = formatarNumero(agora.getSeconds());
+            document.getElementById('relogio').innerText = `${horas}:${minutos}:${segundos}`;
+        }
+
+        setInterval(atualizarRelogio, 1000);
+        atualizarRelogio();
+        converterMinutosParaHoras();
+
+        // === Aba 3: Excêntrico ===
+        const table = [
+            {angle:14, min:5, max:7},
+            {angle:18, min:7, max:10},
+            {angle:20, min:10, max:12},
+            {angle:34, min:12, max:15},
+            {angle:41, min:15, max:18},
+            {angle:49, min:18, max:20},
+            {angle:58, min:20, max:25},
+            {angle:61, min:25, max:30},
+            {angle:65, min:30, max:35},
+            {angle:67, min:35, max:40},
+            {angle:70, min:40, max:45},
+            {angle:80, min:45, max:50},
+            {angle:91, min:50, max:55},
+            {angle:106, min:55, max:60},
+            {angle:113, min:60, max:68},
+            {angle:122, min:68, max:75},
+            {angle:133, min:75, max:83},
+            {angle:149, min:83, max:95},
+            {angle:160, min:95, max:102},
+            {angle:171, min:102, max:110},
+            {angle:180, min:110, max:Infinity}
+        ];
+
+        const tbody = document.querySelector('#ref-table tbody');
+        table.forEach(r => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `<td>${r.angle}°</td><td>${r.max === Infinity ? `${r.min} — ACIMA` : `${r.min} — ${r.max}`}</td>`;
+            tbody.appendChild(tr);
+        });
+
+        function findRowByAngle(angle) {
+            for (let i = 0; i < table.length; i++) {
+                if (table[i].angle === angle) return { row: table[i], index: i };
+            }
+            return null;
+        }
+
+        function findRowBySingle(single) {
+            for (let i = 0; i < table.length; i++) {
+                const prevMax = i > 0 ? table[i - 1].max : -Infinity;
+                if (single > prevMax && single <= table[i].max) {
+                    return { row: table[i], prevMax };
+                }
+            }
+            const lastIdx = table.length - 1;
+            return { row: table[lastIdx], prevMax: table[lastIdx - 1]?.max || -Infinity };
+        }
+
+        function formatRange(min, max) {
+            return max === Infinity ? `${min} — ACIMA` : `${min} — ${max}`;
+        }
+
+        function calcFromAngle(angle) {
+            const found = findRowByAngle(angle);
+            if (!found) return { error: 'Ângulo não encontrado na tabela.' };
+            const r = found.row;
+            const idx = found.index;
+            const prevMax = idx > 0 ? table[idx - 1].max : null;
+
+            const outputs = { angle: r.angle, simples: formatRange(r.min, r.max), detalhes: [] };
+            for (let proc = 1; proc <= 4; proc++) {
+                let smin = prevMax === null ? r.min * proc : prevMax * proc + 1;
+                const smax = r.max === Infinity ? Infinity : r.max * proc;
+                outputs.detalhes.push({
+                    proc,
+                    smin: Math.round(smin),
+                    smax: isFinite(smax) ? Math.round(smax) : Infinity
+                });
+            }
+            return outputs;
+        }
+
+        function calcFromSpeed(speed, proc) {
+            const singleEq = speed / proc;
+            const found = findRowBySingle(singleEq);
+            const r = found.row;
+            const prevMax = found.prevMax;
+            let smin = prevMax === -Infinity ? r.min * proc : prevMax * proc + 1;
+            const smax = r.max === Infinity ? Infinity : r.max * proc;
+            return {
+                singleEq,
+                angle: r.angle,
+                smin: Math.round(smin),
+                smax: isFinite(smax) ? Math.round(smax) : Infinity,
+                simplesRange: formatRange(r.min, r.max)
+            };
+        }
+
+        const mode = document.getElementById('mode');
+        const eccPanel = document.getElementById('ecc-panel');
+        const speedPanel = document.getElementById('speed-panel');
+        const resultEl = document.getElementById('result');
+
+        mode.addEventListener('change', () => {
+            if (mode.value === 'ecc') {
+                eccPanel.style.display = 'block';
+                speedPanel.style.display = 'none';
+            } else {
+                eccPanel.style.display = 'none';
+                speedPanel.style.display = 'block';
+            }
+            resultEl.textContent = 'Resultado aparecerá aqui.';
+        });
+
+        document.getElementById('calc-ecc').addEventListener('click', () => {
+            const a = Number(document.getElementById('ecc-input').value);
+            if (isNaN(a)) {
+                resultEl.textContent = 'Insira um ângulo válido.';
+                return;
+            }
+            const out = calcFromAngle(a);
+            if (out.error) {
+                resultEl.textContent = out.error;
+                return;
+            }
+            let text = `Excêntrico ${out.angle}° → Simples: ${out.simples}\n\n`;
+            out.detalhes.forEach(d => {
+                text += `${d.proc === 1 ? 'Simples' : d.proc + 'x'}: ${d.smin} — ${d.smax === Infinity ? 'ACIMA' : d.smax}\n`;
+            });
+            resultEl.textContent = text;
+        });
+
+        document.getElementById('calc-speed').addEventListener('click', () => {
+            const speed = Number(document.getElementById('speed-input').value);
+            const proc = Number(document.getElementById('process-select').value);
+            if (isNaN(speed) || isNaN(proc) || proc < 1) {
+                resultEl.textContent = 'Insira velocidade e processo válidos.';
+                return;
+            }
+            const out = calcFromSpeed(speed, proc);
+            let text = `Velocidade: ${speed} (processo x${proc})\n`;
+            text += `Equivalente simples: ${out.singleEq.toFixed(2)}\n`;
+            text += `Excêntrico aproximado: ${out.angle}°\n`;
+            text += `Faixa válida para o processo: ${out.smin} — ${out.smax === Infinity ? 'ACIMA' : out.smax}\n`;
+            text += `Faixa simples (referência): ${out.simplesRange}`;
+            resultEl.textContent = text;
+        });
+
+        const toggleBtn = document.getElementById('toggle-table');
+        const tableBox = document.getElementById('table-box');
+
+        toggleBtn.addEventListener('click', () => {
+            const isVisible = tableBox.classList.contains('visible');
+            if (isVisible) {
+                tableBox.classList.remove('visible');
+                toggleBtn.textContent = 'Mostrar Tabela de Referência';
+            } else {
+                tableBox.classList.add('visible');
+                toggleBtn.textContent = 'Esconder Tabela de Referência';
+            }
+        });
+
+        document.getElementById('ecc-input').value = 91;
+        document.getElementById('speed-input').value = 70;
     </script>
 </body>
 </html>
