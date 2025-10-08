@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Gerenciador de Exames - Automático e Responsivo</title>
+
+<!-- Bibliotecas -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<!-- Biblioteca para gerar PDF -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+
+<style>
+  /* ... (mesmo CSS anterior) ... */
+  :root{
+    --azul:#1a73e8; --verde:#e8f5e9; --verde-text:#388e3c;
+    --laranja:#fff3e0; --laranja-text:#f57c00;
+    --vermelho:#ffebee; --vermelho-text:#d32f2f;
+    --amarelo:#fffde7; --amarelo-text:#fbc02d;
+    --azulpastel:#e3f2fd; --azul-text:#1e88e5;
+  }
+  body{font-family:'Segoe UI',sans-serif;margin:0;padding:0;background:#f4f7f6;color:#333;}
+  .container{max-width:1100px;margin:auto;padding:15px;}
+  h1{color:var(--azul);text-align:center;margin-bottom:15px;font-size:1.5rem;}
+  button{background:var(--azul);color:#fff;border:none;padding:10px 16px;border-radius:8px;cursor:pointer;font-weight:500;font-size:0.95rem;}
+  button:hover{background:#155ab5;}
+  button.secondary{background:#777;}
+  button.small{padding:6px 10px;font-size:0.85rem;}
+  .flex{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:center;margin-bottom:15px;}
+  .patients{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:15px;}
+  .patient-card{background:#fff;border:1px solid #ddd;border-radius:8px;padding:10px 14px;cursor:pointer;min-width:120px;text-align:center;}
+  .patient-card.active{background:var(--azul);color:#fff;}
+  table{width:100%;border-collapse:separate;border-spacing:0 10px;}
+  th,td{padding:10px;text-align:left;}
+  th{background:#e8f0fe;color:#1a237e;border-top:1px solid #ccc;border-bottom:1px solid #ccc;}
+  tbody tr{background:#fff;border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,0.05);}
+  .resultado{font-weight:700;text-align:center;border-radius:6px;padding:6px;}
+  .bom{background:var(--verde);color:var(--verde-text);}
+  .proximo_ruim_acima{background:var(--laranja);color:var(--laranja-text);}
+  .ruim_acima{background:var(--vermelho);color:var(--vermelho-text);}
+  .proximo_ruim_abaixo{background:var(--amarelo);color:var(--amarelo-text);}
+  .ruim_abaixo{background:var(--azulpastel);color:var(--azul-text);}
+  .legend{margin-top:15px;padding:12px;background:#fafafa;border:1px solid #eee;border-radius:8px;}
+  .legend div{display:flex;align-items:center;margin:5px 0;}
+  .sw{width:18px;height:18px;border-radius:4px;margin-right:8px;}
+  .sw-verde{background:var(--verde-text);}
+  .sw-laranja{background:var(--laranja-text);}
+  .sw-vermelho{background:var(--vermelho-text);}
+  .sw-amarelo{background:var(--amarelo-text);}
+  .sw-azul{background:var(--azul-text);}
+  .file-input{display:none;}
+  #chartContainer{margin-top:20px;background:#fff;border-radius:10px;padding:15px;box-shadow:0 1px 6px rgba(0,0,0,0.05);}
+  @media(max-width:768px){
+    #layout{display:block;}
+    .flex button{padding:8px 12px;font-size:0.9rem;}
+    .patient-card{min-width:100px;padding:8px 10px;font-size:0.9rem;}
+    th, td{padding:8px;font-size:0.85rem;}
+    h3{font-size:1.2rem;margin-top:15px;}
+    #examsList div{font-size:0.9rem;padding:5px 0;}
+  }
+  @media(min-width:769px){
+    #layout{display:grid;grid-template-columns:1fr 0.9fr;gap:20px;}
+  }
+  .small{font-size:0.9em;color:#555;}
+  #modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);align-items:center;justify-content:center;z-index:1000;}
+  #modal .box{background:#fff;padding:18px;border-radius:10px;min-width:300px;max-width:90vw;margin:0 10px;}
+  #examsList button{padding:4px 8px;font-size:0.8rem;}
+  
+  /* Estilos para impressão */
+  @media print {
+    .no-print { display: none !important; }
+    body { background: #fff; color: #000; }
+    .container { max-width: none; padding: 0; }
+    #layout { display: block !important; }
+    #chartContainer { page-break-inside: avoid; }
+    table { border-spacing: 0; }
+    tbody tr { box-shadow: none; border: 1px solid #ddd; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>Gerenciador de Exames - Automático</h1>
+
+  <div class="patients no-print" id="patients"></div>
+
+  <div class="flex no-print">
+    <button onclick="openAddPatient()">➕ Adicionar Paciente</button>
+    <input type="file" id="pdfFile" class="file-input" accept="application/pdf" onchange="onPdfSelected(event)">
+    <button onclick="triggerPdf()">📤 Importar PDF</button>
+    <button class="secondary" onclick="importSample()">📄 Testar Exemplo</button>
+    <button class="secondary" onclick="exportData()">💾 Exportar Dados</button>
+    <button class="secondary" onclick="generatePDF()">🖨️ Gerar PDF</button>
+  </div>
+
+  <div id="layout">
+    <div>
+      <h3 id="userInfo">Nenhum paciente selecionado</h3>
+      <table id="resultsTable">
+        <thead>
+          <tr><th>Exame</th><th>Resultado</th><th>Referência</th><th>Anterior</th><th>Classificação</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+
+      <div class="legend">
+        <div><div class="sw sw-verde"></div>Verde: Bom</div>
+        <div><div class="sw sw-laranja"></div>Laranja: Próximo do Ruim (acima)</div>
+        <div><div class="sw sw-vermelho"></div>Vermelho: Ruim (acima)</div>
+        <div><div class="sw sw-amarelo"></div>Amarelo: Próximo do Ruim (abaixo)</div>
+        <div><div class="sw sw-azul"></div>Azul: Ruim (abaixo)</div>
+      </div>
+    </div>
+
+    <div id="chartContainer">
+      <h3>Histórico & Gráficos</h3>
+      <div id="examsList"></div>
+      <canvas id="chartCanvas" style="max-width:100%;"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de novo paciente -->
+<div id="modal" class="no-print">
+  <div class="box">
+    <h3>Novo Paciente</h3>
+    <label>Nome:</label><br>
+    <input id="inpNome" style="width:100%;padding:8px;margin-bottom:8px;border-radius:6px;border:1px solid #ccc"><br>
+    <label>Data de Nascimento:</label><br>
+    <input id="inpNasc" type="date" style="width:100%;padding:8px;border-radius:6px;border:1px solid #ccc"><br>
+    <div style="text-align:right;margin-top:8px">
+      <button class="secondary" onclick="closeModal()">Cancelar</button>
+      <button onclick="addPatient()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ======== Configuração OBRIGATÓRIA do pdf.js ========
+// Sem isso, o pdf.js NÃO FUNCIONA a partir da v2.x
+pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+
+// ======== Banco de dados local ========
+const STORAGE_KEY = "exames_auto_v1";
+let data = JSON.parse(localStorage.getItem(STORAGE_KEY)||"null")||{pacientes:[]};
+let ativo=null;
+let chart=null;
+const save=()=>localStorage.setItem(STORAGE_KEY,JSON.stringify(data));
+
+// ======== Funções básicas ========
+function calcAge(d){
+  const b=new Date(d),t=new Date();
+  let a=t.getFullYear()-b.getFullYear();
+  const m=t.getMonth()-b.getMonth();
+  if(m<0||(m===0&&t.getDate()<b.getDate()))a--;
+  return a;
+}
+
+function openAddPatient(){
+  document.getElementById("modal").style.display="flex";
+}
+
+function closeModal(){
+  document.getElementById("modal").style.display="none";
+}
+
+function addPatient(){
+  const n=document.getElementById("inpNome").value.trim();
+  const nasc=document.getElementById("inpNasc").value;
+  if(!n||!nasc){
+    alert("Preencha os campos");
+    return;
+  }
+  data.pacientes.push({nome:n,nasc,exames:{},hist:[]});
+  ativo=data.pacientes.length-1;
+  save();
+  renderAll();
+  closeModal();
+  // Limpar campos após salvar
+  document.getElementById("inpNome").value = "";
+  document.getElementById("inpNasc").value = "";
+}
+
+function renderPatients(){
+  const pDiv=document.getElementById("patients");
+  pDiv.innerHTML="";
+  data.pacientes.forEach((p,i)=>{
+    const d=document.createElement("div");
+    d.className="patient-card"+(i===ativo?" active":"");
+    d.innerHTML=`<strong>${p.nome}</strong><br><span class="small">${calcAge(p.nasc)} anos</span>`;
+    d.onclick=()=>{ativo=i;renderAll();};
+    pDiv.appendChild(d);
+  });
+}
+
+function triggerPdf(){
+  document.getElementById("pdfFile").click();
+}
+
+// ======== Importar PDF ========
+async function onPdfSelected(e){
+  const f=e.target.files[0];
+  if(!f||ativo===null){
+    alert("Selecione um paciente antes.");
+    return;
+  }
+  try {
+    const arr=await f.arrayBuffer();
+    const pdf=await pdfjsLib.getDocument({data: arr}).promise;
+    let txt="";
+    for(let i=1;i<=pdf.numPages;i++){
+      const p=await pdf.getPage(i);
+      const t=await p.getTextContent();
+      txt+=t.items.map(x=>x.str).join(" ")+" ";
+    }
+    parseExams(txt);
+  } catch (err) {
+    console.error("Erro ao processar PDF:", err);
+    alert("Erro ao ler o PDF. Verifique o arquivo.");
+  }
+  e.target.value="";
+}
+
+function parseNumber(s){
+  return parseFloat(String(s).replace(",",".").replace(/[^\d\.]/g,""));
+}
+
+function parseExams(text){
+  const p=data.pacientes[ativo];
+  const now=new Date().toISOString();
+  const regex=/([A-ZÀ-Ÿ][A-Za-zÀ-ÿ\s\.\(\)\/0-9-]+?)\s*[:]\s*([0-9]+(?:[.,][0-9]+)?)\s*([a-zA-Zµμ\/%\.]*)/g;
+  const ref=/(\d+(?:[.,]\d+)?\s*-\s*\d+(?:[.,]\d+)?\s*[a-zA-Zµμ\/%\.]*)|Até\s*\d+(?:[.,]\d+)?\s*[a-zA-Zµμ\/%\.]*/g;
+  let m;
+  while((m=regex.exec(text))!==null){
+    const nome=m[1].trim();
+    const val=parseNumber(m[2]);
+    const un=m[3].trim();
+    if(!p.exames[nome])p.exames[nome]={vals:[],ref:""};
+    p.exames[nome].vals.push({v:val,u:un,d:now});
+    const idx=text.indexOf(nome);
+    if(idx!=-1){
+      const win=text.substring(idx,idx+150);
+      const r=win.match(ref);
+      if(r)p.exames[nome].ref=r[0];
+    }
+  }
+  p.hist.push({d:now,vals:JSON.parse(JSON.stringify(p.exames))});
+  save();
+  renderAll();
+}
+
+// ======== Classificação ========
+function parseRange(ref){
+  if(!ref)return{min:null,max:null};
+  let m;
+  if(m=ref.match(/(\d+(?:[.,]\d+)?)\s*-\s*(\d+(?:[.,]\d+)?)/)){
+    return{min:parseNumber(m[1]),max:parseNumber(m[2])};
+  }
+  if(m=ref.match(/Até\s*(\d+(?:[.,]\d+)?)/i))
+    return{min:null,max:parseNumber(m[1])};
+  if(m=ref.match(/Inferior a\s*(\d+(?:[.,]\d+)?)/i))
+    return{min:null,max:parseNumber(m[1])};
+  if(m=ref.match(/Superior a\s*(\d+(?:[.,]\d+)?)/i)||m=ref.match(/Acima de\s*(\d+(?:[.,]\d+)?)/i))
+    return{min:parseNumber(m[1]),max:null};
+  return{min:null,max:null};
+}
+
+function classify(v,ref){
+  const{min,max}=parseRange(ref);
+  const tol=0.1;
+  if(min!=null&&max!=null){
+    if(v>=min&&v<=max)return"bom";
+    if(v>max&&v<max*(1+tol))return"proximo_ruim_acima";
+    if(v>max)return"ruim_acima";
+    if(v<min&&v>min*(1-tol))return"proximo_ruim_abaixo";
+    return"ruim_abaixo";
+  }
+  if(max!=null){
+    if(v<=max)return"bom";
+    if(v<=max*(1+tol))return"proximo_ruim_acima";
+    return"ruim_acima";
+  }
+  if(min!=null){
+    if(v>=min)return"bom";
+    if(v>=min*(1-tol))return"proximo_ruim_abaixo";
+    return"ruim_abaixo";
+  }
+  return"bom";
+}
+
+// ======== Render ========
+function renderAll(){
+  renderPatients();
+  renderTable();
+  renderList();
+}
+
+function renderTable(){
+  const tb=document.querySelector("#resultsTable tbody");
+  tb.innerHTML="";
+  if(ativo===null)return;
+  const p=data.pacientes[ativo];
+  document.getElementById("userInfo").innerText=`${p.nome} — ${calcAge(p.nasc)} anos`;
+  Object.keys(p.exames).forEach(k=>{
+    const e=p.exames[k];
+    const last=e.vals[e.vals.length-1];
+    const prev=e.vals.length>1?e.vals[e.vals.length-2].v:"-";
+    const c=classify(last.v,e.ref);
+    const row=document.createElement("tr");
+    row.innerHTML=`<td>${k}</td><td>${last.v} ${last.u||""}</td><td>${e.ref||"-"}</td><td>${prev}</td><td><div class="resultado ${c}">${c.replace(/_/g," ")}</div></td>`;
+    row.onclick=()=>showChart(k);
+    tb.appendChild(row);
+  });
+}
+
+function renderList(){
+  const l=document.getElementById("examsList");
+  l.innerHTML="";
+  if(ativo===null)return;
+  const p=data.pacientes[ativo];
+  Object.keys(p.exames).forEach(k=>{
+    const e=p.exames[k];
+    const last=e.vals[e.vals.length-1];
+    const div=document.createElement("div");
+    div.innerHTML=`<strong>${k}</strong> — ${last.v} ${last.u||""} <button class="small" onclick="showChart('${encodeURIComponent(k)}')">📈</button>`;
+    l.appendChild(div);
+  });
+}
+
+// ======== Gráfico ========
+function showChart(k){
+  const nome=decodeURIComponent(k);
+  const p=data.pacientes[ativo];
+  const e=p.exames[nome];
+  const ctx=document.getElementById("chartCanvas");
+  if(chart)chart.destroy();
+  chart=new Chart(ctx,{
+    type:"line",
+    data:{
+      labels:e.vals.map(x=>new Date(x.d).toLocaleDateString()),
+      datasets:[{
+        label:nome,
+        data:e.vals.map(x=>x.v),
+        borderColor:"#1a73e8",
+        fill:false,
+        tension:0.2
+      }]
+    },
+    options:{
+      responsive:true,
+      plugins:{legend:{display:true}}
+    }
+  });
+}
+
+// ======== Extra ========
+function exportData(){
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download="dados_exames.json";
+  a.click();
+}
+
+function importSample(){
+  const sample="Creatinina: 1.01 mg/dL Até 1.25 mg/dL Glicose: 90 mg/dL 70 - 99 mg/dL TGP: 55 U/L 10 - 49 U/L Colesterol HDL: 40 mg/dL Superior a 40 mg/dL Triglicérides: 158 mg/dL Inferior a 150 mg/dL";
+  parseExams(sample);
+}
+
+// ======== Gerar PDF ========
+function generatePDF() {
+  if (ativo === null || data.pacientes.length === 0) {
+    alert("Selecione um paciente primeiro.");
+    return;
+  }
+  
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  
+  // Título
+  doc.setFontSize(18);
+  doc.text("Relatório de Exames", 14, 20);
+  
+  // Informações do paciente
+  const p = data.pacientes[ativo];
+  doc.setFontSize(12);
+  doc.text(`Paciente: ${p.nome}`, 14, 30);
+  doc.text(`Idade: ${calcAge(p.nasc)} anos`, 14, 36);
+  
+  // Tabela de exames
+  const tableData = [];
+  Object.keys(p.exames).forEach(k => {
+    const e = p.exames[k];
+    const last = e.vals[e.vals.length - 1];
+    const prev = e.vals.length > 1 ? e.vals[e.vals.length - 2].v : "-";
+    const c = classify(last.v, e.ref);
+    let classText = c.replace(/_/g, " ");
+    if (classText === "bom") classText = "Bom";
+    else if (classText === "proximo ruim acima") classText = "Próximo do Ruim (acima)";
+    else if (classText === "ruim acima") classText = "Ruim (acima)";
+    else if (classText === "proximo ruim abaixo") classText = "Próximo do Ruim (abaixo)";
+    else if (classText === "ruim abaixo") classText = "Ruim (abaixo)";
+    
+    tableData.push([
+      k,
+      `${last.v} ${last.u || ""}`,
+      e.ref || "-",
+      prev.toString(),
+      classText
+    ]);
+  });
+  
+  doc.autoTable({
+    head: [['Exame', 'Resultado', 'Referência', 'Anterior', 'Classificação']],
+    body: tableData,
+    startY: 45,
+    theme: 'grid',
+    headStyles: { fillColor: [26, 115, 232] },
+    styles: { fontSize: 9 },
+    columnStyles: {
+      0: { cellWidth: 40 },
+      1: { cellWidth: 25 },
+      2: { cellWidth: 35 },
+      3: { cellWidth: 20 },
+      4: { cellWidth: 40 }
+    }
+  });
+  
+  // Adicionar data de geração
+  const today = new Date().toLocaleDateString('pt-BR');
+  doc.setFontSize(10);
+  doc.text(`Gerado em: ${today}`, 14, doc.lastAutoTable.finalY + 10);
+  
+  // Salvar PDF
+  doc.save(`exames_${p.nome.replace(/\s+/g, '_')}.pdf`);
+}
+
+// ======== Inicialização ========
+document.addEventListener('DOMContentLoaded', () => {
+  if(data.pacientes.length){
+    ativo=0;
+  }else{
+    data.pacientes.push({nome:"Edson Carlos",nasc:"1980-01-01",exames:{},hist:[]});
+    ativo=0;
+    save();
+  }
+  renderAll();
+});
+</script>
+</body>
+</html>
