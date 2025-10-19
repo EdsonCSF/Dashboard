@@ -1,463 +1,724 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Controle de EPIs - Funcionários</title>
-  <style>
-    :root {
-      --green: #4caf50;
-      --red: #f44336;
-      --light: #f9f9f9;
-      --dark: #333;
-      --border: #e0e0e0;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Controle de Entrega de EPIs</title>
+    <style>
+        :root {
+            --cor-primaria: #007bff;
+            --cor-sucesso: #5cb85c;
+            --cor-aviso: #f0ad4e;
+            --cor-erro: #d9534f;
+            --verde-claro: #d4edda;
+            --vermelho-claro: #f8d7da;
+            --cor-edicao: #3498db; /* Azul para edição */
+        }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: 'Segoe UI', system-ui, sans-serif;
-    }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background-color: #f4f4f9;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
 
-    body {
-      background-color: #f5f7fa;
-      color: var(--dark);
-      padding: 20px;
-      line-height: 1.6;
-    }
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            flex-grow: 1;
+        }
 
-    .container {
-      max-width: 1000px;
-      margin: 0 auto;
-    }
+        h1, h2 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 15px;
+        }
 
-    header {
-      text-align: center;
-      margin-bottom: 30px;
-    }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
 
-    h1 {
-      font-size: 2.2rem;
-      color: #2c3e50;
-      margin-bottom: 8px;
-    }
+        .form-group input {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
 
-    .form-card {
-      background: white;
-      padding: 25px;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-      margin-bottom: 30px;
-    }
+        button {
+            padding: 10px 15px;
+            background-color: var(--cor-sucesso);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
 
-    .form-row {
-      display: flex;
-      gap: 20px;
-      flex-wrap: wrap;
-      margin-bottom: 20px;
-    }
+        button:hover {
+            background-color: #4cae4c;
+        }
 
-    .form-group {
-      flex: 1;
-      min-width: 200px;
-    }
+        /* --- Formulário de Funcionário (Melhor Responsividade) --- */
+        #form-funcionario {
+            display: flex;
+            flex-wrap: wrap; 
+            gap: 20px;
+            margin-bottom: 30px;
+            padding: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        
+        #form-funcionario > .form-group {
+            flex: 1 1 45%; 
+            min-width: 250px; 
+        }
+        
+        #btn-abrir-modal-epis {
+            background-color: var(--cor-aviso);
+            width: 100%;
+        }
 
-    label {
-      display: block;
-      margin-bottom: 6px;
-      font-weight: 600;
-      color: #444;
-    }
+        #btn-abrir-modal-epis:hover {
+             background-color: #e59400;
+        }
 
-    input, select {
-      width: 100%;
-      padding: 12px;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      font-size: 16px;
-    }
+        #form-funcionario button[type="submit"] {
+            flex-basis: 100%; 
+        }
+        
+        /* Botões de Ação na Tabela */
+        .btn-edit {
+            background-color: var(--cor-edicao);
+            margin-right: 5px;
+        }
+        .btn-edit:hover {
+            background-color: #2980b9;
+        }
 
-    .epi-list {
-      margin: 20px 0;
-    }
+        /* --- Tabela de EPIs Disponíveis (Tags) --- */
+        #form-epi-adicional {
+            display: grid;
+            grid-template-columns: 2fr 1fr; 
+            gap: 15px;
+            margin-top: 20px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #e9ecef;
+            border-radius: 5px;
+        }
+        
+        #lista-epis-container {
+            grid-column: 1 / -1; 
+            padding: 10px;
+            border: 1px dashed #ccc;
+            background-color: #f8f9fa;
+        }
 
-    .epi-item {
-      display: flex;
-      gap: 12px;
-      margin-bottom: 12px;
-      align-items: center;
-    }
+        .epi-tag {
+            display: inline-flex;
+            align-items: center;
+            background-color: var(--cor-primaria);
+            color: white;
+            padding: 3px 8px;
+            margin: 3px;
+            border-radius: 4px;
+            font-size: 0.85em;
+        }
 
-    .epi-item button {
-      background: var(--red);
-      color: white;
-      border: none;
-      border-radius: 6px;
-      width: 32px;
-      height: 32px;
-      cursor: pointer;
-      font-weight: bold;
-    }
+        .btn-excluir-epi {
+            background: none;
+            border: none;
+            color: white;
+            font-weight: bold;
+            margin-left: 5px;
+            cursor: pointer;
+            padding: 0;
+            line-height: 1;
+            font-size: 1em;
+            opacity: 0.8;
+        }
+        
+        /* --- Tabela de Funcionários --- */
+        #tabela-funcionarios {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            font-size: 0.9em;
+        }
 
-    .btn-group {
-      display: flex;
-      gap: 12px;
-      margin-top: 10px;
-    }
+        #tabela-funcionarios th, #tabela-funcionarios td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        
+        /* Centraliza a quantidade */
+        #tabela-funcionarios td:nth-child(n+4) {
+             text-align: center;
+        }
 
-    button {
-      padding: 10px 20px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: 600;
-      transition: opacity 0.2s;
-    }
+        #tabela-funcionarios th {
+            background-color: var(--cor-primaria);
+            color: white;
+            position: sticky; 
+            top: 0;
+            z-index: 10;
+        }
 
-    button:hover {
-      opacity: 0.9;
-    }
+        .pegar-epi {
+            background-color: var(--verde-claro) !important;
+        }
 
-    .btn-add {
-      background: #2196f3;
-      color: white;
-    }
+        .nao-pegar-epi {
+            background-color: var(--vermelho-claro) !important;
+        }
 
-    .btn-save {
-      background: #4caf50;
-      color: white;
-    }
+        .btn-status {
+            padding: 5px;
+            border-radius: 3px;
+            font-size: 0.75em;
+        }
 
-    /* Cards de Funcionários */
-    .funcionarios-list {
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-    }
+        .btn-status-pegar {
+            background-color: green;
+        }
 
-    .func-card {
-      background: white;
-      border-radius: 12px;
-      padding: 20px;
-      box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-      position: relative;
-    }
+        .btn-status-nao-pegar {
+            background-color: red;
+        }
 
-    .func-card.green {
-      border-left: 6px solid var(--green);
-    }
+        .btn-remover {
+            background-color: var(--cor-erro);
+        }
+        
+        /* --- Modal EPIs --- */
+        .modal {
+            display: none; 
+            position: fixed; 
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%; 
+            height: 100%; 
+            overflow: auto; 
+            background-color: rgba(0,0,0,0.4); 
+        }
 
-    .func-card.red {
-      border-left: 6px solid var(--red);
-    }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 10% auto; 
+            padding: 20px;
+            border: 1px solid #888;
+            width: 90%; 
+            max-width: 600px;
+            border-radius: 8px;
+            position: relative;
+        }
 
-    .func-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: 15px;
-    }
+        .close-button {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
 
-    .func-info h2 {
-      font-size: 1.5rem;
-      margin-bottom: 4px;
-    }
+        .close-button:hover,
+        .close-button:focus {
+            color: #000;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        
+        #lista-modal-epis {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .epi-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px dotted #eee;
+        }
+        
+        .epi-item:last-child {
+            border-bottom: none;
+        }
+        
+        .epi-item input[type="number"] {
+            width: 60px;
+            text-align: center;
+        }
 
-    .func-info p {
-      color: #666;
-      font-size: 1rem;
-    }
+        /* --- Rodapé de Créditos --- */
+        .developer-credits {
+            background-color: #333;
+            color: #fff;
+            padding: 15px;
+            text-align: center;
+            font-size: 0.9em;
+            margin-top: 20px;
+        }
 
-    .epis-display {
-      margin-top: 12px;
-    }
+        .developer-credits h3 {
+            margin-top: 0;
+            font-size: 1.2em;
+        }
 
-    .epis-display h3 {
-      font-size: 1.1rem;
-      margin-bottom: 8px;
-      color: #2c3e50;
-    }
-
-    .epi-tag {
-      display: inline-block;
-      background: #e3f2fd;
-      padding: 6px 12px;
-      border-radius: 20px;
-      margin: 4px 6px 4px 0;
-      font-size: 0.9rem;
-    }
-
-    .status-actions {
-      margin-top: 15px;
-      display: flex;
-      gap: 10px;
-    }
-
-    .status-btn {
-      padding: 8px 16px;
-      font-size: 0.9rem;
-    }
-
-    .btn-pegou {
-      background: var(--green);
-      color: white;
-    }
-
-    .btn-nao-pegou {
-      background: var(--red);
-      color: white;
-    }
-
-    .btn-remove {
-      background: #9e9e9e;
-      color: white;
-    }
-
-    footer {
-      margin-top: 50px;
-      padding: 25px;
-      background: #2c3e50;
-      color: white;
-      border-radius: 12px;
-      text-align: center;
-    }
-
-    .developer-credits h3 {
-      margin-bottom: 10px;
-      font-size: 1.3rem;
-    }
-
-    .developer-credits p {
-      margin: 6px 0;
-      font-size: 1rem;
-    }
-
-    .developer-credits a {
-      color: #4fc3f7;
-      text-decoration: none;
-    }
-
-    .developer-credits a:hover {
-      text-decoration: underline;
-    }
-
-    @media (max-width: 600px) {
-      .form-row {
-        flex-direction: column;
-      }
-      .btn-group {
-        flex-direction: column;
-      }
-      button {
-        width: 100%;
-      }
-    }
-  </style>
+        .developer-credits a {
+            color: var(--vermelho-claro); 
+            text-decoration: none;
+        }
+        
+        /* --- Responsividade Geral --- */
+        @media (max-width: 600px) {
+            .container {
+                margin: 10px;
+                padding: 10px;
+            }
+            .table-container {
+                overflow-x: auto; 
+            }
+        }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <header>
-      <h1>Controle de EPIs</h1>
-      <p>Adicione funcionários e registre os EPIs que eles utilizam</p>
-    </header>
 
-    <!-- Formulário de Cadastro -->
-    <section class="form-card">
-      <div class="form-row">
-        <div class="form-group">
-          <label for="drt">DRT</label>
-          <input type="text" id="drt" placeholder="Ex: 123456" />
-        </div>
-        <div class="form-group">
-          <label for="nome">Nome do Funcionário</label>
-          <input type="text" id="nome" placeholder="Nome completo" />
-        </div>
-      </div>
+    <div class="container">
+        <h1>Controle de Entrega de EPIs</h1>
 
-      <div class="epi-list" id="epiList">
-        <!-- Campos de EPI serão adicionados aqui -->
-      </div>
-
-      <div class="btn-group">
-        <button class="btn-add" onclick="addEpiField()">+ Adicionar EPI</button>
-        <button class="btn-save" onclick="addFuncionario()">Salvar Funcionário</button>
-      </div>
-    </section>
-
-    <!-- Lista de Funcionários -->
-    <section class="funcionarios-list" id="funcionariosList">
-      <!-- Os cards dos funcionários serão renderizados aqui -->
-    </section>
-  </div>
-
-  <!-- Rodapé com créditos (apenas uma vez!) -->
-  <footer>
-    <div class="developer-credits">
-      <h3>Desenvolvedor</h3>
-      <p>Desenvolvido por EdsonC.S.F.</p>
-      <p>Contato: <a href="mailto:edsony1@gmail.com">edsony1@gmail.com</a></p>
-      <p>Criação: Outubro de 2025</p>
-      <p>Versão: 1.0 © 2025. Todos os direitos reservados.</p>
-    </div>
-  </footer>
-
-  <script>
-    const epiOptions = [
-      "Protetor Auricular",
-      "Luvas Finas",
-      "Mangote",
-      "Óculos",
-      "Capacete",
-      "Bota",
-      "Palmilha",
-      "Carneira"
-    ];
-
-    let funcionarios = JSON.parse(localStorage.getItem('funcionarios')) || [];
-
-    function addEpiField(container = null) {
-      const div = document.createElement('div');
-      div.className = 'epi-item';
-      const select = document.createElement('select');
-      epiOptions.forEach(option => {
-        const opt = document.createElement('option');
-        opt.value = option;
-        opt.textContent = option;
-        select.appendChild(opt);
-      });
-      const input = document.createElement('input');
-      input.type = 'number';
-      input.min = '1';
-      input.value = '1';
-      input.placeholder = 'Quantidade';
-      const removeBtn = document.createElement('button');
-      removeBtn.textContent = '×';
-      removeBtn.onclick = () => div.remove();
-
-      div.appendChild(select);
-      div.appendChild(input);
-      div.appendChild(removeBtn);
-
-      if (container) {
-        container.appendChild(div);
-      } else {
-        document.getElementById('epiList').appendChild(div);
-      }
-    }
-
-    function getEpiData(container) {
-      const items = [];
-      container.querySelectorAll('.epi-item').forEach(item => {
-        const select = item.querySelector('select');
-        const input = item.querySelector('input');
-        if (select && input) {
-          items.push({
-            nome: select.value,
-            quantidade: parseInt(input.value) || 1
-          });
-        }
-      });
-      return items;
-    }
-
-    function addFuncionario() {
-      const drt = document.getElementById('drt').value.trim();
-      const nome = document.getElementById('nome').value.trim();
-      const epiContainer = document.getElementById('epiList');
-
-      if (!drt || !nome) {
-        alert('Preencha DRT e Nome.');
-        return;
-      }
-
-      const epiItems = getEpiData(epiContainer);
-      if (epiItems.length === 0) {
-        alert('Adicione pelo menos um EPI.');
-        return;
-      }
-
-      const novoFunc = {
-        id: Date.now(),
-        drt,
-        nome,
-        epi: epiItems,
-        status: 'nao' // 'sim' ou 'nao'
-      };
-
-      funcionarios.push(novoFunc);
-      saveToLocalStorage();
-      renderFuncionarios();
-      clearForm();
-    }
-
-    function clearForm() {
-      document.getElementById('drt').value = '';
-      document.getElementById('nome').value = '';
-      document.getElementById('epiList').innerHTML = '';
-    }
-
-    function saveToLocalStorage() {
-      localStorage.setItem('funcionarios', JSON.stringify(funcionarios));
-    }
-
-    function renderFuncionarios() {
-      const container = document.getElementById('funcionariosList');
-      container.innerHTML = '';
-
-      if (funcionarios.length === 0) {
-        container.innerHTML = '<p style="text-align:center; color:#777;">Nenhum funcionário cadastrado ainda.</p>';
-        return;
-      }
-
-      funcionarios.forEach(func => {
-        const card = document.createElement('div');
-        card.className = `func-card ${func.status === 'sim' ? 'green' : 'red'}`;
-
-        const epiTags = func.epi.map(e => 
-          `<span class="epi-tag">${e.nome} ×${e.quantidade}</span>`
-        ).join('');
-
-        card.innerHTML = `
-          <div class="func-header">
-            <div class="func-info">
-              <h2>${func.nome}</h2>
-              <p><strong>DRT:</strong> ${func.drt}</p>
+        <h2>Adicionar/Excluir EPI</h2>
+        <form id="form-epi-adicional">
+            <div class="form-group">
+                <label for="nome-novo-epi">Nome do EPI:</label>
+                <input type="text" id="nome-novo-epi" placeholder="Ex: Luva de Raspa" required>
             </div>
-          </div>
-          <div class="epis-display">
-            <h3>EPIs Solicitados:</h3>
-            <div>${epiTags || '<em>Nenhum EPI registrado</em>'}</div>
-          </div>
-          <div class="status-actions">
-            <button class="status-btn btn-pegou" onclick="setStatus(${func.id}, 'sim')">✅ Pegou Hoje</button>
-            <button class="status-btn btn-nao-pegou" onclick="setStatus(${func.id}, 'nao')">❌ Não Pegou</button>
-            <button class="status-btn btn-remove" onclick="removeFunc(${func.id})">🗑️ Remover</button>
-          </div>
-        `;
+            <div class="form-group">
+                <button type="submit">Adicionar EPI à Lista</button>
+            </div>
+            <div id="lista-epis-container">
+                <strong>EPIs Disponíveis:</strong> <div id="lista-epis-tags"></div>
+            </div>
+        </form>
 
-        container.appendChild(card);
-      });
-    }
+        <h2>Cadastrar Funcionário e EPIs</h2>
+        <form id="form-funcionario">
+            <input type="hidden" id="edit-index" value="-1"> 
+            
+            <div class="form-group">
+                <label for="nome">Nome do Funcionário:</label>
+                <input type="text" id="nome" required>
+            </div>
+            <div class="form-group">
+                <label for="drt">DRT (Número):</label>
+                <input type="text" id="drt" required>
+            </div>
+            
+            <div class="form-group" style="flex: 1 1 100%;">
+                <label>EPIs Selecionados (Clique para Adicionar/Editar):</label>
+                <button type="button" id="btn-abrir-modal-epis" onclick="abrirModalEpis()">Selecionar EPIs e Quantidades</button>
+                <p style="margin-top: 5px; font-size: 0.9em;">*Quantidade de EPIs selecionadas: <span id="qtd-epis-selecionados">0</span></p>
+            </div>
 
-    function setStatus(id, status) {
-      funcionarios = funcionarios.map(f => f.id === id ? {...f, status} : f);
-      saveToLocalStorage();
-      renderFuncionarios();
-    }
+            <button type="submit" id="btn-submit">Adicionar Funcionário</button>
+            <button type="button" id="btn-cancelar" style="background-color: var(--cor-erro); display: none;" onclick="cancelarEdicao()">Cancelar Edição</button>
+        </form>
 
-    function removeFunc(id) {
-      if (confirm('Tem certeza que deseja remover este funcionário?')) {
-        funcionarios = funcionarios.filter(f => f.id !== id);
-        saveToLocalStorage();
-        renderFuncionarios();
-      }
-    }
+        <h2>Lista de Funcionários</h2>
+        <div class="table-container" style="overflow-x: auto;">
+            <table id="tabela-funcionarios">
+                <thead>
+                    <tr>
+                        <th>DRT</th>
+                        <th>Nome</th>
+                        <th>Status (Pegar/Não Pegar)</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <div id="modalEpis" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="fecharModalEpis()">&times;</span>
+            <h2>Selecione os EPIs e a Quantidade</h2>
+            <p>Digite a quantidade necessária para cada EPI. Deixe em branco (limpo) para não incluir.</p>
+            <div id="lista-modal-epis">
+                </div>
+            <button type="button" onclick="salvarEpisDoModal()">Salvar Seleção de EPIs</button>
+        </div>
+    </div>
 
-    // Inicializa
-    window.onload = () => {
-      renderFuncionarios();
-    };
-  </script>
+    <div class="developer-credits">
+        <h3>Desenvolvedor</h3>
+        <p>Desenvolvido por EdsonC.S.F.</p>
+        <p>Contato: <a href="mailto:edsony1@gmail.com">edsony1@gmail.com</a></p>
+        <p>Criação: Outubro de 2025</p>
+        <p>Versão: 1.0 &copy; 2025. Todos os direitos reservados.</p>
+    </div>
+
+    <script>
+        const STORAGE_KEY_FUNCIONARIOS = 'episFuncionarioData';
+        const STORAGE_KEY_EPIS = 'episDisponiveis';
+
+        let episDisponiveis = [
+            'Protetor Auricular',
+            'Luvas Finas',
+            'Mangote',
+            'Óculos',
+            'Capacete',
+            'Bota',
+            'Palmilha',
+            'Carneira'
+        ];
+
+        let funcionarios = [];
+        let episTemporarios = {}; 
+
+        // --- Funções de Armazenamento Local (LocalStorage) ---
+
+        function carregarDados() {
+            const storedEpis = localStorage.getItem(STORAGE_KEY_EPIS);
+            if (storedEpis) {
+                episDisponiveis = JSON.parse(storedEpis);
+            }
+
+            const storedFuncionarios = localStorage.getItem(STORAGE_KEY_FUNCIONARIOS);
+            if (storedFuncionarios) {
+                funcionarios = JSON.parse(storedFuncionarios);
+            }
+            
+            // Corrige dados antigos para garantir que todos os EPIs globais existam
+            funcionarios.forEach(func => {
+                const novosEpis = {};
+                episDisponiveis.forEach(epi => {
+                    novosEpis[epi] = func.epis[epi] || 0; 
+                });
+                func.epis = novosEpis;
+            });
+            salvarFuncionarios(); 
+
+            // Inicializa episTemporarios
+            inicializarEpisTemporarios();
+        }
+
+        function salvarFuncionarios() {
+            localStorage.setItem(STORAGE_KEY_FUNCIONARIOS, JSON.stringify(funcionarios));
+        }
+
+        function salvarEpis() {
+            localStorage.setItem(STORAGE_KEY_EPIS, JSON.stringify(episDisponiveis));
+        }
+        
+        // --- Controle do Formulário e Edição ---
+        
+        function inicializarEpisTemporarios(episData = {}) {
+            episTemporarios = {};
+            let count = 0;
+            episDisponiveis.forEach(epi => {
+                const qtd = episData[epi] || 0;
+                episTemporarios[epi] = qtd;
+                if (qtd > 0) count++;
+            });
+            document.getElementById('qtd-epis-selecionados').textContent = count;
+        }
+
+        function preencherFormulario(funcionario, index) {
+            document.getElementById('nome').value = funcionario.nome;
+            document.getElementById('drt').value = funcionario.drt;
+            document.getElementById('edit-index').value = index;
+            document.getElementById('btn-submit').textContent = 'Salvar Edição';
+            document.getElementById('btn-submit').style.backgroundColor = 'var(--cor-edicao)';
+            document.getElementById('btn-cancelar').style.display = 'inline-block';
+            
+            // Carrega os dados de EPIs para o objeto temporário
+            inicializarEpisTemporarios(funcionario.epis);
+        }
+
+        function limparFormulario() {
+            document.getElementById('form-funcionario').reset();
+            document.getElementById('edit-index').value = -1;
+            document.getElementById('btn-submit').textContent = 'Adicionar Funcionário';
+            document.getElementById('btn-submit').style.backgroundColor = 'var(--cor-sucesso)';
+            document.getElementById('btn-cancelar').style.display = 'none';
+            inicializarEpisTemporarios();
+        }
+        
+        function cancelarEdicao() {
+            limparFormulario();
+        }
+
+        // --- Funções do Modal ---
+        
+        function abrirModalEpis(funcionarioEpis = null) {
+            const modal = document.getElementById('modalEpis');
+            const listaModal = document.getElementById('lista-modal-epis');
+            listaModal.innerHTML = ''; 
+            
+            // Se estiver reabrindo o modal, o episTemporarios já tem os valores.
+            // Se for a primeira vez (ou novo cadastro), usamos a função inicializarEpisTemporarios()
+            
+            episDisponiveis.forEach(epi => {
+                const qtd = episTemporarios[epi] || ''; 
+                
+                // CRUCIAL: Se a QTD for 0, usamos '' (string vazia) para melhor usabilidade
+                const displayQtd = (qtd === 0) ? '' : qtd;
+
+                const html = `
+                    <div class="epi-item">
+                        <span>${epi}:</span>
+                        <input type="number" id="modal-qtd-${epi.replace(/\s/g, '_')}" 
+                               min="0" step="1" value="${displayQtd}" oninput="atualizarEpiTemporario('${epi}', this.value)">
+                    </div>
+                `;
+                listaModal.insertAdjacentHTML('beforeend', html);
+            });
+
+            modal.style.display = 'block';
+        }
+        
+        function fecharModalEpis() {
+            document.getElementById('modalEpis').style.display = 'none';
+        }
+        
+        function atualizarEpiTemporario(epiNome, valor) {
+            // Se o valor for uma string vazia, trata como 0 para salvar
+            const qtd = Math.max(0, parseInt(valor) || 0); 
+            episTemporarios[epiNome] = qtd;
+        }
+
+        function salvarEpisDoModal() {
+            // Conta quantos EPIs têm quantidade > 0
+            const qtdSelecionados = Object.values(episTemporarios).filter(qtd => qtd > 0).length;
+            document.getElementById('qtd-epis-selecionados').textContent = qtdSelecionados;
+            
+            fecharModalEpis();
+        }
+
+        // --- Funções de Renderização e Lógica do Sistema ---
+
+        function renderizarListaEpisTags() {
+            const listaTagsDiv = document.getElementById('lista-epis-tags');
+            listaTagsDiv.innerHTML = '';
+
+            episDisponiveis.forEach(epi => {
+                const tagHtml = `
+                    <span class="epi-tag">
+                        ${epi} 
+                        <button class="btn-excluir-epi" type="button" onclick="excluirEPI('${epi}')" title="Excluir EPI">x</button>
+                    </span>
+                `;
+                listaTagsDiv.insertAdjacentHTML('beforeend', tagHtml);
+            });
+        }
+
+        function renderizarTabela() {
+            const tbody = document.querySelector('#tabela-funcionarios tbody');
+            const theadTr = document.querySelector('#tabela-funcionarios thead tr');
+            tbody.innerHTML = ''; 
+
+            // 1. Recria o cabeçalho
+            theadTr.innerHTML = `
+                <th>DRT</th>
+                <th>Nome</th>
+                <th>Status (Pegar/Não Pegar)</th>
+            `;
+            episDisponiveis.forEach(epi => {
+                theadTr.insertAdjacentHTML('beforeend', `<th data-epi-name="${epi}">${epi} (Qtd)</th>`);
+            });
+            theadTr.insertAdjacentHTML('beforeend', `<th>Ações</th>`);
+
+            // 2. Preenche as linhas dos funcionários
+            funcionarios.forEach((funcionario, index) => {
+                const tr = document.createElement('tr');
+
+                if (funcionario.status === 'pegar') {
+                    tr.classList.add('pegar-epi');
+                } else if (funcionario.status === 'nao-pegar') {
+                    tr.classList.add('nao-pegar-epi');
+                }
+
+                let rowHtml = `
+                    <td data-label="DRT">${funcionario.drt}</td>
+                    <td data-label="Nome">${funcionario.nome}</td>
+                    <td data-label="Status">
+                        <button class="btn-status btn-status-pegar" onclick="trocarStatus(${index}, 'pegar')">VERDE</button>
+                        <button class="btn-status btn-status-nao-pegar" onclick="trocarStatus(${index}, 'nao-pegar')">VERMELHO</button>
+                    </td>
+                `;
+
+                // Adiciona as colunas de quantidade de EPIs
+                episDisponiveis.forEach(epi => {
+                    // Pega o valor do EPI, se não existir, usa 0
+                    const qtd = funcionario.epis[epi] || 0; 
+                    
+                    // Lógica para remover os 0s da exibição na tabela
+                    const displayQtd = (qtd > 0) ? qtd : ''; 
+                    
+                    rowHtml += `<td data-label="${epi} (Qtd)">${displayQtd}</td>`;
+                });
+
+                rowHtml += `
+                    <td data-label="Ações">
+                        <button class="btn-edit btn-status" onclick="editarFuncionario(${index})">Editar</button>
+                        <button class="btn-remover" onclick="removerFuncionario(${index})">Remover</button>
+                    </td>
+                `;
+
+                tr.innerHTML = rowHtml;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // --- Funções de Ação (Adicionar, Editar, Excluir, Status) ---
+
+        function adicionarFuncionario(event) {
+            event.preventDefault();
+
+            const nome = document.getElementById('nome').value.trim();
+            const drt = document.getElementById('drt').value.trim();
+            const editIndex = parseInt(document.getElementById('edit-index').value);
+            
+            if (!nome || !drt) {
+                alert("Por favor, preencha o Nome e o DRT do funcionário.");
+                return;
+            }
+
+            // Cria o objeto de EPIs com base nos temporários (apenas QTD > 0)
+            let episFinais = {};
+            episDisponiveis.forEach(epi => {
+                 const qtd = episTemporarios[epi] || 0;
+                 if (qtd > 0) {
+                     episFinais[epi] = qtd;
+                 }
+            });
+
+            const dadosFuncionario = {
+                nome: nome,
+                drt: drt,
+                epis: episFinais,
+                status: (editIndex === -1) ? 'nao-pegar' : funcionarios[editIndex].status // Mantém status se for edição
+            };
+
+            if (editIndex === -1) {
+                // Modo Adicionar
+                funcionarios.push(dadosFuncionario);
+            } else {
+                // Modo Editar
+                funcionarios[editIndex] = dadosFuncionario;
+            }
+
+            salvarFuncionarios();
+            renderizarTabela();
+            limparFormulario();
+        }
+        
+        function editarFuncionario(index) {
+            const funcionario = funcionarios[index];
+            preencherFormulario(funcionario, index);
+            
+            // Abre o modal após carregar os dados
+            // O modal será aberto com os dados do funcionário carregados em episTemporarios
+            // não é necessário chamá-lo aqui, pois o objeto já está pronto.
+            
+            // Se quiser que o modal abra automaticamente ao clicar em Editar:
+            // abrirModalEpis();
+        }
+
+        function adicionarNovoEPI(event) {
+            event.preventDefault();
+            const novoEpiInput = document.getElementById('nome-novo-epi');
+            const novoEpiNome = novoEpiInput.value.trim();
+
+            if (novoEpiNome && !episDisponiveis.includes(novoEpiNome)) {
+                episDisponiveis.push(novoEpiNome);
+                salvarEpis();
+                
+                // Atualiza os registros dos funcionários existentes com 0 para o novo EPI
+                funcionarios.forEach(func => {
+                    func.epis[novoEpiNome] = 0;
+                });
+                salvarFuncionarios();
+                
+                renderizarListaEpisTags();
+                renderizarTabela(); 
+                inicializarEpisTemporarios(); // Adiciona o novo EPI na lista do modal/temporários
+
+                novoEpiInput.value = '';
+            } else {
+                alert('Nome do EPI inválido ou já existente.');
+            }
+        }
+        
+        function excluirEPI(epiNome) {
+            if (confirm(`Tem certeza que deseja excluir o EPI: "${epiNome}"? Isso removerá a coluna da tabela e apagará os dados deste EPI em todos os funcionários.`)) {
+                
+                episDisponiveis = episDisponiveis.filter(epi => epi !== epiNome);
+                salvarEpis();
+
+                funcionarios.forEach(func => {
+                    delete func.epis[epiNome];
+                });
+                salvarFuncionarios();
+                
+                renderizarListaEpisTags();
+                renderizarTabela();
+                inicializarEpisTemporarios(); 
+            }
+        }
+
+        function trocarStatus(index, novoStatus) {
+            funcionarios[index].status = novoStatus;
+            salvarFuncionarios();
+            renderizarTabela();
+        }
+
+        function removerFuncionario(index) {
+            if (confirm('Tem certeza que deseja remover este funcionário?')) {
+                funcionarios.splice(index, 1);
+                salvarFuncionarios();
+                renderizarTabela();
+            }
+        }
+
+        // --- Inicialização ---
+
+        document.addEventListener('DOMContentLoaded', () => {
+            carregarDados();
+            renderizarListaEpisTags();
+            renderizarTabela();
+            
+            document.getElementById('form-funcionario').addEventListener('submit', adicionarFuncionario);
+
+            // Adiciona listener para fechar o modal clicando fora
+            window.onclick = function(event) {
+                const modal = document.getElementById('modalEpis');
+                if (event.target == modal) {
+                    fecharModalEpis();
+                }
+            }
+        });
+
+    </script>
+
 </body>
 </html>
