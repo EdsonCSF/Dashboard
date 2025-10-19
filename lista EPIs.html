@@ -119,6 +119,10 @@
             border-radius: 5px;
         }
         
+        #form-epi-adicional > .form-group:last-of-type {
+            align-self: end; /* Alinha o botão ao final */
+        }
+        
         #lista-epis-container {
             grid-column: 1 / -1; 
             padding: 10px;
@@ -411,8 +415,10 @@
             funcionarios.forEach(func => {
                 const novosEpis = {};
                 episDisponiveis.forEach(epi => {
+                    // Garante que todos os EPIs disponíveis estejam no registro do funcionário (com 0 se não tiver)
                     novosEpis[epi] = func.epis[epi] || 0; 
                 });
+                // Garante que apenas EPIs que existem no episDisponiveis sejam mantidos
                 func.epis = novosEpis;
             });
             salvarFuncionarios(); 
@@ -473,9 +479,6 @@
             const modal = document.getElementById('modalEpis');
             const listaModal = document.getElementById('lista-modal-epis');
             listaModal.innerHTML = ''; 
-            
-            // Se estiver reabrindo o modal, o episTemporarios já tem os valores.
-            // Se for a primeira vez (ou novo cadastro), usamos a função inicializarEpisTemporarios()
             
             episDisponiveis.forEach(epi => {
                 const qtd = episTemporarios[epi] || ''; 
@@ -603,13 +606,12 @@
                 return;
             }
 
-            // Cria o objeto de EPIs com base nos temporários (apenas QTD > 0)
+            // Cria o objeto de EPIs com base nos temporários (mantém 0s também para sincronização)
             let episFinais = {};
             episDisponiveis.forEach(epi => {
-                 const qtd = episTemporarios[epi] || 0;
-                 if (qtd > 0) {
-                     episFinais[epi] = qtd;
-                 }
+                 // Garante que todos os EPIs disponíveis no array global estejam no objeto, 
+                 // mesmo que a quantidade seja 0, para a lógica de correção de dados funcionar
+                 episFinais[epi] = episTemporarios[epi] || 0;
             });
 
             const dadosFuncionario = {
@@ -621,9 +623,21 @@
 
             if (editIndex === -1) {
                 // Modo Adicionar
+                // Verifica se já existe um DRT igual
+                const drtExistente = funcionarios.findIndex(f => f.drt === drt);
+                if (drtExistente !== -1) {
+                    alert(`Funcionário com DRT ${drt} já existe. Use a função de edição.`);
+                    return;
+                }
                 funcionarios.push(dadosFuncionario);
             } else {
                 // Modo Editar
+                 // Verifica se já existe um DRT igual em *outros* funcionários
+                const drtExistente = funcionarios.findIndex((f, i) => f.drt === drt && i !== editIndex);
+                if (drtExistente !== -1) {
+                    alert(`DRT ${drt} já está em uso por outro funcionário. Por favor, corrija.`);
+                    return;
+                }
                 funcionarios[editIndex] = dadosFuncionario;
             }
 
@@ -635,13 +649,6 @@
         function editarFuncionario(index) {
             const funcionario = funcionarios[index];
             preencherFormulario(funcionario, index);
-            
-            // Abre o modal após carregar os dados
-            // O modal será aberto com os dados do funcionário carregados em episTemporarios
-            // não é necessário chamá-lo aqui, pois o objeto já está pronto.
-            
-            // Se quiser que o modal abra automaticamente ao clicar em Editar:
-            // abrirModalEpis();
         }
 
         function adicionarNovoEPI(event) {
@@ -683,6 +690,9 @@
                 renderizarListaEpisTags();
                 renderizarTabela();
                 inicializarEpisTemporarios(); 
+                
+                // Limpa o formulário de funcionário caso o EPI excluído estivesse em edição
+                limparFormulario(); 
             }
         }
 
@@ -697,6 +707,7 @@
                 funcionarios.splice(index, 1);
                 salvarFuncionarios();
                 renderizarTabela();
+                limparFormulario(); // Limpa o formulário caso o funcionário removido estivesse em edição
             }
         }
 
@@ -707,7 +718,11 @@
             renderizarListaEpisTags();
             renderizarTabela();
             
+            // Listener para o formulário de cadastro/edição de funcionário
             document.getElementById('form-funcionario').addEventListener('submit', adicionarFuncionario);
+            
+            // Listener CORRIGIDO para o formulário de adição de EPI
+            document.getElementById('form-epi-adicional').addEventListener('submit', adicionarNovoEPI);
 
             // Adiciona listener para fechar o modal clicando fora
             window.onclick = function(event) {
