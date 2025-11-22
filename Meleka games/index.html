@@ -1,0 +1,1165 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RPG Tactics PvP (Link de Turno)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=MedievalSharp&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0a0a0a;
+            --wood-dark: #3e2723;
+            --wood-light: #5d4037;
+            --parchment: #d7ccc8;
+            --gold: #ffd700;
+            --grid-cell: 44px;
+        }
+        
+        body {
+            background-color: var(--bg-dark);
+            background-image: url("https://www.transparenttextures.com/patterns/dark-matter.png"); 
+            color: var(--parchment);
+            font-family: 'MedievalSharp', cursive;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 10px;
+            overflow-x: hidden;
+            user-select: none;
+        }
+
+        h1 {
+            font-family: 'Cinzel', serif;
+            color: var(--gold);
+            text-shadow: 2px 2px 0px #000;
+            margin: 5px 0;
+        }
+        
+        /* --- MODAL --- */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            display: flex; justify-content: center; align-items: center;
+            z-index: 2000; backdrop-filter: blur(5px);
+        }
+        .modal-content {
+            background: url("https://www.transparenttextures.com/patterns/aged-paper.png"), var(--parchment);
+            border: 8px solid var(--wood-dark);
+            border-radius: 15px; padding: 20px;
+            text-align: center; width: 650px; max-width: 95%;
+            box-shadow: 0 0 50px rgba(0,0,0,0.8);
+            color: #2c1810;
+        }
+        .class-selection { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin: 20px 0; }
+        .class-card {
+            background: rgba(255,255,255,0.5); border: 2px solid var(--wood-light);
+            border-radius: 8px; padding: 10px; width: 120px;
+            cursor: pointer; transition: transform 0.2s;
+        }
+        .class-card:hover { transform: translateY(-5px); box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+        .class-card.selected {
+            background: #fff; border-color: var(--gold);
+            box-shadow: 0 0 15px var(--gold); transform: scale(1.05);
+        }
+        .class-card svg { width: 60px; height: 60px; filter: drop-shadow(2px 4px 2px rgba(0,0,0,0.3)); }
+        
+        .name-input, .mode-select {
+            padding: 10px; font-family: 'MedievalSharp', cursive; font-size: 18px;
+            border: 2px solid var(--wood-dark); background: #fff8e1;
+            border-radius: 5px; width: 80%; max-width: 300px; text-align: center; margin-bottom: 10px;
+        }
+        .start-btn {
+            background: linear-gradient(to bottom, var(--gold), #b8860b);
+            border: 2px solid #5d4037; color: #2c1810;
+            font-family: 'Cinzel', serif; font-weight: bold; font-size: 18px;
+            padding: 10px 30px; border-radius: 25px; cursor: pointer; margin-top: 15px;
+            box-shadow: 0 4px 0 #5d4037;
+        }
+        .start-btn:disabled { background: #ccc; box-shadow: none; cursor: not-allowed; }
+        
+        /* Contêiner de input de nome no modal de setup */
+        #player-names-container { margin-top: 15px; }
+
+        /* Novo modal de Link de Turno */
+        #link-modal .modal-content { max-width: 450px; }
+        #link-display {
+            background: #fff8e1; border: 1px solid #ccc; padding: 10px;
+            border-radius: 5px; margin: 15px 0; font-size: 14px;
+            word-break: break-all; text-align: left;
+            user-select: all; /* Permite seleção fácil */
+            width: 90%;
+            height: 80px;
+            resize: none;
+        }
+        #btn-copy {
+            background: #2e7d32; color: #fff; border: 2px solid #1b5e20;
+            padding: 8px 15px; border-radius: 15px; cursor: pointer;
+            font-family: 'Cinzel', serif; margin-top: 10px;
+        }
+        
+        /* Botões de modo de jogo */
+        .mode-button-group { display: flex; gap: 10px; margin-bottom: 15px; justify-content: center; }
+        .mode-button {
+            padding: 10px 20px; border-radius: 8px; cursor: pointer;
+            background: #5d4037; color: var(--parchment); border: 2px solid #2c1810;
+            font-family: 'Cinzel', serif; transition: background 0.2s;
+        }
+        .mode-button.selected {
+            background: #9e9e9e; color: #000; border-color: var(--gold);
+            box-shadow: 0 0 10px var(--gold);
+        }
+
+        /* --- HUD --- */
+        .game-container { display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 800px; }
+        .hud-panel {
+            display: flex; justify-content: space-between; width: 100%;
+            background: var(--wood-dark); border: 4px solid #2c1810;
+            border-radius: 10px; padding: 10px; margin-bottom: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5); box-sizing: border-box;
+        }
+        .char-stats { width: 45%; background: rgba(0,0,0,0.3); padding: 8px; border-radius: 5px; position: relative; }
+        .player-info { border: 2px solid #29b6f6; }
+        .opponent-info { border: 2px solid #ef5350; }
+        .char-header { display: flex; align-items: center; gap: 10px; margin-bottom: 5px; }
+        .char-icon-mini { width: 30px; height: 30px; }
+        .char-name { font-size: 14px; color: var(--gold); font-weight: bold; }
+        .bar-container { width: 100%; height: 12px; background: #222; border: 1px solid #555; border-radius: 6px; overflow: hidden; margin-top: 2px; }
+        .bar-fill { height: 100%; transition: width 0.5s; }
+        .hp-fill { background: #d32f2f; }
+        .stats-row { display: flex; justify-content: space-between; font-size: 12px; margin-top: 5px; color: #ccc; }
+        
+        /* Ícones de Equipamento no HUD */
+        .equipment-slots { display: flex; gap: 5px; margin-top: 5px; justify-content: center; }
+        .equip-slot { width: 20px; height: 20px; background: rgba(0,0,0,0.5); border: 1px solid #555; border-radius: 3px; display: flex; align-items: center; justify-content: center; font-size: 10px; }
+        .equip-active { border-color: var(--gold); box-shadow: 0 0 5px var(--gold); background: rgba(255, 215, 0, 0.2); }
+
+        /* --- TABULEIRO --- */
+        .board-frame {
+            background: url("https://www.transparenttextures.com/patterns/wood-pattern.png"), var(--wood-light);
+            padding: 15px; border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8); border: 6px solid #2c1810;
+            position: relative; margin: 10px 0;
+        }
+        .game-grid {
+            display: grid;
+            grid-template-columns: repeat(9, var(--grid-cell));
+            grid-template-rows: repeat(9, var(--grid-cell));
+            gap: 2px; background: #1a1a1a; border: 2px solid #000;
+        }
+        .cell {
+            width: var(--grid-cell); height: var(--grid-cell);
+            background-color: #3e3e42;
+            background-image: linear-gradient(45deg, #333 25%, transparent 25%, transparent 75%, #333 75%, #333), 
+                              linear-gradient(45deg, #333 25%, transparent 25%, transparent 75%, #333 75%, #333);
+            background-size: 20px 20px; background-position: 0 0, 10px 10px;
+            position: relative; display: flex; align-items: center; justify-content: center;
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.7);
+        }
+        
+        /* Névoa de Guerra */
+        .fog-of-war { background-color: #111111; opacity: 0.9; cursor: not-allowed; }
+
+        .cell-content {
+            width: 90%; height: 90%;
+            pointer-events: none; z-index: 2;
+            filter: drop-shadow(2px 2px 1px rgba(0,0,0,0.6));
+        }
+
+        /* Classes de Jogador para HUD */
+        .player-indicator {
+            position: absolute; top: -10px; left: 50%; transform: translateX(-50%);
+            background: var(--gold); color: #000; padding: 2px 8px; border-radius: 5px;
+            font-size: 10px; font-weight: bold; font-family: 'Cinzel', serif;
+        }
+
+        /* --- ANIMAÇÕES --- */
+        @keyframes idle { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-2px); } }
+        .character-idle { animation: idle 2s infinite ease-in-out; }
+        
+        @keyframes attackAnim { 
+            0% { transform: scale(1); } 
+            50% { transform: scale(1.3) rotate(15deg); } 
+            100% { transform: scale(1); } 
+        }
+        .character-attack { animation: attackAnim 0.4s ease; }
+
+        /* Caixas Misteriosas / Boss */
+        .mystery-box {
+            width: 70%; height: 70%;
+            background: #5d4037;
+            border: 2px solid #8d6e63;
+            display: flex; align-items: center; justify-content: center;
+            font-family: 'Cinzel', serif; color: var(--gold); font-weight: bold; font-size: 20px;
+            box-shadow: 0 0 5px #000; z-index: 1;
+            animation: pulseBox 2s infinite;
+        }
+        @keyframes pulseBox { 0%,100% { border-color: #8d6e63; } 50% { border-color: var(--gold); } }
+
+        /* Highlights */
+        .highlight-move { box-shadow: inset 0 0 0 2px #4caf50; background-color: rgba(76, 175, 80, 0.2); cursor: pointer; }
+        .highlight-attack { box-shadow: inset 0 0 0 2px #f44336; background-color: rgba(244, 67, 54, 0.2); cursor: crosshair; }
+
+        /* Efeitos */
+        .damage-float {
+            position: fixed; color: #ff3d00; font-weight: bold; font-size: 20px;
+            text-shadow: 1px 1px 0 #000; animation: floatUp 1s ease-out forwards; z-index: 100; pointer-events: none;
+        }
+        .buff-float { color: #00e676 !important; }
+        @keyframes floatUp { from { transform: translateY(0); opacity: 1; } to { transform: translateY(-30px); opacity: 0; } }
+
+        .projectile {
+            position: fixed; width: 20px; height: 20px; z-index: 99; pointer-events: none;
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        /* Controles */
+        .controls-area { display: flex; gap: 10px; margin-top: 10px; justify-content: center; }
+        .game-btn {
+            background: #4e342e; color: #fff; border: 2px solid #2c1810; padding: 10px 20px;
+            font-family: 'Cinzel', serif; border-radius: 20px; cursor: pointer; transition: all 0.2s;
+        }
+        .game-btn:hover:not(:disabled) { background: #5d4037; transform: translateY(-2px); }
+        .game-btn.active { background: #ff6f00; border-color: #ffca28; }
+        .game-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .log-box {
+            width: 100%; height: 40px; background: rgba(0,0,0,0.5); border-radius: 5px;
+            margin-top: 10px; display: flex; align-items: center; justify-content: center;
+            font-size: 14px; color: #fff; border: 1px solid #555;
+        }
+        
+        /* Responsividade */
+        @media (max-width: 500px) { 
+            :root { --grid-cell: 38px; } 
+            .hud-panel { flex-direction: column; } 
+            .char-stats { width: 100%; margin-bottom: 10px; }
+            .controls-area { flex-direction: column; width: 100%; }
+            .mode-button-group { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Modal de Seleção de Classe/Nome -->
+    <div class="modal-overlay" id="selection-modal">
+        <div class="modal-content">
+            <h2 id="modal-title">Dungeon Tactics PvP Assíncrono</h2>
+            <div id="mode-selection" class="mode-button-group">
+                <button class="mode-button selected" id="btn-mode-pvp" onclick="setMode('pvp')">👥 PVP (Link)</button>
+                <button class="mode-button" id="btn-mode-solo" onclick="setMode('solo')">👤 SOLO (Contra o Boss)</button>
+            </div>
+            
+            <p id="setup-message">Insira seu nome e selecione sua classe:</p>
+            <div id="player-names-container">
+                <input type="text" id="player-name" class="name-input" placeholder="Seu Nome" maxlength="12" oninput="checkStart()">
+            </div>
+
+            <div class="class-selection">
+                <div class="class-card" onclick="selectClass('SWORDSMAN')" id="card-SWORDSMAN">
+                    <div id="preview-SWORDSMAN"></div>
+                    <div style="font-weight:bold; margin-top:5px">Guerreiro</div>
+                </div>
+                <div class="class-card" onclick="selectClass('NINJA')" id="card-NINJA">
+                    <div id="preview-NINJA"></div>
+                    <div style="font-weight:bold; margin-top:5px">Ninja</div>
+                </div>
+                <div class="class-card" onclick="selectClass('MAGE')" id="card-MAGE">
+                    <div id="preview-MAGE"></div>
+                    <div style="font-weight:bold; margin-top:5px">Mago</div>
+                </div>
+                <div class="class-card" onclick="selectClass('ARCHER')" id="card-ARCHER">
+                    <div id="preview-ARCHER"></div>
+                    <div style="font-weight:bold; margin-top:5px">Arqueiro</div>
+                </div>
+            </div>
+            
+            <button id="btn-start" class="start-btn" onclick="startGame()" disabled>INICIAR PARTIDA</button>
+        </div>
+    </div>
+    
+    <!-- Modal de Link de Turno -->
+    <div class="modal-overlay" id="link-modal" style="display:none;">
+        <div class="modal-content">
+            <h2>FIM DO SEU TURNO</h2>
+            <p>
+                <span id="link-header-text">Copie e envie o link para o próximo jogador:</span>
+            </p>
+            <textarea id="link-display" readonly></textarea>
+            <button id="btn-copy" onclick="copyLink()">COPIAR LINK</button>
+            <p style="font-size: 12px; color: #8d6e63; margin-top: 20px;">
+                Você pode fechar esta página. O jogo será retomado quando seu oponente te enviar o novo link.
+            </p>
+        </div>
+    </div>
+
+    <!-- Modal de Fim de Jogo -->
+    <div class="modal-overlay" id="game-over-modal" style="display:none;">
+        <div class="modal-content">
+            <h2 id="game-over-title"></h2>
+            <button class="start-btn" onclick="location.reload()">NOVA PARTIDA</button>
+        </div>
+    </div>
+
+    <!-- Interface Principal do Jogo -->
+    <div class="game-container" id="game-ui" style="display:none;">
+        <h1>Dungeon Tactics PvP</h1>
+        <p id="turn-indicator" style="font-weight: bold; font-size: 1.2em;"></p>
+        
+        <div class="hud-panel">
+            <!-- HUD do Jogador Local (Sempre P1 no HUD) -->
+            <div class="char-stats player-info">
+                <span class="player-indicator">VOCÊ (<span id="p1-slot-label">P1</span>)</span>
+                <div class="char-header"><div id="hud-p1-icon" class="char-icon-mini"></div><div class="char-name" id="hud-p1-name"></div></div>
+                <div class="bar-container"><div class="bar-fill hp-fill" id="bar-hp-p1" style="width:100%"></div></div>
+                <div class="stats-row">
+                    <span id="txt-hp-p1">HP: 20</span>
+                    <span id="txt-ap-p1" style="color:cyan; font-weight:bold">AP: 3</span>
+                </div>
+                <div class="equipment-slots">
+                    <div class="equip-slot" id="slot-p1-def" title="Defesa">🛡️</div>
+                    <div class="equip-slot" id="slot-p1-atk" title="Ataque">⚔️</div>
+                </div>
+            </div>
+
+            <!-- HUD do Oponente (Sempre P2/Boss no HUD) -->
+            <div class="char-stats opponent-info" id="opponent-hud">
+                <span class="player-indicator" id="opponent-indicator">OPONENTE (P2)</span>
+                <div class="char-header" style="justify-content: flex-end;"><div class="char-name" id="hud-p2-name"></div><div id="hud-p2-icon" class="char-icon-mini"></div></div>
+                <div class="bar-container"><div class="bar-fill hp-fill" id="bar-hp-p2" style="width:100%"></div></div>
+                <div class="stats-row"><span id="txt-hp-p2">HP: 20</span></div>
+                <div class="equipment-slots" id="p2-equip-slots">
+                    <div class="equip-slot" id="slot-p2-def" title="Defesa">🛡️</div>
+                    <div class="equip-slot" id="slot-p2-atk" title="Ataque">⚔️</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="board-frame">
+            <div class="game-grid" id="grid"></div>
+        </div>
+
+        <div class="log-box" id="game-log"></div>
+
+        <div class="controls-area">
+            <button class="game-btn" id="btn-attack" onclick="toggleAttackMode()">⚔️ Atacar (1 AP)</button>
+            <button class="game-btn" style="background:#2e7d32" onclick="endTurn()">➡️ Finalizar Turno</button>
+        </div>
+    </div>
+
+    <script>
+        // --- CONFIGURAÇÕES E ASSETS ---
+        const GRID_SIZE = 9;
+        const INITIAL_HP = 20;
+        const INITIAL_BOSS_HP = 10;
+        const VISION_RANGE = 5; 
+
+        const SVGS = {
+            SWORDSMAN: `<svg class="cell-content" viewBox="0 0 100 100"><path d="M30 60 Q50 90 70 60 L70 40 L30 40 Z" fill="#b71c1c"/><circle cx="50" cy="35" r="18" fill="#9e9e9e" stroke="#212121" stroke-width="2"/><path d="M50 17 L50 10 L60 15 Z" fill="#ffd700"/><rect x="72" y="30" width="6" height="40" fill="#cfd8dc" stroke="#546e7a"/></svg>`,
+            NINJA: `<svg class="cell-content" viewBox="0 0 100 100"><circle cx="50" cy="50" r="25" fill="#212121"/><path d="M30 45 L70 45" stroke="#d32f2f" stroke-width="4"/><circle cx="45" cy="45" r="2" fill="#fff"/><circle cx="55" cy="45" r="2" fill="#fff"/><path d="M20 60 L30 50 L25 45 Z" fill="#b0bec5"/></svg>`,
+            MAGE: `<svg class="cell-content" viewBox="0 0 100 100"><path d="M30 80 L50 20 L70 80 Z" fill="#304ffe"/><circle cx="50" cy="35" r="12" fill="#ffe0b2"/><circle cx="25" cy="30" r="6" fill="#00e5ff"><animate attributeName="opacity" values="0.5;1;0.5" dur="1s" repeatCount="indefinite"/></circle></svg>`,
+            ARCHER: `<svg class="cell-content" viewBox="0 0 100 100"><path d="M35 80 L65 80 L50 20 Z" fill="#33691e"/><path d="M75 30 Q65 50 75 70" fill="none" stroke="#8d6e63" stroke-width="3"/><line x1="75" y1="30" x2="75" y2="70" stroke="#eee"/></svg>`,
+            BOSS: `<svg class="cell-content" viewBox="0 0 100 100"><path d="M30 30 L70 30 L60 85 L40 85 Z" fill="#424242" stroke="#b71c1c" stroke-width="2"/><circle cx="50" cy="40" r="15" fill="#e53935"/><path d="M40 50 L50 70 L60 50" fill="#757575"/></svg>`
+        };
+
+        const CLASSES = {
+            SWORDSMAN: { name: 'Guerreiro', range: 1, ap: 3, dmg: 3, hp: INITIAL_HP, x: 0, y: 8 },
+            NINJA: { name: 'Ninja', range: 1, ap: 4, dmg: 2, hp: INITIAL_HP, x: 0, y: 8 },
+            MAGE: { name: 'Mago', range: 3, ap: 3, dmg: 3, hp: INITIAL_HP, x: 0, y: 8 },
+            ARCHER: { name: 'Arqueiro', range: 4, ap: 3, dmg: 2, hp: INITIAL_HP, x: 0, y: 8 }
+        };
+
+        const MYSTERY_EVENTS = [
+            { type: 'ARMOR', name: 'Armadura de Aço', effect: 'def', val: 1 },
+            { type: 'GLOVES', name: 'Luvas de Poder', effect: 'atk', val: 1 },
+            { type: 'POTION', name: 'Poção de Cura', effect: 'heal', val: 5 },
+            { type: 'POISON', name: 'Gás Venenoso', effect: 'dmg', val: 3 },
+            { type: 'CURSE', name: 'Maldição', effect: 'debuff_atk', val: 1 },
+            { type: 'EMPTY', name: 'Nada...', effect: 'none', val: 0 }
+        ];
+
+        // Estado inicial do jogo
+        let state = {
+            gameMode: 'pvp',
+            turn: 'P1', 
+            mode: 'move',
+            currentPlayer: null, 
+            opponentPlayer: null,
+            playerSlot: null, // P1 ou P2 (Local)
+            opponentSlot: null, // P2 ou P1 (Local)
+            
+            p1: createNewPlayerState('P1', 0, 8),
+            p2: createNewPlayerState('P2', 8, 0),
+            boss: { x: 4, y: 4, hp: INITIAL_BOSS_HP, hpMax: INITIAL_BOSS_HP, name: 'Boss', isAlive: false },
+            gridEvents: []
+        };
+
+        let turnLog = [];
+        let localPlayerName = '';
+        let localPlayerClass = null;
+
+        // --- FUNÇÕES DE UTILIDADE ---
+        function createNewPlayerState(id, x, y) {
+            return {
+                id: id, name: id, selectedClass: null, classData: null,
+                x: x, y: y, 
+                hp: INITIAL_HP, hpMax: INITIAL_HP, 
+                ap: 0, apMax: 0, def: 0, atkBonus: 0, 
+                isAlive: true,
+                isInitialized: false, // Flag para P2 saber que precisa de nome/classe
+            };
+        }
+
+        function dist(x1, y1, x2, y2) { return Math.abs(x1 - x2) + Math.abs(y1 - y2); }
+
+        function log(msg) { 
+            const logBox = document.getElementById('game-log');
+            if (logBox) logBox.innerText = msg;
+            turnLog.push(msg);
+        }
+        
+        function canMoveTo(x, y) {
+            if (x < 0 || x >= GRID_SIZE || y < 0 || y >= GRID_SIZE) return false;
+            // Checa se o destino é a posição de um jogador/Boss vivo
+            if (state.p1.isAlive && x === state.p1.x && y === state.p1.y) return false;
+            if (state.p2.isAlive && x === state.p2.x && y === state.p2.y) return false;
+            if (state.boss.isAlive && x === state.boss.x && y === state.boss.y) return false;
+            return true;
+        }
+
+        function showModal(id, show = true) {
+            document.getElementById(id).style.display = show ? 'flex' : 'none';
+        }
+
+        // --- ENCODE / DECODE (Link de Turno) ---
+        function encodeState() {
+            // Estrutura: {mode}|{turn}|P1:{name},{class},{hp},{x},{y},{def},{atkBonus},{init}|P2:{name},{class},{hp},{x},{y},{def},{atkBonus},{init}|Boss:{hp},{x},{y}|Events:{x,y,eventIdx};...
+            const p1 = state.p1;
+            const p2 = state.p2;
+            const boss = state.boss;
+            
+            // Adiciona a flag isInitialized ao estado
+            const p1_str = `${p1.name},${p1.selectedClass},${p1.hp},${p1.x},${p1.y},${p1.def},${p1.atkBonus},${p1.isInitialized ? 1 : 0}`;
+            const p2_str = `${p2.name},${p2.selectedClass},${p2.hp},${p2.x},${p2.y},${p2.def},${p2.atkBonus},${p2.isInitialized ? 1 : 0}`;
+            const boss_str = `${boss.hp},${boss.x},${boss.y}`;
+
+            const events_str = state.gridEvents
+                .map(e => `${e.x},${e.y},${MYSTERY_EVENTS.findIndex(evt => evt.type === e.data.type)}`)
+                .join(';');
+
+            const full_state = `${state.gameMode}|${state.turn}|P1:${p1_str}|P2:${p2_str}|Boss:${boss_str}|Events:${events_str}`;
+            
+            return encodeURIComponent(btoa(full_state));
+        }
+
+        function decodeState(encoded) {
+            try {
+                const decoded = atob(decodeURIComponent(encoded));
+                const parts = decoded.split('|');
+                
+                const newState = { ...state, gameMode: parts[0], turn: parts[1] };
+                
+                parts.slice(2).forEach(part => {
+                    const [key, value] = part.split(':');
+                    
+                    if (key === 'P1' || key === 'P2') {
+                        const [name, cls, hp, x, y, def, atkBonus, initialized] = value.split(',');
+                        const player = newState[key.toLowerCase()];
+                        player.name = name;
+                        player.selectedClass = cls !== 'null' ? cls : null;
+                        player.classData = player.selectedClass ? CLASSES[cls] : null;
+                        player.hp = parseInt(hp);
+                        player.x = parseInt(x);
+                        player.y = parseInt(y);
+                        player.def = parseInt(def);
+                        player.atkBonus = parseInt(atkBonus);
+                        player.isInitialized = initialized === '1';
+                        
+                        if (player.classData) {
+                            player.apMax = player.classData.ap;
+                            player.hpMax = player.classData.hp;
+                        }
+                        player.isAlive = player.hp > 0;
+                    } else if (key === 'Boss') {
+                        const [hp, x, y] = value.split(',').map(Number);
+                        newState.boss.hp = hp;
+                        newState.boss.x = x;
+                        newState.boss.y = y;
+                        newState.boss.isAlive = newState.boss.hp > 0;
+                    } else if (key === 'Events') {
+                        newState.gridEvents = value.split(';').filter(Boolean).map(e => {
+                            const [x, y, idx] = e.split(',').map(Number);
+                            return { x, y, data: MYSTERY_EVENTS[idx] };
+                        });
+                    }
+                });
+                
+                // Configura o jogador local, oponente, e a ordem do turno
+                if(newState.turn === 'P1') {
+                    newState.currentPlayer = newState.p1;
+                    newState.opponentPlayer = newState.p2;
+                    newState.playerSlot = 'P1';
+                    newState.opponentSlot = 'P2';
+                } else {
+                    newState.currentPlayer = newState.p2;
+                    newState.opponentPlayer = newState.p1;
+                    newState.playerSlot = 'P2';
+                    newState.opponentSlot = 'P1';
+                }
+
+                // Reseta o AP e o modo para o jogador que está entrando
+                newState.currentPlayer.ap = newState.currentPlayer.apMax || 0;
+                newState.mode = 'move';
+                turnLog = [];
+
+                return newState;
+
+            } catch(e) {
+                console.error("Falha ao decodificar estado:", e);
+                return null;
+            }
+        }
+
+        // --- FLUXO DE INICIALIZAÇÃO ---
+        function setMode(mode) {
+            state.gameMode = mode;
+            document.querySelectorAll('.mode-button').forEach(btn => btn.classList.remove('selected'));
+            document.getElementById(`btn-mode-${mode}`).classList.add('selected');
+            
+            document.getElementById('setup-message').innerText = 
+                mode === 'pvp' 
+                ? "Insira seu nome e selecione sua classe para iniciar o PvP (Você será o Player 1)." 
+                : "Insira seu nome e selecione sua classe para jogar Solo (Você será P1).";
+
+            checkStart();
+        }
+
+        function init() {
+            for(let k in SVGS) if(k !== 'BOSS') document.getElementById(`preview-${k}`).innerHTML = SVGS[k];
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const encodedState = urlParams.get('state');
+            const encodedLog = urlParams.get('log');
+
+            if (encodedState) {
+                const loadedState = decodeState(encodedState);
+                if (loadedState) {
+                    state = loadedState;
+                    state.gameMode = loadedState.gameMode;
+                    
+                    // Se P1 está entrando e P2 ainda não foi inicializado, exibe o setup do P2 (modo PVP)
+                    if (state.gameMode === 'pvp' && state.playerSlot === 'P2' && !state.currentPlayer.isInitialized) {
+                        setupPlayer2();
+                        return;
+                    }
+
+                    // Se P1 (ou P2 já inicializado) está entrando, vai direto para o jogo
+                    document.getElementById('selection-modal').style.display = 'none';
+                    document.getElementById('game-ui').style.display = 'flex';
+                    
+                    // Atualiza a AP do jogador local para o máximo da classe carregada
+                    if (state.currentPlayer.classData) {
+                         state.currentPlayer.ap = state.currentPlayer.apMax;
+                    }
+                    
+                    // Configuração do HUD
+                    if (state.gameMode === 'solo') {
+                        setupSoloHud();
+                    } else {
+                        setupPvpHud();
+                    }
+                    
+                    // Exibe o log do turno anterior
+                    if(encodedLog) {
+                        try {
+                            const prevTurnLog = JSON.parse(atob(decodeURIComponent(encodedLog)));
+                            log(`--- Turno de ${state.opponentPlayer.name} (${state.opponentSlot}) ---`);
+                            prevTurnLog.forEach(msg => log(msg));
+                            log(`--- Seu Turno (${state.playerSlot}) ---`);
+                        } catch(e) { console.error("Falha ao decodificar log."); }
+                    } else {
+                         log("Partida carregada. É o seu turno!");
+                    }
+                    
+                    render();
+                    return;
+                }
+            }
+            
+            // Inicia em modo PVP (padrão) para o P1 iniciar
+            setMode('pvp');
+        }
+
+        function setupPvpHud() {
+            document.getElementById('opponent-indicator').innerText = `OPONENTE (${state.opponentSlot})`;
+            document.getElementById('p1-slot-label').innerText = state.playerSlot;
+            document.getElementById('opponent-hud').classList.remove('boss-info');
+            document.getElementById('opponent-hud').classList.add('opponent-info');
+            document.getElementById('p2-equip-slots').style.display = 'flex';
+        }
+
+        function setupSoloHud() {
+             document.getElementById('opponent-indicator').innerText = 'BOSS';
+             document.getElementById('opponent-hud').classList.remove('opponent-info');
+             document.getElementById('opponent-hud').classList.add('boss-info');
+             document.getElementById('p1-slot-label').innerText = 'P1';
+             document.getElementById('p2-equip-slots').style.display = 'none'; // Boss não tem itens
+        }
+
+        function setupPlayer2() {
+            // Reconfigura o modal para a configuração do Player 2
+            document.getElementById('modal-title').innerText = "Você é o Player 2";
+            document.getElementById('mode-selection').style.display = 'none';
+            document.getElementById('setup-message').innerText = `Selecione sua classe, ${state.p2.name} (Player 2):`;
+            document.getElementById('player-name').value = state.p2.name; // Mantém o nome carregado
+            document.getElementById('player-name').disabled = true;
+            document.getElementById('btn-start').innerText = "ENTRAR NO JOGO";
+            localPlayerName = state.p2.name; // Define o nome localmente
+            // A classe deve ser selecionada (localPlayerClass)
+            checkStart();
+        }
+
+        function selectClass(key) {
+            localPlayerClass = key;
+            document.querySelectorAll('.class-card').forEach(c => c.classList.remove('selected'));
+            document.getElementById(`card-${key}`).classList.add('selected');
+            checkStart();
+        }
+
+        function checkStart() {
+            const name = document.getElementById('player-name').value.trim();
+            localPlayerName = name;
+            document.getElementById('btn-start').disabled = !(name && localPlayerClass);
+        }
+
+        function spawnMysteryBoxes(count) {
+            for(let i=0; i<count; i++) {
+                let x, y;
+                // Garante que não spawna nos cantos de início (P1: 0,8 | P2: 8,0) e não no Boss (4,4)
+                do { 
+                    x = Math.floor(Math.random() * GRID_SIZE); 
+                    y = Math.floor(Math.random() * GRID_SIZE); 
+                } while(dist(x,y,0,8) < 3 || dist(x,y,8,0) < 3 || dist(x,y,4,4) === 0 || state.gridEvents.some(e=>e.x===x && e.y===y));
+                
+                const evt = MYSTERY_EVENTS[Math.floor(Math.random() * MYSTERY_EVENTS.length)];
+                state.gridEvents.push({x, y, data: evt});
+            }
+        }
+
+        function startGame() {
+            const isP2Setup = state.gameMode === 'pvp' && state.playerSlot === 'P2' && !state.currentPlayer.isInitialized;
+            
+            if (!isP2Setup) {
+                // ------------------------------------
+                // FLUXO P1 (Início de Nova Partida)
+                // ------------------------------------
+                state.p1.name = localPlayerName;
+                state.p1.selectedClass = localPlayerClass;
+                state.p1.classData = CLASSES[localPlayerClass];
+                state.p1.apMax = state.p1.classData.ap;
+                state.p1.hpMax = state.p1.classData.hp;
+                state.p1.isInitialized = true;
+
+                state.currentPlayer = state.p1;
+                state.playerSlot = 'P1';
+
+                if (state.gameMode === 'pvp') {
+                    // P2 apenas recebe o nome P2 para ser substituído
+                    state.p2.name = 'Player 2';
+                    state.opponentPlayer = state.p2;
+                    state.boss.isAlive = false;
+                    setupPvpHud();
+                } else { // Solo Mode
+                    state.p2.isAlive = false;
+                    state.boss.isAlive = true;
+                    state.opponentPlayer = state.boss;
+                    setupSoloHud();
+                }
+                
+                state.turn = 'P1';
+                state.currentPlayer.ap = state.currentPlayer.apMax;
+                
+                spawnMysteryBoxes(state.gameMode === 'solo' ? 12 : 10);
+                
+                log(state.gameMode === 'pvp' 
+                    ? `Partida PvP iniciada. É o turno de ${state.p1.name} (P1).`
+                    : `Partida Solo iniciada. É o turno de ${state.p1.name}.`
+                );
+
+            } else {
+                // ------------------------------------
+                // FLUXO P2 (Inicialização ao receber link)
+                // ------------------------------------
+                state.p2.name = localPlayerName;
+                state.p2.selectedClass = localPlayerClass;
+                state.p2.classData = CLASSES[localPlayerClass];
+                state.p2.apMax = state.p2.classData.ap;
+                state.p2.hpMax = state.p2.classData.hp;
+                state.p2.isInitialized = true;
+                
+                // Atualiza o currentPlayer com os novos dados de classe
+                state.currentPlayer = state.p2;
+                state.currentPlayer.ap = state.currentPlayer.apMax;
+
+                log(`Bem-vindo, ${state.p2.name}! É o seu turno (P2).`);
+                setupPvpHud(); // P2 precisa do setup PVP
+            }
+
+            document.getElementById('selection-modal').style.display = 'none';
+            document.getElementById('game-ui').style.display = 'flex';
+            
+            // Configura o ícone no HUD
+            document.getElementById('hud-p1-icon').innerHTML = SVGS[state.currentPlayer.selectedClass];
+            if (state.opponentPlayer.selectedClass) {
+                document.getElementById('hud-p2-icon').innerHTML = SVGS[state.opponentPlayer.selectedClass];
+            } else if (state.gameMode === 'solo') {
+                document.getElementById('hud-p2-icon').innerHTML = SVGS.BOSS;
+            }
+
+            render();
+        }
+
+        // --- RENDER & HUD ---
+        function render() {
+            const grid = document.getElementById('grid');
+            grid.innerHTML = '';
+            updateHud();
+            
+            const current = state.currentPlayer;
+            const opponent = state.opponentPlayer; 
+            const isOpponentPlayer = state.gameMode === 'pvp'; // Se não for PVP, é o Boss
+
+            // Verifica se o jogador local tem os dados (para o caso de P2 entrar no jogo)
+            if (!current.classData) {
+                 // Deve estar no modal de seleção/nome
+                 return;
+            }
+            
+            document.getElementById('turn-indicator').innerText = `Turno de ${current.name} (${state.playerSlot})`;
+            document.getElementById('btn-attack').disabled = current.ap < 1;
+
+            for(let y=0; y<GRID_SIZE; y++) {
+                for(let x=0; x<GRID_SIZE; x++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'cell';
+
+                    let isVisible = true;
+                    if (state.gameMode === 'pvp' && opponent.isInitialized) {
+                        // Visão no PVP
+                        isVisible = dist(x, y, current.x, current.y) <= VISION_RANGE;
+                    }
+
+                    if (!isVisible) {
+                         cell.classList.add('fog-of-war');
+                    }
+                    
+                    // 2. Conteúdo da Célula (Item/Boss) - Visível
+                    if (isVisible) {
+                        const event = state.gridEvents.find(e => e.x === x && e.y === y);
+                        if (event) {
+                            cell.innerHTML += `<div class="mystery-box">?</div>`;
+                        }
+                        if (state.gameMode === 'solo' && opponent.isAlive && x === opponent.x && y === opponent.y) {
+                            // Boss no modo solo
+                            cell.innerHTML += `<div id="token-Boss" class="cell-content character-idle">${SVGS.BOSS}</div>`;
+                        }
+                    }
+
+                    // 3. Jogadores
+                    let playerHere = null;
+                    let isCurrentPlayer = false;
+
+                    if (current.isAlive && x === current.x && y === current.y) {
+                        playerHere = current;
+                        isCurrentPlayer = true;
+                    } else if (isOpponentPlayer && opponent.isAlive && opponent.isInitialized && x === opponent.x && y === opponent.y) {
+                        // O oponente PVP só é renderizado se estiver dentro do alcance de visão
+                        if (isVisible) {
+                            playerHere = opponent;
+                        }
+                    }
+                    
+                    if (playerHere) {
+                        const iconSvg = SVGS[playerHere.selectedClass];
+                        const borderColor = isCurrentPlayer ? 'cyan' : 'red';
+                        cell.innerHTML += `<div id="token-${playerHere.id}" class="cell-content character-idle" style="border: 2px solid ${borderColor}; border-radius: 50%;">${iconSvg}</div>`;
+                    }
+
+                    // 4. Interatividade
+                    if (current.isAlive) {
+                        // Mover
+                        if (state.mode === 'move' && current.ap > 0) {
+                            if (dist(x, y, current.x, current.y) === 1 && canMoveTo(x, y)) {
+                                cell.classList.add('highlight-move');
+                                cell.onclick = () => movePlayer(x, y);
+                            }
+                        }
+                        // Atacar Oponente ou Boss
+                        if (state.mode === 'attack' && current.ap > 0 && isVisible) {
+                            const range = current.classData.range;
+                            
+                            // Atacar Oponente PVP (apenas se inicializado)
+                            if (isOpponentPlayer && opponent.isInitialized && playerHere === opponent && dist(x, y, current.x, current.y) <= range) {
+                                cell.classList.add('highlight-attack');
+                                cell.onclick = () => attackTarget(opponent);
+                            }
+                            // Atacar Boss (Solo)
+                            else if (!isOpponentPlayer && opponent.isAlive && x === opponent.x && y === opponent.y && dist(x, y, current.x, current.y) <= range) {
+                                 cell.classList.add('highlight-attack');
+                                 cell.onclick = () => attackTarget(opponent);
+                             }
+                        }
+                    }
+
+                    grid.appendChild(cell);
+                }
+            }
+
+            const atkBtn = document.getElementById('btn-attack');
+            atkBtn.classList.toggle('active', state.mode === 'attack');
+            atkBtn.innerText = state.mode === 'attack' ? "CANCELAR" : `ATACAR (1 AP)`;
+        }
+
+        function updateHud() {
+            const current = state.currentPlayer;
+            const opponent = state.opponentPlayer; // Boss ou P2
+            
+            // Verifica se as classes foram carregadas/selecionadas antes de atualizar o HUD
+            if (!current.classData) return;
+
+            // HUD do Jogador Local
+            document.getElementById('hud-p1-name').innerText = current.name || 'Nome?';
+            document.getElementById('hud-p1-icon').innerHTML = SVGS[current.selectedClass] || '';
+            document.getElementById('bar-hp-p1').style.width = `${(current.hp/current.hpMax)*100}%`;
+            document.getElementById('txt-hp-p1').innerText = `HP: ${current.hp}/${current.hpMax}`;
+            document.getElementById('txt-ap-p1').innerText = `AP: ${current.ap}`;
+            document.getElementById('slot-p1-def').classList.toggle('equip-active', current.def > 0);
+            document.getElementById('slot-p1-atk').classList.toggle('equip-active', current.atkBonus > 0);
+
+            // HUD do Oponente (P2 ou Boss)
+            document.getElementById('hud-p2-name').innerText = opponent.name;
+            document.getElementById('hud-p2-icon').innerHTML = opponent.selectedClass ? SVGS[opponent.selectedClass] : SVGS.BOSS;
+            document.getElementById('bar-hp-p2').style.width = `${(opponent.hp/opponent.hpMax)*100}%`;
+            document.getElementById('txt-hp-p2').innerText = `HP: ${opponent.hp}/${opponent.hpMax}`;
+            
+            // Slots do oponente (mostra apenas se for PVP e inicializado)
+            const showP2Equip = state.gameMode === 'pvp' && opponent.isInitialized;
+            document.getElementById('p2-equip-slots').style.display = showP2Equip ? 'flex' : 'none';
+            if (showP2Equip) {
+                document.getElementById('slot-p2-def').classList.toggle('equip-active', opponent.def > 0);
+                document.getElementById('slot-p2-atk').classList.toggle('equip-active', opponent.atkBonus > 0);
+            }
+        }
+
+        // --- AÇÕES DO JOGADOR ---
+        function toggleAttackMode() {
+            if(state.currentPlayer.ap < 1) { log("AP insuficiente!"); return; }
+            state.mode = state.mode === 'move' ? 'attack' : 'move';
+            render();
+        }
+
+        function movePlayer(x, y) {
+            const current = state.currentPlayer;
+            current.x = x; current.y = y; current.ap--;
+            
+            const evtIdx = state.gridEvents.findIndex(e => e.x === x && e.y === y);
+            if (evtIdx >= 0) {
+                const eventData = state.gridEvents[evtIdx].data;
+                triggerEvent(current, eventData, x, y);
+                state.gridEvents.splice(evtIdx, 1); 
+            }
+            
+            render();
+            if (state.gameMode === 'solo' && current.ap === 0) {
+                endTurn(); // Aciona o Boss
+            }
+        }
+
+        function triggerEvent(player, data, x, y) {
+            let text = data.name;
+            let color = "white";
+
+            if (data.effect === 'def') { 
+                player.def += data.val; 
+                text = `+${data.val} DEF!`; 
+            }
+            else if (data.effect === 'atk') { 
+                player.atkBonus += data.val; 
+                text = `+${data.val} ATK!`; 
+            }
+            else if (data.effect === 'heal') { 
+                player.hp = Math.min(player.hp + data.val, player.hpMax); 
+                text = `+${data.val} HP`; 
+                color = "#00e676";
+            }
+            else if (data.effect === 'dmg') { 
+                takeDamage(player, data.val); 
+                text = `ARMADILHA! -${data.val}`; 
+                color = "red";
+            }
+            else if (data.effect === 'debuff_atk') {
+                player.atkBonus = Math.max(0, player.atkBonus - data.val);
+                text = "ENFRAQUECIDO!";
+                color = "purple";
+            }
+            else {
+                text = "Vazio...";
+            }
+            
+            log(`${player.name} encontrou: ${data.name}`);
+            createFloatingText(x, y, text, color);
+        }
+        
+        // --- COMBATE E TURNO DO BOSS ---
+        function attackTarget(target) {
+            const current = state.currentPlayer;
+            state.mode = 'move'; current.ap--;
+            
+            const token = document.getElementById(`token-${current.id}`);
+            if(token) {
+                token.classList.remove('character-idle');
+                token.classList.add('character-attack');
+                setTimeout(()=> token.classList.remove('character-attack'), 400);
+            }
+
+            const targetX = target.x || state.boss.x;
+            const targetY = target.y || state.boss.y;
+            
+            let dmg = current.classData.dmg + current.atkBonus;
+            
+            createProjectile(current.x, current.y, targetX, targetY, () => {
+                const isTargetVisible = target === state.boss || dist(current.x, current.y, target.x, target.y) <= VISION_RANGE;
+                
+                if (isTargetVisible || target.name === 'Boss') {
+                    takeDamage(target, dmg, current);
+                } else {
+                    target.hp -= dmg;
+                    log(`Você atacou ${target.name} (Invisível) e causou ${dmg} de dano!`);
+                }
+
+                if(token) token.classList.add('character-idle');
+                render();
+                checkGameOver();
+                
+                if (state.gameMode === 'solo' && current.ap === 0) {
+                    endTurn(); // Aciona o Boss
+                }
+            });
+        }
+
+        function takeDamage(target, amount, attacker = null) {
+            // Se o alvo for um jogador, aplica defesa
+            let finalDamage = amount;
+            if (target.id && target.id.startsWith('P') && target.def > 0) {
+                finalDamage = Math.max(1, amount - target.def);
+            }
+            
+            target.hp -= finalDamage;
+            
+            // Retaliação do Boss (apenas no modo Solo, atacando P1)
+            if (target === state.boss && target.hp > 0 && attacker && state.gameMode === 'solo') {
+                const retaliationDmg = 1;
+                log(`Boss revida em ${attacker.name} (-${retaliationDmg} HP)`);
+                attacker.hp -= retaliationDmg; 
+                createFloatingText(attacker.x, attacker.y, `-${retaliationDmg}`, "red");
+            }
+            
+            createFloatingText(target.x || state.boss.x, target.y || state.boss.y, `-${finalDamage}`, "red");
+            target.isAlive = target.hp > 0;
+            
+            if (target === state.boss && !target.isAlive) {
+                log("Boss derrotado! Você VENCEU!");
+                checkGameOver();
+            }
+        }
+        
+        function bossTurn(callback) {
+            if (!state.boss.isAlive || state.p1.hp <= 0) { 
+                if (callback) callback();
+                return;
+            }
+            log("Turno do Boss...");
+            const player = state.p1; // P1 é sempre o alvo no modo solo
+            const boss = state.boss;
+
+            const distToPlayer = dist(player.x, player.y, boss.x, boss.y);
+            const attackRange = 2;
+
+            if (distToPlayer <= attackRange) {
+                setTimeout(() => {
+                    const bossDmg = 3;
+                    log(`Boss ataca ${player.name} e causa ${bossDmg} de dano!`);
+                    takeDamage(player, bossDmg);
+                    render();
+                    checkGameOver();
+                    if (callback) callback();
+                }, 500);
+            } else {
+                // Move-se em direção ao jogador (movimento horizontal e vertical)
+                setTimeout(() => {
+                    let newX = boss.x;
+                    let newY = boss.y;
+                    
+                    if (Math.random() < 0.5) { // Tenta X primeiro
+                        if (player.x > boss.x && canMoveTo(boss.x + 1, boss.y)) newX++;
+                        else if (player.x < boss.x && canMoveTo(boss.x - 1, boss.y)) newX--;
+                    } else { // Tenta Y primeiro
+                        if (player.y > boss.y && canMoveTo(boss.x, boss.y + 1)) newY++;
+                        else if (player.y < boss.y && canMoveTo(boss.x, boss.y - 1)) newY--;
+                    }
+
+                    if (newX !== boss.x || newY !== boss.y) {
+                        boss.x = newX;
+                        boss.y = newY;
+                        log("Boss se moveu.");
+                    } else {
+                        log("Boss falhou em se mover.");
+                    }
+                    render();
+                    if (callback) callback();
+                }, 500);
+            }
+        }
+
+        function checkGameOver() {
+            if (state.gameMode === 'pvp') {
+                if (state.p1.hp <= 0 && state.p2.hp <= 0) {
+                    showModal('game-over-modal');
+                    document.getElementById('game-over-title').innerText = "EMPATE! Ambos foram derrotados!";
+                } else if (state.p1.hp <= 0) {
+                    showModal('game-over-modal');
+                    document.getElementById('game-over-title').innerText = `FIM DE JOGO! ${state.p2.name} VENCEU!`;
+                } else if (state.p2.hp <= 0) {
+                    showModal('game-over-modal');
+                    document.getElementById('game-over-title').innerText = `FIM DE JOGO! ${state.p1.name} VENCEU!`;
+                }
+            } else { // Solo Mode
+                if (state.p1.hp <= 0) {
+                    showModal('game-over-modal');
+                    document.getElementById('game-over-title').innerText = `FIM DE JOGO! Você foi derrotado pelo Boss.`;
+                } else if (!state.boss.isAlive) {
+                    showModal('game-over-modal');
+                    document.getElementById('game-over-title').innerText = `VITÓRIA! Você derrotou o temível Boss!`;
+                }
+            }
+        }
+
+        // --- FIM DE TURNO E GERAÇÃO DE LINK ---
+        function endTurn() {
+            if (state.gameMode === 'solo') {
+                state.currentPlayer.ap = 0; // Zera o AP para o próximo turno do Boss
+                // O Boss joga, e ao terminar o turno, reinicia o AP do P1
+                bossTurn(() => {
+                    state.currentPlayer.ap = state.currentPlayer.apMax;
+                    log(`Turno do Boss terminou. É o turno de ${state.currentPlayer.name}.`);
+                    render();
+                    checkGameOver();
+                });
+                return;
+            }
+
+            // --- PVP Turno ---
+
+            // 1. Verifica se o jogo acabou (PvP)
+            if (state.p1.hp <= 0 || state.p2.hp <= 0) {
+                checkGameOver();
+                return;
+            }
+
+            // 2. Alterna o turno no estado
+            state.turn = state.playerSlot === 'P1' ? 'P2' : 'P1';
+
+            // 3. Codifica o estado e o log do turno
+            const encodedState = encodeState();
+            const encodedLog = encodeURIComponent(btoa(JSON.stringify(turnLog)));
+            
+            // 4. Constrói o URL
+            const nextPlayerUrl = `${window.location.protocol}//${window.location.host}${window.location.pathname}?state=${encodedState}&log=${encodedLog}`;
+
+            // 5. Exibe o modal
+            const nextPlayerName = state.turn === 'P1' ? state.p1.name : state.p2.name;
+            document.getElementById('link-header-text').innerText = `Copie e envie o link para o ${state.turn} (${nextPlayerName}):`;
+            document.getElementById('link-display').value = nextPlayerUrl;
+            showModal('link-modal');
+            document.getElementById('game-ui').style.display = 'none';
+        }
+
+        function copyLink() {
+            const linkDisplay = document.getElementById('link-display');
+            
+            // 1. Seleciona o texto dentro do textarea
+            linkDisplay.select();
+            linkDisplay.setSelectionRange(0, 99999); // Para mobile
+
+            // 2. Tenta copiar usando o execCommand (melhor compatibilidade em iframes)
+            try {
+                const successful = document.execCommand('copy');
+                const msg = successful ? "COPIADO!" : "FALHA NA CÓPIA";
+                 document.getElementById('btn-copy').innerText = msg;
+                 setTimeout(() => document.getElementById('btn-copy').innerText = "COPIAR LINK", 1500);
+
+            } catch (err) {
+                // 3. Fallback: API moderna
+                if (navigator.clipboard) {
+                    navigator.clipboard.writeText(linkDisplay.value).then(() => {
+                        document.getElementById('btn-copy').innerText = "COPIADO!";
+                        setTimeout(() => document.getElementById('btn-copy').innerText = "COPIAR LINK", 1500);
+                    }).catch(err => {
+                        document.getElementById('btn-copy').innerText = "Erro. Use Ctrl+C";
+                        setTimeout(() => document.getElementById('btn-copy').innerText = "COPIAR LINK", 1500);
+                    });
+                } else {
+                    document.getElementById('btn-copy').innerText = "Erro. Use Ctrl+C";
+                }
+            }
+        }
+
+        // --- EFEITOS VISUAIS ---
+        function getCellCenter(gx, gy) {
+            const cells = document.querySelectorAll('.cell');
+            const index = gy * GRID_SIZE + gx;
+            if(!cells[index]) return {x:0, y:0};
+            const rect = cells[index].getBoundingClientRect();
+            // Retorna a posição fixa na viewport
+            return { 
+                x: rect.left + rect.width/2, 
+                y: rect.top + rect.height/2 
+            };
+        }
+
+        function createProjectile(x1, y1, x2, y2, onHit) {
+            const start = getCellCenter(x1, y1);
+            const end = getCellCenter(x2, y2);
+            const el = document.createElement('div');
+            el.className = 'projectile';
+            
+            el.style.left = start.x + 'px'; el.style.top = start.y + 'px';
+            
+            // Bola de fogo genérica
+            el.innerHTML = `<div style="width:12px; height:12px; background:orange; border-radius:50%; box-shadow:0 0 8px red"></div>`;
+            
+            document.body.appendChild(el);
+            const anim = el.animate([
+                { transform: `translate(0, 0)` },
+                { transform: `translate(${end.x - start.x}px, ${end.y - start.y}px)` }
+            ], { duration: 300, easing: 'linear' });
+            
+            anim.onfinish = () => { el.remove(); if(onHit) onHit(); };
+        }
+
+        function createFloatingText(gx, gy, text, color="white") {
+            const pos = getCellCenter(gx, gy);
+            const el = document.createElement('div');
+            el.className = 'damage-float'; el.innerText = text;
+            el.style.color = color;
+            el.style.left = pos.x + 'px'; el.style.top = pos.y + 'px';
+            document.body.appendChild(el);
+            setTimeout(() => el.remove(), 1000);
+        }
+
+        window.onload = init;
+    </script>
+</body>
+</html>
+
