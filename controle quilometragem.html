@@ -1,0 +1,1073 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0a0a0f">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Odômetro GPS</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;600;700&family=Share+Tech+Mono&family=Exo+2:wght@200;400;600&display=swap');
+
+  :root {
+    --bg: #070710;
+    --surface: #0e0e1f;
+    --surface2: #141428;
+    --accent: #00e5ff;
+    --accent2: #ff6b35;
+    --warn: #ffd600;
+    --danger: #ff1744;
+    --green: #00e676;
+    --text: #e0e0f0;
+    --muted: #6060a0;
+    --glow: 0 0 20px rgba(0,229,255,0.4);
+    --glow-warn: 0 0 20px rgba(255,214,0,0.5);
+    --glow-danger: 0 0 25px rgba(255,23,68,0.6);
+    --radius: 16px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Exo 2', sans-serif;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 0 40px 0;
+    overflow-x: hidden;
+  }
+
+  /* Grid background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,229,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,229,255,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    width: 100%;
+    max-width: 420px;
+    padding: 0 16px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Header */
+  .header {
+    padding: 28px 0 20px;
+    text-align: center;
+  }
+  .header h1 {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 1.6rem;
+    font-weight: 700;
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    color: var(--accent);
+    text-shadow: var(--glow);
+  }
+  .header p {
+    font-size: 0.72rem;
+    color: var(--muted);
+    letter-spacing: 3px;
+    margin-top: 4px;
+    text-transform: uppercase;
+  }
+
+  /* Main odometer */
+  .odo-card {
+    background: var(--surface);
+    border: 1px solid rgba(0,229,255,0.15);
+    border-radius: var(--radius);
+    padding: 28px 20px;
+    margin-bottom: 16px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.3s, box-shadow 0.3s;
+  }
+  .odo-card.warning {
+    border-color: rgba(255,214,0,0.5);
+    box-shadow: var(--glow-warn), inset 0 0 40px rgba(255,214,0,0.05);
+    animation: warnPulse 2s ease-in-out infinite;
+  }
+  .odo-card.danger {
+    border-color: rgba(255,23,68,0.7);
+    box-shadow: var(--glow-danger), inset 0 0 40px rgba(255,23,68,0.08);
+    animation: dangerPulse 1s ease-in-out infinite;
+  }
+  @keyframes warnPulse {
+    0%,100% { box-shadow: var(--glow-warn), inset 0 0 40px rgba(255,214,0,0.05); }
+    50% { box-shadow: 0 0 40px rgba(255,214,0,0.7), inset 0 0 40px rgba(255,214,0,0.1); }
+  }
+  @keyframes dangerPulse {
+    0%,100% { box-shadow: var(--glow-danger), inset 0 0 40px rgba(255,23,68,0.08); }
+    50% { box-shadow: 0 0 50px rgba(255,23,68,0.9), inset 0 0 50px rgba(255,23,68,0.15); }
+  }
+
+  .odo-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(ellipse at 50% 0%, rgba(0,229,255,0.04) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .odo-label {
+    font-size: 0.65rem;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-align: center;
+    margin-bottom: 12px;
+  }
+
+  .odo-display {
+    text-align: center;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 4.5rem;
+    color: var(--accent);
+    text-shadow: var(--glow);
+    line-height: 1;
+    letter-spacing: -2px;
+    transition: color 0.3s, text-shadow 0.3s;
+  }
+  .odo-display.warning {
+    color: var(--warn);
+    text-shadow: var(--glow-warn);
+  }
+  .odo-display.danger {
+    color: var(--danger);
+    text-shadow: var(--glow-danger);
+  }
+  .odo-unit {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 1rem;
+    color: var(--muted);
+    letter-spacing: 2px;
+    text-align: center;
+    margin-top: 4px;
+  }
+
+  /* Progress bar */
+  .progress-wrap {
+    margin-top: 20px;
+  }
+  .progress-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.7rem;
+    color: var(--muted);
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+  }
+  .progress-bar-bg {
+    height: 8px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    border-radius: 4px;
+    transition: width 0.5s ease, background 0.3s;
+    position: relative;
+    min-width: 4px;
+  }
+  .progress-bar-fill::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: white;
+    box-shadow: 0 0 8px rgba(255,255,255,0.8);
+  }
+  .progress-bar-fill.warning {
+    background: linear-gradient(90deg, var(--accent2), var(--warn));
+  }
+  .progress-bar-fill.danger {
+    background: linear-gradient(90deg, var(--warn), var(--danger));
+  }
+
+  /* Status cards row */
+  .cards-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: var(--radius);
+    padding: 16px 14px;
+    position: relative;
+    overflow: hidden;
+  }
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent), transparent);
+  }
+  .stat-card.orange::before { background: linear-gradient(90deg, var(--accent2), transparent); }
+  .stat-card.green::before { background: linear-gradient(90deg, var(--green), transparent); }
+
+  .stat-label {
+    font-size: 0.6rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+  .stat-value {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 1.6rem;
+    color: var(--text);
+    line-height: 1;
+  }
+  .stat-unit {
+    font-size: 0.65rem;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  /* GPS status */
+  .gps-bar {
+    background: var(--surface);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: var(--radius);
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+    font-size: 0.75rem;
+  }
+  .gps-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--muted);
+    flex-shrink: 0;
+    transition: background 0.3s;
+  }
+  .gps-dot.active { background: var(--green); animation: blink 1.5s ease-in-out infinite; }
+  .gps-dot.searching { background: var(--warn); animation: blink 0.8s ease-in-out infinite; }
+  .gps-dot.error { background: var(--danger); }
+  @keyframes blink {
+    0%,100% { opacity: 1; box-shadow: 0 0 6px currentColor; }
+    50% { opacity: 0.4; box-shadow: none; }
+  }
+  .gps-text { flex: 1; color: var(--muted); }
+  .gps-accuracy { font-family: 'Share Tech Mono', monospace; color: var(--accent); font-size: 0.7rem; }
+
+  /* Limit setting */
+  .limit-card {
+    background: var(--surface);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: var(--radius);
+    padding: 20px 16px;
+    margin-bottom: 16px;
+  }
+  .limit-card h3 {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.8rem;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 14px;
+  }
+  .limit-input-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+  .limit-input {
+    flex: 1;
+    background: var(--surface2);
+    border: 1px solid rgba(0,229,255,0.2);
+    border-radius: 10px;
+    padding: 12px 16px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 1.4rem;
+    color: var(--accent);
+    text-align: center;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    width: 100%;
+  }
+  .limit-input:focus {
+    border-color: var(--accent);
+    box-shadow: var(--glow);
+  }
+  .limit-unit {
+    font-size: 0.75rem;
+    color: var(--muted);
+    letter-spacing: 2px;
+  }
+
+  /* Presets */
+  .presets {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+    flex-wrap: wrap;
+  }
+  .preset-btn {
+    background: var(--surface2);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 8px;
+    padding: 6px 12px;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 1px;
+  }
+  .preset-btn:active, .preset-btn.active {
+    background: rgba(0,229,255,0.12);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  /* Main buttons */
+  .btn-primary {
+    width: 100%;
+    padding: 18px;
+    border: none;
+    border-radius: var(--radius);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 12px;
+  }
+  .btn-start {
+    background: linear-gradient(135deg, var(--accent) 0%, #0099bb 100%);
+    color: #000;
+    box-shadow: 0 4px 20px rgba(0,229,255,0.3);
+  }
+  .btn-start:active { transform: scale(0.97); box-shadow: 0 2px 10px rgba(0,229,255,0.2); }
+
+  .btn-stop {
+    background: linear-gradient(135deg, #333 0%, #222 100%);
+    color: var(--danger);
+    border: 1px solid rgba(255,23,68,0.3);
+  }
+  .btn-stop:active { transform: scale(0.97); }
+
+  .btn-fuel {
+    background: linear-gradient(135deg, var(--accent2) 0%, #cc4400 100%);
+    color: #fff;
+    box-shadow: 0 4px 20px rgba(255,107,53,0.35);
+    font-size: 1.2rem;
+    padding: 22px;
+  }
+  .btn-fuel:active { transform: scale(0.97); box-shadow: 0 2px 10px rgba(255,107,53,0.2); }
+
+  .btn-fuel .fuel-icon {
+    display: inline-block;
+    margin-right: 8px;
+    font-size: 1.4rem;
+    vertical-align: middle;
+  }
+
+  /* History */
+  .history-card {
+    background: var(--surface);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: var(--radius);
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+  .history-card h3 {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.75rem;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 12px;
+  }
+  .history-list { display: flex; flex-direction: column; gap: 8px; }
+  .history-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 12px;
+    background: var(--surface2);
+    border-radius: 8px;
+    font-size: 0.78rem;
+  }
+  .history-item .date { color: var(--muted); font-size: 0.68rem; }
+  .history-item .km {
+    font-family: 'Share Tech Mono', monospace;
+    color: var(--accent);
+    font-size: 0.9rem;
+  }
+  .empty-history {
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.75rem;
+    letter-spacing: 2px;
+    padding: 10px 0;
+  }
+
+  /* Alert banner */
+  .alert-banner {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    background: linear-gradient(135deg, var(--danger), #cc0030);
+    color: white;
+    text-align: center;
+    padding: 20px 20px 24px;
+    z-index: 1000;
+    transform: translateY(-100%);
+    transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1);
+    box-shadow: 0 4px 30px rgba(255,23,68,0.6);
+  }
+  .alert-banner.show { transform: translateY(0); }
+  .alert-banner h2 {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+    letter-spacing: 3px;
+    margin-bottom: 4px;
+  }
+  .alert-banner p { font-size: 0.8rem; opacity: 0.85; }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    bottom: 30px; left: 50%; transform: translateX(-50%) translateY(80px);
+    background: var(--surface2);
+    border: 1px solid rgba(0,229,255,0.3);
+    border-radius: 24px;
+    padding: 12px 24px;
+    font-size: 0.8rem;
+    color: var(--accent);
+    letter-spacing: 2px;
+    z-index: 999;
+    transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1);
+    white-space: nowrap;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* Speed indicator */
+  .speed-strip {
+    position: absolute;
+    top: 12px; right: 14px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--muted);
+    text-align: right;
+  }
+  .speed-val {
+    font-size: 1.1rem;
+    color: var(--green);
+    display: block;
+    line-height: 1;
+  }
+
+  /* Tracking indicator */
+  .tracking-ring {
+    position: absolute;
+    top: 14px; left: 14px;
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    border: 2px solid var(--green);
+    animation: ringPulse 1.5s ease-out infinite;
+  }
+  @keyframes ringPulse {
+    0% { transform: scale(1); opacity: 1; }
+    100% { transform: scale(2.5); opacity: 0; }
+  }
+  .tracking-dot {
+    position: absolute;
+    top: 18px; left: 18px;
+    width: 6px; height: 6px; margin: -3px;
+    border-radius: 50%;
+    background: var(--green);
+  }
+
+  .section-divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent);
+    margin: 4px 0 16px;
+  }
+
+  /* Wake lock toggle */
+  .wakelock-bar {
+    background: var(--surface);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+    gap: 12px;
+  }
+  .wakelock-info { flex: 1; }
+  .wakelock-info strong {
+    display: block;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.85rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text);
+    margin-bottom: 2px;
+  }
+  .wakelock-info span {
+    font-size: 0.65rem;
+    color: var(--muted);
+    letter-spacing: 1px;
+  }
+  .toggle-wrap {
+    position: relative;
+    width: 52px;
+    height: 28px;
+    flex-shrink: 0;
+  }
+  .toggle-wrap input { opacity: 0; width: 0; height: 0; position: absolute; }
+  .toggle-slider {
+    position: absolute;
+    inset: 0;
+    background: rgba(255,255,255,0.08);
+    border-radius: 14px;
+    cursor: pointer;
+    transition: background 0.3s;
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+  .toggle-slider::before {
+    content: '';
+    position: absolute;
+    width: 20px; height: 20px;
+    left: 3px; top: 3px;
+    background: var(--muted);
+    border-radius: 50%;
+    transition: transform 0.3s, background 0.3s;
+  }
+  .toggle-wrap input:checked + .toggle-slider {
+    background: rgba(0,229,255,0.2);
+    border-color: rgba(0,229,255,0.4);
+  }
+  .toggle-wrap input:checked + .toggle-slider::before {
+    transform: translateX(24px);
+    background: var(--accent);
+    box-shadow: 0 0 8px rgba(0,229,255,0.6);
+  }
+  .wakelock-status {
+    font-size: 0.6rem;
+    letter-spacing: 2px;
+    color: var(--muted);
+    text-align: center;
+    margin-top: 4px;
+    text-transform: uppercase;
+  }
+  .wakelock-status.on { color: var(--green); }
+</style>
+</head>
+<body>
+
+<div class="alert-banner" id="alertBanner">
+  <h2>⛽ HORA DE ABASTECER!</h2>
+  <p>Você atingiu o limite de quilometragem definido</p>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<div class="container">
+  <div class="header">
+    <h1>ODÔMETRO GPS</h1>
+    <p>Rastreador de combustível</p>
+  </div>
+
+  <!-- GPS Status -->
+  <div class="gps-bar">
+    <div class="gps-dot" id="gpsDot"></div>
+    <span class="gps-text" id="gpsText">GPS não iniciado</span>
+    <span class="gps-accuracy" id="gpsAccuracy"></span>
+  </div>
+
+  <!-- Wake Lock Toggle -->
+  <div class="wakelock-bar" id="wakelockBar">
+    <div class="wakelock-info">
+      <strong>🔆 Tela sempre ativa</strong>
+      <span id="wakelockDesc">Evita que o GPS pare quando a tela apaga</span>
+    </div>
+    <div>
+      <label class="toggle-wrap">
+        <input type="checkbox" id="wakelockToggle" onchange="toggleWakeLock(this.checked)">
+        <span class="toggle-slider"></span>
+      </label>
+      <div class="wakelock-status" id="wakelockStatus">desligado</div>
+    </div>
+  </div>
+
+  <!-- Main Odometer -->
+  <div class="odo-card" id="odoCard">
+    <div class="tracking-ring" id="trackingRing" style="display:none"></div>
+    <div class="tracking-dot" id="trackingDot" style="display:none"></div>
+    <div class="speed-strip" id="speedStrip" style="display:none">
+      <span class="speed-val" id="speedVal">0</span>
+      km/h
+    </div>
+
+    <div class="odo-label">DISTÂNCIA PERCORRIDA</div>
+    <div class="odo-display" id="odoDisplay">0.000</div>
+    <div class="odo-unit">QUILÔMETROS</div>
+
+    <div class="progress-wrap" id="progressWrap">
+      <div class="progress-meta">
+        <span>0 km</span>
+        <span id="progressPct">0%</span>
+        <span id="limitLabel">— km</span>
+      </div>
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="progressFill" style="width:0%"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats Row -->
+  <div class="cards-row">
+    <div class="stat-card">
+      <div class="stat-label">Restam</div>
+      <div class="stat-value" id="remainVal">—</div>
+      <div class="stat-unit">km até abastecer</div>
+    </div>
+    <div class="stat-card orange">
+      <div class="stat-label">Abastecimentos</div>
+      <div class="stat-value" id="refuelCount">0</div>
+      <div class="stat-unit">nesta sessão</div>
+    </div>
+  </div>
+
+  <!-- Limit Config -->
+  <div class="limit-card">
+    <h3>Limite para abastecer</h3>
+    <div class="limit-input-row">
+      <input type="number" class="limit-input" id="limitInput" value="400" min="1" max="9999" placeholder="400">
+      <span class="limit-unit">KM</span>
+    </div>
+    <div class="presets">
+      <button class="preset-btn" onclick="setPreset(200)">200</button>
+      <button class="preset-btn" onclick="setPreset(300)">300</button>
+      <button class="preset-btn active" onclick="setPreset(400)">400</button>
+      <button class="preset-btn" onclick="setPreset(500)">500</button>
+      <button class="preset-btn" onclick="setPreset(600)">600</button>
+    </div>
+  </div>
+
+  <!-- Control Buttons -->
+  <button class="btn-primary btn-start" id="startBtn" onclick="startTracking()">▶ INICIAR RASTREAMENTO</button>
+  <button class="btn-primary btn-stop" id="stopBtn" onclick="stopTracking()" style="display:none">■ PAUSAR</button>
+
+  <div class="section-divider"></div>
+
+  <button class="btn-primary btn-fuel" id="fuelBtn" onclick="refueled()">
+    <span class="fuel-icon">⛽</span> ABASTECI!
+  </button>
+
+  <!-- History -->
+  <div class="history-card">
+    <h3>Histórico de abastecimentos</h3>
+    <div class="history-list" id="historyList">
+      <div class="empty-history">Nenhum abastecimento registrado</div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // State
+  let tracking = false;
+  let watchId = null;
+  let lastPos = null;
+  let totalKm = 0;
+  let sessionStart = null;
+  let refuelCount = 0;
+  let history = JSON.parse(localStorage.getItem('fuelHistory') || '[]');
+  let alertShown = false;
+  let notifPermission = false;
+  let limitKm = 400;
+
+  // DOM refs
+  const odoDisplay = document.getElementById('odoDisplay');
+  const odoCard = document.getElementById('odoCard');
+  const gpsDot = document.getElementById('gpsDot');
+  const gpsText = document.getElementById('gpsText');
+  const gpsAccuracy = document.getElementById('gpsAccuracy');
+  const progressFill = document.getElementById('progressFill');
+  const progressPct = document.getElementById('progressPct');
+  const limitLabel = document.getElementById('limitLabel');
+  const remainVal = document.getElementById('remainVal');
+  const refuelCountEl = document.getElementById('refuelCount');
+  const startBtn = document.getElementById('startBtn');
+  const stopBtn = document.getElementById('stopBtn');
+  const limitInput = document.getElementById('limitInput');
+  const trackingRing = document.getElementById('trackingRing');
+  const trackingDot = document.getElementById('trackingDot');
+  const speedStrip = document.getElementById('speedStrip');
+  const speedVal = document.getElementById('speedVal');
+  const alertBanner = document.getElementById('alertBanner');
+
+  // Init
+  limitInput.addEventListener('change', () => {
+    limitKm = Math.max(1, parseFloat(limitInput.value) || 400);
+    updateUI();
+  });
+
+  // Request notification permission on load
+  if ('Notification' in window) {
+    Notification.requestPermission().then(p => {
+      notifPermission = p === 'granted';
+    });
+  }
+
+  renderHistory();
+
+  function setPreset(val) {
+    limitKm = val;
+    limitInput.value = val;
+    document.querySelectorAll('.preset-btn').forEach(b => {
+      b.classList.toggle('active', parseInt(b.textContent) === val);
+    });
+    updateUI();
+  }
+
+  function startTracking() {
+    if (!navigator.geolocation) {
+      showToast('GPS não suportado neste dispositivo');
+      return;
+    }
+
+    tracking = true;
+    lastPos = null;
+    alertShown = false;
+    limitKm = parseFloat(limitInput.value) || 400;
+    sessionStart = new Date();
+
+    startBtn.style.display = 'none';
+    stopBtn.style.display = 'block';
+    trackingRing.style.display = 'block';
+    trackingDot.style.display = 'block';
+    speedStrip.style.display = 'block';
+
+    setGpsStatus('searching', 'Buscando sinal GPS...', '');
+
+    watchId = navigator.geolocation.watchPosition(
+      onPosition,
+      onGpsError,
+      {
+        enableHighAccuracy: true,
+        maximumAge: 1000,
+        timeout: 10000
+      }
+    );
+
+    showToast('RASTREAMENTO INICIADO');
+
+    showToast('RASTREAMENTO INICIADO');
+  }
+
+  function stopTracking() {
+    tracking = false;
+    if (watchId !== null) {
+      navigator.geolocation.clearWatch(watchId);
+      watchId = null;
+    }
+    startBtn.style.display = 'block';
+    stopBtn.style.display = 'none';
+    trackingRing.style.display = 'none';
+    trackingDot.style.display = 'none';
+    speedStrip.style.display = 'none';
+
+    setGpsStatus('', 'GPS pausado', '');
+    showToast('RASTREAMENTO PAUSADO');
+  }
+
+  function onPosition(pos) {
+    const { latitude, longitude, accuracy, speed } = pos.coords;
+
+    // GPS status
+    const acc = Math.round(accuracy);
+    setGpsStatus('active', 'GPS ativo', acc > 0 ? `±${acc}m` : '');
+
+    // Speed
+    if (speed !== null && speed !== undefined) {
+      speedVal.textContent = Math.round(speed * 3.6);
+    }
+
+    if (lastPos !== null) {
+      const dist = haversine(lastPos.lat, lastPos.lng, latitude, longitude);
+
+      // Filter: ignore implausible jumps (GPS glitch) or tiny noise
+      const maxStep = 0.5; // 500m max per tick - avoid teleportation glitches
+      const minStep = 0.003; // 3m minimum - ignore GPS noise when still
+      if (dist > minStep && dist < maxStep) {
+        totalKm += dist;
+        updateUI();
+        checkLimit();
+      }
+    }
+
+    lastPos = { lat: latitude, lng: longitude };
+  }
+
+  function onGpsError(err) {
+    const msgs = {
+      1: 'Permissão de localização negada. Ative nas configurações.',
+      2: 'Sinal GPS indisponível. Vá para um local aberto.',
+      3: 'Tempo esgotado ao buscar GPS.'
+    };
+    setGpsStatus('error', msgs[err.code] || 'Erro de GPS', '');
+  }
+
+  function setGpsStatus(state, text, accuracy) {
+    gpsDot.className = 'gps-dot' + (state ? ' ' + state : '');
+    gpsText.textContent = text;
+    gpsAccuracy.textContent = accuracy;
+  }
+
+  function updateUI() {
+    const km = totalKm;
+    odoDisplay.textContent = km.toFixed(3);
+
+    const limit = limitKm;
+    const pct = Math.min(100, (km / limit) * 100);
+    const remain = Math.max(0, limit - km);
+
+    progressFill.style.width = pct + '%';
+    progressPct.textContent = pct.toFixed(0) + '%';
+    limitLabel.textContent = limit + ' km';
+    remainVal.textContent = remain.toFixed(1);
+    refuelCountEl.textContent = refuelCount;
+
+    // Color states
+    const isWarn = pct >= 80 && pct < 100;
+    const isDanger = pct >= 100;
+
+    odoCard.className = 'odo-card' + (isDanger ? ' danger' : isWarn ? ' warning' : '');
+    odoDisplay.className = 'odo-display' + (isDanger ? ' danger' : isWarn ? ' warning' : '');
+    progressFill.className = 'progress-bar-fill' + (isDanger ? ' danger' : isWarn ? ' warning' : '');
+  }
+
+  function checkLimit() {
+    if (totalKm >= limitKm && !alertShown) {
+      alertShown = true;
+      triggerFuelAlert();
+    }
+  }
+
+  function triggerFuelAlert() {
+    // Visual banner
+    alertBanner.classList.add('show');
+    setTimeout(() => alertBanner.classList.remove('show'), 5000);
+
+    // Browser notification
+    if (notifPermission && 'Notification' in window) {
+      new Notification('⛽ Hora de abastecer!', {
+        body: `Você percorreu ${totalKm.toFixed(1)} km. Hora de abastecer!`,
+        icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">⛽</text></svg>',
+        tag: 'fuel-alert',
+        requireInteraction: true,
+        vibrate: [300, 100, 300, 100, 300]
+      });
+    }
+
+    // Vibration API
+    if ('vibrate' in navigator) {
+      navigator.vibrate([500, 200, 500, 200, 1000]);
+    }
+
+    // Beep sound
+    playBeep();
+  }
+
+  function playBeep() {
+    try {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const times = [0, 0.4, 0.8];
+      times.forEach(t => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.frequency.value = 880;
+        osc.type = 'square';
+        gain.gain.setValueAtTime(0.3, ctx.currentTime + t);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + t + 0.3);
+        osc.start(ctx.currentTime + t);
+        osc.stop(ctx.currentTime + t + 0.3);
+      });
+    } catch(e) {}
+  }
+
+  function refueled() {
+    if (totalKm === 0 && refuelCount === 0) {
+      showToast('Inicie o rastreamento primeiro');
+      return;
+    }
+
+    // Save to history
+    const entry = {
+      date: new Date().toLocaleDateString('pt-BR', { day:'2-digit', month:'2-digit', year:'2-digit', hour:'2-digit', minute:'2-digit' }),
+      km: totalKm.toFixed(2),
+      limit: limitKm
+    };
+    history.unshift(entry);
+    if (history.length > 10) history = history.slice(0, 10);
+    localStorage.setItem('fuelHistory', JSON.stringify(history));
+
+    // Reset
+    totalKm = 0;
+    lastPos = null;
+    alertShown = false;
+    refuelCount++;
+
+    // Reset visuals
+    odoCard.className = 'odo-card';
+    odoDisplay.className = 'odo-display';
+    progressFill.className = 'progress-bar-fill';
+    alertBanner.classList.remove('show');
+
+    updateUI();
+    renderHistory();
+    showToast('✓ ABASTECIDO! CONTADOR ZERADO');
+
+    if ('vibrate' in navigator) navigator.vibrate([100, 50, 100]);
+  }
+
+  function renderHistory() {
+    const list = document.getElementById('historyList');
+    if (history.length === 0) {
+      list.innerHTML = '<div class="empty-history">Nenhum abastecimento registrado</div>';
+      return;
+    }
+    list.innerHTML = history.map(h => `
+      <div class="history-item">
+        <div>
+          <div style="color:var(--text);font-size:0.82rem;">Percorrido</div>
+          <div class="date">${h.date}</div>
+        </div>
+        <div class="km">${h.km} km</div>
+      </div>
+    `).join('');
+  }
+
+  function haversine(lat1, lon1, lat2, lon2) {
+    const R = 6371;
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = Math.sin(dLat/2)**2 +
+              Math.cos(lat1*Math.PI/180) * Math.cos(lat2*Math.PI/180) *
+              Math.sin(dLon/2)**2;
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2800);
+  }
+
+  // Wake Lock
+  let wakeLock = null;
+  let wakelockEnabled = false;
+
+  async function toggleWakeLock(enabled) {
+    wakelockEnabled = enabled;
+    const statusEl = document.getElementById('wakelockStatus');
+    const descEl = document.getElementById('wakelockDesc');
+
+    if (enabled) {
+      await requestWakeLock();
+    } else {
+      if (wakeLock) {
+        await wakeLock.release();
+        wakeLock = null;
+      }
+      statusEl.textContent = 'desligado';
+      statusEl.className = 'wakelock-status';
+      descEl.textContent = 'Evita que o GPS pare quando a tela apaga';
+    }
+  }
+
+  async function requestWakeLock() {
+    const statusEl = document.getElementById('wakelockStatus');
+    const descEl = document.getElementById('wakelockDesc');
+
+    if (!('wakeLock' in navigator)) {
+      statusEl.textContent = 'não suportado';
+      statusEl.className = 'wakelock-status';
+      descEl.textContent = 'Seu navegador não suporta wake lock. Use o Chrome.';
+      document.getElementById('wakelockToggle').checked = false;
+      wakelockEnabled = false;
+      return;
+    }
+
+    try {
+      wakeLock = await navigator.wakeLock.request('screen');
+      statusEl.textContent = '● ativo';
+      statusEl.className = 'wakelock-status on';
+      descEl.textContent = 'Tela permanecerá ligada enquanto você dirige';
+
+      wakeLock.addEventListener('release', () => {
+        // Auto re-acquire if still enabled and page visible
+        if (wakelockEnabled && document.visibilityState === 'visible') {
+          setTimeout(requestWakeLock, 1000);
+        } else {
+          statusEl.textContent = 'desligado';
+          statusEl.className = 'wakelock-status';
+        }
+      });
+    } catch (err) {
+      statusEl.textContent = 'erro ao ativar';
+      statusEl.className = 'wakelock-status';
+      descEl.textContent = 'Não foi possível manter a tela ativa. Verifique permissões.';
+      document.getElementById('wakelockToggle').checked = false;
+      wakelockEnabled = false;
+    }
+  }
+
+  // Re-acquire wake lock when tab becomes visible again
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') {
+      if (wakelockEnabled && !wakeLock) requestWakeLock();
+      if ('Notification' in window) {
+        Notification.requestPermission().then(p => { notifPermission = p === 'granted'; });
+      }
+    }
+  });
+</script>
+</body>
+</html>
