@@ -1,0 +1,1351 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema Industrial — Extração & Volumetria</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+
+        /* ===================================================
+           NAVEGAÇÃO DAS ABAS
+        =================================================== */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .tab-nav {
+            display: flex;
+            background: #1b2a1b;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 3px solid #2e7d32;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 16px 24px;
+            background: transparent;
+            border: none;
+            border-bottom: 4px solid transparent;
+            margin-bottom: -3px;
+            color: #a5d6a7;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 0.9rem;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            cursor: pointer;
+            transition: color 0.2s, border-color 0.2s, background 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .tab-btn:hover {
+            background: rgba(255,255,255,0.05);
+            color: #fff;
+        }
+
+        .tab-btn.active {
+    color: #fff;
+    border-bottom-color: #4caf50;
+    background: #2e7d32; /* verde para Extração */
+}
+
+.tab-btn.tab-vol.active {
+    color: #fff;
+    border-bottom-color: #3b82f6;
+    background: #1565c0; /* azul para Volumetria */
+}
+
+        /* ===================================================
+           PAINÉIS DAS ABAS
+        =================================================== */
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; }
+
+        /* ===================================================
+           ABA 1 — EXTRAÇÃO (código original preservado)
+        =================================================== */
+        #panel-extracao {
+            background-color: #f5f5f5;
+            min-height: calc(100vh - 55px);
+        }
+
+        #panel-extracao .container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            max-width: 900px;
+            margin: 40px auto;
+            transition: box-shadow 0.3s ease;
+        }
+
+        #panel-extracao .container:hover {
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+
+        #panel-extracao h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 2.1rem;
+    letter-spacing: -0.02em;
+    color: #ffffff;
+    line-height: 1.1;
+    text-align: center;
+    margin-bottom: 24px;
+    padding: 22px 24px;
+    position: relative;
+    background: linear-gradient(135deg, #1b5e20 0%, #2e7d32 60%, #388e3c 100%);
+    border: 1px solid #4caf50;
+    border-radius: 14px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+    overflow: hidden;
+}
+
+#panel-extracao h1::before {
+    content: '';
+    position: absolute;
+    top: -50px;
+    right: -50px;
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,255,255,0.12) 0%, transparent 70%);
+    pointer-events: none;
+}
+
+#panel-extracao h1::after {
+    display: none;
+}
+
+        #panel-extracao .developer-credits {
+    text-align: center;
+    margin-top: 40px;
+    padding: 20px 15px;
+    background: #1f2f22;
+    border-top: 1px solid #4caf50;
+    border-radius: 0 0 12px 12px;
+    font-size: 0.85em;
+    color: #c8e6c9;
+    letter-spacing: 0.04em;
+}
+
+#panel-extracao .developer-credits h3 {
+    color: #ffffff;
+    margin-bottom: 8px;
+    font-size: 1em;
+}
+
+#panel-extracao .developer-credits a {
+    color: #a5d6a7;
+    text-decoration: none;
+}
+
+#panel-extracao .developer-credits a:hover {
+    color: #ffffff;
+    text-decoration: underline;
+}
+
+        #panel-extracao h2 {
+            color: #2e7d32;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #a5d6a7;
+        }
+
+        #panel-extracao .section {
+            margin-bottom: 30px;
+            border: 1px solid #a5d6a7;
+            padding: 25px;
+            border-radius: 10px;
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            transition: transform 0.2s ease;
+        }
+
+        #panel-extracao .section:hover { transform: translateY(-2px); }
+
+        #panel-extracao .section p {
+            margin-bottom: 20px;
+            color: #555;
+            font-style: italic;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        #panel-extracao .calculation-entry {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 20px;
+            padding: 18px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            background-color: #fff;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            transition: box-shadow 0.2s ease;
+        }
+
+        #panel-extracao .calculation-entry:hover { box-shadow: 0 3px 8px rgba(0,0,0,0.1); }
+
+        #panel-extracao .input-fields-row,
+        #panel-extracao .formula-output-row {
+            display: flex;
+            align-items: center;
+            width: 100%;
+        }
+
+        #panel-extracao .input-fields-row {
+            margin-bottom: 12px;
+            justify-content: flex-start;
+        }
+
+        #panel-extracao .input-pair {
+            display: flex;
+            align-items: center;
+            margin-right: 20px;
+        }
+
+        #panel-extracao .input-pair:last-child { margin-right: 0; }
+
+        #panel-extracao .input-pair label {
+            margin-right: 8px;
+            font-weight: 600;
+            white-space: nowrap;
+            color: #444;
+        }
+
+        #panel-extracao .input-pair input[type="number"] {
+            width: 100px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 1em;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        #panel-extracao .input-pair input[type="number"]:focus {
+            border-color: #4caf50;
+            box-shadow: 0 0 0 2px rgba(76,175,80,0.2);
+            outline: none;
+        }
+
+        #panel-extracao .formula-output-row { justify-content: flex-end; }
+
+        #panel-extracao .formula-output-row .formula { 
+            margin-right: 15px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        #panel-extracao .formula-output-row .result {
+            font-weight: 700;
+            color: #2e7d32;
+            min-width: 120px;
+            text-align: right;
+            font-size: 1.1em;
+            background-color: #e8f5e9;
+            padding: 5px 10px;
+            border-radius: 4px;
+        }
+
+        #panel-extracao .add-row-button {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            background-color: #2e7d32;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+        }
+
+        #panel-extracao .add-row-button:hover { background-color: #1b5e20; }
+        #panel-extracao .add-row-button:active { transform: scale(0.98); }
+        #panel-extracao .add-row-button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        #panel-extracao .total-section {
+            margin-top: 40px;
+            padding-top: 25px;
+            border-top: 2px solid #2e7d32;
+            text-align: center;
+        }
+
+        #panel-extracao .total-section h3 {
+            color: #2e7d32;
+            margin-bottom: 15px;
+            font-size: 1.4em;
+        }
+
+        #panel-extracao #totalResult {
+            font-size: 2em;
+            font-weight: 700;
+            color: #1b5e20;
+            background-color: #e8f5e9;
+            padding: 12px 25px;
+            border-radius: 8px;
+            display: inline-block;
+            min-width: 220px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        #panel-extracao .unit {
+            font-size: 1.2em;
+            color: #555;
+            margin-top: 8px;
+            font-weight: 500;
+        }
+
+        #panel-extracao button.calculate-button {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            background-color: #2e7d32;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.2em;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 30px;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+        }
+
+        #panel-extracao button.calculate-button:hover { background-color: #1b5e20; }
+        #panel-extracao button.calculate-button:active { transform: scale(0.98); }
+
+        @media (max-width: 600px) {
+            #panel-extracao .container { margin: 20px 10px; padding: 20px; }
+            #panel-extracao h1 { font-size: 1.8em; }
+            #panel-extracao .input-fields-row { flex-direction: column; align-items: flex-start; }
+            #panel-extracao .input-pair { margin-right: 0; margin-bottom: 12px; width: 100%; }
+            #panel-extracao .input-pair input[type="number"] { width: 100%; }
+            #panel-extracao .formula-output-row { justify-content: flex-start; }
+            #panel-extracao .formula-output-row .formula { margin-right: 10px; }
+            #panel-extracao #totalResult { font-size: 1.6em; min-width: 180px; padding: 10px 20px; }
+        }
+
+        /* ===================================================
+           ABA 2 — VOLUMETRIA (código original preservado)
+        =================================================== */
+        #panel-volumetria {
+            background: #0d0f14;
+            min-height: calc(100vh - 55px);
+            color: #e8eaf0;
+            font-family: 'DM Mono', monospace;
+        }
+
+        #panel-volumetria header {
+            background: linear-gradient(135deg, #0d0f14 0%, #161c2e 60%, #0d1220 100%);
+            border-bottom: 1px solid #2a3045;
+            padding: 36px 40px 28px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #panel-volumetria header::before {
+            content: '';
+            position: absolute;
+            top: -60px; right: -60px;
+            width: 280px; height: 280px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(59,130,246,0.12) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        #panel-volumetria header h1 {
+            font-family: 'DM Serif Display', serif;
+            font-size: 2.1rem;
+            letter-spacing: -0.02em;
+            color: #e8eaf0;
+            line-height: 1.1;
+        }
+
+        #panel-volumetria header h1 span { color: #3b82f6; font-style: italic; }
+
+        #panel-volumetria header p {
+            margin-top: 8px;
+            font-size: 0.75rem;
+            color: #7a8099;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        #panel-volumetria .container {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 40px 24px 0;
+        }
+
+        #panel-volumetria .section-label {
+            font-size: 0.65rem;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: #7a8099;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        #panel-volumetria .section-label::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: #2a3045;
+        }
+
+        #panel-volumetria .input-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        @media (max-width: 600px) {
+            #panel-volumetria .input-grid { grid-template-columns: 1fr; }
+        }
+
+        #panel-volumetria .field {
+            background: #161921;
+            border: 1px solid #2a3045;
+            border-radius: 10px;
+            padding: 16px 18px;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        #panel-volumetria .field:focus-within {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59,130,246,0.12);
+        }
+
+        #panel-volumetria .field label {
+            display: block;
+            font-size: 0.65rem;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: #7a8099;
+            margin-bottom: 8px;
+        }
+
+        #panel-volumetria .field .unit {
+            font-size: 0.7rem;
+            color: #d4a843;
+            margin-left: 4px;
+        }
+
+        #panel-volumetria .field input {
+            width: 100%;
+            background: transparent;
+            border: none;
+            outline: none;
+            color: #e8eaf0;
+            font-family: 'DM Mono', monospace;
+            font-size: 1.25rem;
+            font-weight: 500;
+            caret-color: #3b82f6;
+        }
+
+        #panel-volumetria .field input::placeholder { color: #2a3045; }
+        #panel-volumetria .field.blue-accent { border-left: 3px solid #3b82f6; }
+        #panel-volumetria .field.yellow-accent { border-left: 3px solid #f59e0b; }
+        #panel-volumetria .field.red-accent { border-left: 3px solid #ef4444; }
+
+        #panel-volumetria .calc-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-family: 'DM Mono', monospace;
+            font-size: 0.85rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: opacity 0.2s, transform 0.15s;
+            margin-bottom: 12px;
+        }
+
+        #panel-volumetria .calc-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+        #panel-volumetria .calc-btn:active { transform: translateY(0); }
+
+        #panel-volumetria .hist-btn {
+            width: 100%;
+            padding: 13px;
+            background: transparent;
+            color: #7a8099;
+            border: 1px solid #2a3045;
+            border-radius: 10px;
+            font-family: 'DM Mono', monospace;
+            font-size: 0.8rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: border-color 0.2s, color 0.2s, background 0.2s;
+            margin-bottom: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        #panel-volumetria .hist-btn:hover {
+            border-color: #d4a843;
+            color: #d4a843;
+            background: rgba(212,168,67,0.05);
+        }
+
+        #panel-volumetria .hist-btn .hist-count {
+            background: #1e2330;
+            color: #d4a843;
+            border-radius: 20px;
+            padding: 1px 8px;
+            font-size: 0.7rem;
+        }
+
+        #panel-volumetria .history-panel { display: none; margin-bottom: 40px; }
+        #panel-volumetria .history-panel.visible { display: block; }
+
+        #panel-volumetria .hist-empty {
+            background: #161921;
+            border: 1px solid #2a3045;
+            border-radius: 12px;
+            padding: 24px;
+            text-align: center;
+            font-size: 0.78rem;
+            color: #7a8099;
+        }
+
+        #panel-volumetria .hist-item {
+            background: #161921;
+            border: 1px solid #2a3045;
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-bottom: 10px;
+            transition: border-color 0.2s;
+        }
+
+        #panel-volumetria .hist-item:hover { border-color: #d4a843; }
+
+        #panel-volumetria .hist-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        #panel-volumetria .hist-item-num {
+            font-size: 0.65rem;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: #7a8099;
+        }
+
+        #panel-volumetria .hist-item-time { font-size: 0.65rem; color: #7a8099; }
+
+        #panel-volumetria .hist-item-inputs {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #2a3045;
+        }
+
+        #panel-volumetria .hist-inp { font-size: 0.68rem; color: #7a8099; }
+        #panel-volumetria .hist-inp span { color: #e8eaf0; }
+
+        #panel-volumetria .hist-item-results {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+        }
+
+        @media (max-width: 600px) {
+            #panel-volumetria .hist-item-results { grid-template-columns: 1fr 1fr; }
+        }
+
+        #panel-volumetria .hist-res {
+            text-align: center;
+            padding: 6px 4px;
+            border-radius: 8px;
+            background: #1e2330;
+        }
+
+        #panel-volumetria .hist-res .hr-label {
+            font-size: 0.55rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+            opacity: 0.6;
+        }
+
+        #panel-volumetria .hist-res .hr-val { font-size: 0.9rem; font-weight: 500; }
+        #panel-volumetria .hist-res.hr-red .hr-label,
+        #panel-volumetria .hist-res.hr-red .hr-val { color: #fca5a5; }
+        #panel-volumetria .hist-res.hr-yellow .hr-label,
+        #panel-volumetria .hist-res.hr-yellow .hr-val { color: #fde68a; }
+        #panel-volumetria .hist-res.hr-blue .hr-label,
+        #panel-volumetria .hist-res.hr-blue .hr-val { color: #93c5fd; }
+
+        #panel-volumetria .results-panel { display: none; margin-bottom: 48px; }
+        #panel-volumetria .results-panel.visible { display: block; }
+
+        #panel-volumetria .range-visual {
+            background: #161921;
+            border: 1px solid #2a3045;
+            border-radius: 14px;
+            padding: 20px 20px;
+            margin-bottom: 24px;
+            position: relative;
+        }
+
+        #panel-volumetria .range-bar-container {
+            position: relative;
+            display: flex;
+            justify-content: center;
+        }
+
+        #panel-volumetria .range-lines {
+            position: relative;
+            width: 100%;
+            max-width: 560px;
+            height: 220px;
+            background: #1e2330;
+            border: 1px solid #2a3045;
+            border-radius: 10px;
+            overflow: visible;
+        }
+
+        #panel-volumetria .r-line {
+            position: absolute;
+            left: -4px; right: -4px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transform: translateY(-50%);
+            z-index: 2;
+        }
+
+        #panel-volumetria .r-line .bar {
+            flex: 1;
+            height: 2px;
+            border-radius: 2px;
+            min-width: 40px;
+        }
+
+        #panel-volumetria .r-line .badge {
+            font-size: 0.65rem;
+            font-weight: 500;
+            padding: 2px 8px;
+            border-radius: 20px;
+            white-space: nowrap;
+            min-width: 100px;
+            text-align: center;
+        }
+
+        #panel-volumetria .r-line .val {
+            font-size: 0.75rem;
+            font-family: 'DM Mono', monospace;
+            min-width: 52px;
+            text-align: right;
+            white-space: nowrap;
+        }
+
+        #panel-volumetria .r-red .bar { background: #ef4444; box-shadow: 0 0 6px rgba(239,68,68,0.5); height: 2px; }
+        #panel-volumetria .r-red .badge { background: rgba(239,68,68,0.15); color: #fca5a5; border: 1px solid rgba(239,68,68,0.3); }
+        #panel-volumetria .r-red .val { color: #fca5a5; }
+
+        #panel-volumetria .r-yellow .bar { background: #f59e0b; box-shadow: 0 0 6px rgba(245,158,11,0.4); }
+        #panel-volumetria .r-yellow .badge { background: rgba(245,158,11,0.15); color: #fde68a; border: 1px solid rgba(245,158,11,0.3); }
+        #panel-volumetria .r-yellow .val { color: #fde68a; }
+
+        #panel-volumetria .r-blue .bar { background: #3b82f6; box-shadow: 0 0 10px rgba(59,130,246,0.6); height: 4px; }
+        #panel-volumetria .r-blue .badge { background: rgba(59,130,246,0.2); color: #93c5fd; border: 1px solid rgba(59,130,246,0.4); font-weight: 600; }
+        #panel-volumetria .r-blue .val { color: #93c5fd; font-weight: 600; }
+
+        #panel-volumetria .result-cards {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            margin-bottom: 24px;
+        }
+
+        @media (max-width: 700px) {
+            #panel-volumetria .result-cards { grid-template-columns: 1fr 1fr; }
+            #panel-volumetria .result-cards .card:nth-child(3) { grid-column: span 2; }
+        }
+
+        #panel-volumetria .card {
+            background: #161921;
+            border: 1px solid #2a3045;
+            border-radius: 12px;
+            padding: 14px 12px;
+            text-align: center;
+            transition: transform 0.2s;
+        }
+
+        #panel-volumetria .card:hover { transform: translateY(-2px); }
+
+        #panel-volumetria .card .card-label {
+            font-size: 0.6rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            opacity: 0.7;
+        }
+
+        #panel-volumetria .card .card-val {
+            font-size: 1.3rem;
+            font-weight: 500;
+            letter-spacing: -0.02em;
+        }
+
+        #panel-volumetria .card .card-unit {
+            font-size: 0.65rem;
+            opacity: 0.6;
+            margin-top: 2px;
+        }
+
+        #panel-volumetria .card.c-red { border-top: 3px solid #ef4444; }
+        #panel-volumetria .card.c-red .card-label,
+        #panel-volumetria .card.c-red .card-val { color: #fca5a5; }
+
+        #panel-volumetria .card.c-yellow { border-top: 3px solid #f59e0b; }
+        #panel-volumetria .card.c-yellow .card-label,
+        #panel-volumetria .card.c-yellow .card-val { color: #fde68a; }
+
+        #panel-volumetria .card.c-blue { border-top: 3px solid #3b82f6; background: rgba(59,130,246,0.06); }
+        #panel-volumetria .card.c-blue .card-label,
+        #panel-volumetria .card.c-blue .card-val { color: #93c5fd; }
+
+        #panel-volumetria .formula-box {
+            background: #161921;
+            border: 1px solid #2a3045;
+            border-radius: 14px;
+            padding: 28px;
+            margin-bottom: 40px;
+        }
+
+        #panel-volumetria .formula-box h3 {
+            font-family: 'DM Serif Display', serif;
+            font-size: 1.1rem;
+            color: #d4a843;
+            margin-bottom: 20px;
+        }
+
+        #panel-volumetria .formula-step {
+            display: flex;
+            gap: 14px;
+            align-items: flex-start;
+            margin-bottom: 16px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #2a3045;
+        }
+
+        #panel-volumetria .formula-step:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+
+        #panel-volumetria .step-num {
+            width: 28px; height: 28px;
+            border-radius: 50%;
+            background: #1e2330;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.7rem;
+            color: #7a8099;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        #panel-volumetria .step-body { flex: 1; }
+
+        #panel-volumetria .step-title {
+            font-size: 0.72rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: #c0ccee;
+            margin-bottom: 4px;
+        }
+
+        #panel-volumetria .step-formula {
+            font-size: 0.85rem;
+            color: #e8eaf0;
+            line-height: 1.6;
+        }
+
+        #panel-volumetria .step-formula code {
+            background: #1e2330;
+            padding: 2px 7px;
+            border-radius: 4px;
+            color: #93c5fd;
+            font-family: 'DM Mono', monospace;
+            font-size: 0.8rem;
+        }
+
+        #panel-volumetria .error-msg {
+            background: rgba(239,68,68,0.1);
+            border: 1px solid rgba(239,68,68,0.3);
+            border-radius: 8px;
+            padding: 12px 16px;
+            font-size: 0.8rem;
+            color: #fca5a5;
+            margin-bottom: 16px;
+            display: none;
+        }
+
+        #panel-volumetria footer {
+            background: #161921;
+            border-top: 1px solid #2a3045;
+            padding: 20px 40px;
+            text-align: center;
+            font-size: 0.7rem;
+            color: #7a8099;
+            letter-spacing: 0.08em;
+        }
+
+        #panel-volumetria footer a { color: #d4a843; text-decoration: none; }
+        #panel-volumetria footer a:hover { text-decoration: underline; }
+
+    </style>
+</head>
+<body>
+
+    <!-- ===== NAVEGAÇÃO DAS ABAS ===== -->
+    <nav class="tab-nav">
+    <button class="tab-btn tab-vol active" id="btn-volumetria" onclick="switchTab('volumetria')">
+        🧪 Cálculo Volumetria
+    </button>
+    <button class="tab-btn" id="btn-extracao" onclick="switchTab('extracao')">
+        📝 Cálculo Extração
+    </button>
+</nav>
+
+    <!-- ===================================================
+         ABA 1 — EXTRAÇÃO
+    =================================================== -->
+    <div class="tab-panel" id="panel-extracao">
+        <div class="container">
+            <h1>Calcular Extração</h1>
+
+  
+
+            <div class="section">
+                <h2>Cálculo Rodando</h2>
+                <p>(Peso) x (Velocidade) x 1440</p>
+                <div id="rodandoInputs">
+                    <!-- Linhas de cálculo Rodando serão geradas aqui pelo JS -->
+                </div>
+                <button id="addRodandoBtn" class="add-row-button" onclick="addRodandoRow()">+ Adicionar Linha Rodando</button>
+            </div>
+
+            <div class="section">
+                <h2>Cálculo Drenando</h2>
+                <p>(Peso) x 6 x 1440</p>
+                <div id="drenandoInputs">
+                    <!-- Linhas de cálculo Drenando serão geradas aqui pelo JS -->
+                </div>
+                <button id="addDrenandoBtn" class="add-row-button" onclick="addDrenandoRow()">+ Adicionar Linha Drenando</button>
+            </div>
+
+            <button class="calculate-button" onclick="calcularTudo()">Calcular Tudo</button>
+
+            <div class="total-section">
+                <h3>Total Geral</h3>
+                <span id="totalResult">0,00</span>
+                <div class="unit">toneladas</div>
+            </div>
+            
+            <div class="developer-credits">
+                <h3>Desenvolvedor</h3>
+                <p>Desenvolvido por EdsonC.S.F.</p>
+                <p>Contato: <a href="mailto:edson@exemplo.com">edsony1@gmail.com</a></p>
+                <p>Criação: Julho de 2025</p>
+                <p>Versão: 3.0 © 2025. Todos os direitos reservados.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================================================
+         ABA 2 — VOLUMETRIA
+    =================================================== -->
+    <div class="tab-panel active" id="panel-volumetria">
+
+        <header>
+            <h1>Volumetria <span>Frascos de Vidro Wheaton</span></h1>
+            <p>Sistema de Ajuste de Range · Peso &amp; Volume</p>
+        </header>
+
+        <div class="container">
+
+            <div class="section-label">Parâmetros de entrada</div>
+
+            <div class="input-grid">
+                <div class="field blue-accent">
+                    <label>Volume Média/Average Silqual <span class="unit">ml</span></label>
+                    <input type="text" id="volSilqual" placeholder="0,00" inputmode="decimal">
+                </div>
+                <div class="field yellow-accent">
+                    <label>Peso Média/Average Silqual <span class="unit">g</span></label>
+                    <input type="text" id="pesoSilqual" placeholder="0,00" inputmode="decimal">
+                </div>
+                <div class="field blue-accent">
+                    <label>Volume Ideal/Objetivo <span class="unit">ml</span></label>
+                    <input type="text" id="volIdeal" placeholder="0,00" inputmode="decimal">
+                </div>
+                
+                <div class="field red-accent">
+                    <label>Volume Máximo <span class="unit">ml</span></label>
+                    <input type="text" id="volMax" placeholder="0,00" inputmode="decimal">
+                </div>
+                <div class="field red-accent">
+                    <label>Volume Mínimo <span class="unit">ml</span></label>
+                    <input type="text" id="volMin" placeholder="0,00" inputmode="decimal">
+                </div>
+            </div>
+
+            <div class="error-msg" id="errorMsg"></div>
+
+            <button class="calc-btn" onclick="calcular()">▶ Calcular Range</button>
+
+            <button class="hist-btn" onclick="toggleHistorico()">
+                ◷ Histórico
+                <span class="hist-count" id="histCount">0</span>
+            </button>
+
+            <!-- HISTORY PANEL -->
+            <div class="history-panel" id="historyPanel">
+                <div class="section-label">Últimos 5 resultados</div>
+                <div id="historyContent"></div>
+            </div>
+
+            <!-- RESULTS -->
+            <div class="results-panel" id="resultsPanel">
+
+                <div class="section-label">Resultado dos 5 pontos de range</div>
+
+                <div class="result-cards">
+                    <div class="card c-red">
+                        <div class="card-label">Máximo trabalho</div>
+                        <div class="card-val" id="rMax">—</div>
+                        <div class="card-unit">gramas</div>
+                    </div>
+                    <div class="card c-yellow">
+                        <div class="card-label">Acima do ideal</div>
+                        <div class="card-val" id="rAcima">—</div>
+                        <div class="card-unit">gramas</div>
+                    </div>
+                    <div class="card c-blue">
+                        <div class="card-label">Ideal trabalho</div>
+                        <div class="card-val" id="rIdeal">—</div>
+                        <div class="card-unit">gramas</div>
+                    </div>
+                    <div class="card c-yellow">
+                        <div class="card-label">Abaixo do ideal</div>
+                        <div class="card-val" id="rAbaixo">—</div>
+                        <div class="card-unit">gramas</div>
+                    </div>
+                    <div class="card c-red">
+                        <div class="card-label">Mínimo trabalho</div>
+                        <div class="card-val" id="rMin">—</div>
+                        <div class="card-unit">gramas</div>
+                    </div>
+                </div>
+
+                <div class="section-label">Visualização de range</div>
+
+                <div class="range-visual">
+                    <div class="range-bar-container">
+                        <div class="range-lines" id="rangeLines">
+                            <!-- preenchido via JS -->
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- FÓRMULAS -->
+            <div class="section-label">Como funciona o cálculo</div>
+
+            <div class="formula-box">
+                <h3>Explicação das fórmulas</h3>
+
+                <div class="formula-step">
+                    <div class="step-num">1</div>
+                    <div class="step-body">
+                        <div class="step-title">Resultado ideal de trabalho (linha azul)</div>
+                        <div class="step-formula">
+                            <code>(Vol. Média Silqual − Vol. Ideal) × 2,5 + Peso Média Silqual</code><br>
+                            Calcula o peso de trabalho ideal ajustando a diferença de volume convertida em gramas.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="formula-step">
+                    <div class="step-num">2</div>
+                    <div class="step-body">
+                        <div class="step-title">Linhas amarelas — ±1 g em torno do ideal</div>
+                        <div class="step-formula">
+                            <code>Acima = Ideal × 1,01 (Ideal + 1%)</code><br>
+                            <code>Abaixo = Ideal × 0,99 (Ideal − 1%)</code><br>
+                            Faixa de tolerância de ±1% ao redor do ponto de trabalho ideal.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="formula-step">
+                    <div class="step-num">3</div>
+                    <div class="step-body">
+                        <div class="step-title">Linha vermelha superior — Máximo para trabalhar</div>
+                        <div class="step-formula">
+                            <code>((Vol. Máximo − Vol. Ideal) × 2,5) × 75% + Ideal de Trabalho</code><br>
+                            Calcula-se a diferença de volume × 2,5; sobre esse resultado aplica-se 75%; soma-se ao ideal de trabalho.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="formula-step">
+                    <div class="step-num">4</div>
+                    <div class="step-body">
+                        <div class="step-title">Linha vermelha inferior — Mínimo para trabalhar</div>
+                        <div class="step-formula">
+                            <code>Ideal de Trabalho − ((Vol. Ideal − Vol. Mínimo) × 2,5) × 75%</code><br>
+                            Calcula-se a diferença de volume × 2,5; sobre esse resultado aplica-se 75%; subtrai-se do ideal de trabalho.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="formula-step">
+                    <div class="step-num">5</div>
+                    <div class="step-body">
+                        <div class="step-title">Fator de conversão 2,5</div>
+                        <div class="step-formula">
+                            O fator <code>× 2,5</code> converte a diferença de volume (ml) em variação de peso (g),<br>
+                            considerando a densidade específica do produto (silqual).
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <footer>
+            Sistema de Volumetria · Frascos de Vidro &nbsp;|&nbsp;
+            <a href="mailto:edson@exemplo.com">edsony1@gmail.com |  Criado : abril/2026</a>
+        </footer>
+
+    </div><!-- fim #panel-volumetria -->
+
+    <!-- ===================================================
+         SCRIPTS
+    =================================================== -->
+    <script>
+
+        /* ---------- TROCA DE ABAS ---------- */
+        function switchTab(nome) {
+            document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('panel-' + nome).classList.add('active');
+            document.getElementById('btn-' + nome).classList.add('active');
+        }
+
+        /* ========================================
+           EXTRAÇÃO — JavaScript original completo
+        ======================================== */
+        const MAX_LINHAS = 10; // Máximo de linhas permitidas
+        let rodandoRowCount = 0; // Contador de linhas Rodando
+        let drenandoRowCount = 0; // Contador de linhas Drenando
+
+        // Função para formatar números no padrão brasileiro (milhares com ponto, decimal com vírgula)
+        function formatarNumeroBR(numero) {
+            const numStr = numero.toFixed(2);
+            const partes = numStr.split('.');
+            let parteInteira = partes[0];
+            const parteDecimal = partes[1];
+            parteInteira = parteInteira.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+            return parteInteira + ',' + parteDecimal;
+        }
+
+        // Função para adicionar uma nova linha de cálculo Rodando
+        function addRodandoRow() {
+            if (rodandoRowCount < MAX_LINHAS) {
+                const rodandoDiv = document.getElementById('rodandoInputs');
+                const newRowHtml = `
+                    <div class="calculation-entry">
+                        <div class="input-fields-row">
+                            <div class="input-pair">
+                                <label for="pesoRodando${rodandoRowCount}">Peso ${rodandoRowCount + 1}:</label>
+                                <input type="number" id="pesoRodando${rodandoRowCount}" value="0" step="0.01" oninput="calcularTudo()">
+                                <span style="margin-left:6px;font-weight:600;color:#555;">g</span>
+                            </div>
+                            <div class="input-pair">
+                                <label for="velocidadeRodando${rodandoRowCount}">Velocidade ${rodandoRowCount + 1}:</label>
+                                <input type="number" id="velocidadeRodando${rodandoRowCount}" value="0" step="0.01" oninput="calcularTudo()">
+                            </div>
+                        </div>
+                        <div class="formula-output-row">
+                            <span class="formula">x 1440 =</span>
+                            <span class="result" id="resultadoRodando${rodandoRowCount}">0,00 ton</span>
+                        </div>
+                    </div>
+                `;
+                rodandoDiv.insertAdjacentHTML('beforeend', newRowHtml);
+                rodandoRowCount++;
+                if (rodandoRowCount >= MAX_LINHAS) {
+                    document.getElementById('addRodandoBtn').disabled = true;
+                }
+                calcularTudo(); // Recalcula ao adicionar nova linha
+            }
+        }
+
+        // Função para adicionar uma nova linha de cálculo Drenando
+        function addDrenandoRow() {
+            if (drenandoRowCount < MAX_LINHAS) {
+                const drenandoDiv = document.getElementById('drenandoInputs');
+                const newRowHtml = `
+                    <div class="calculation-entry">
+                        <div class="input-fields-row">
+                            <div class="input-pair">
+                                <label for="pesoDrenando${drenandoRowCount}">Peso ${drenandoRowCount + 1}:</label>
+                                <input type="number" id="pesoDrenando${drenandoRowCount}" value="0" step="0.01" oninput="calcularTudo()">
+                                <span style="margin-left:6px;font-weight:600;color:#555;">g</span>
+                            </div>
+                        </div>
+                        <div class="formula-output-row">
+                            <span class="formula">x 6 x 1440 =</span>
+                            <span class="result" id="resultadoDrenando${drenandoRowCount}">0,00 ton</span>
+                        </div>
+                    </div>
+                `;
+                drenandoDiv.insertAdjacentHTML('beforeend', newRowHtml);
+                drenandoRowCount++;
+                if (drenandoRowCount >= MAX_LINHAS) {
+                    document.getElementById('addDrenandoBtn').disabled = true;
+                }
+                calcularTudo(); // Recalcula ao adicionar nova linha
+            }
+        }
+
+        // Função principal de cálculo
+        function calcularTudo() {
+            let totalGeralGramas = 0;
+
+            // Cálculos Rodando
+            for (let i = 0; i < rodandoRowCount; i++) {
+                const pesoInput = document.getElementById(`pesoRodando${i}`);
+                const velocidadeInput = document.getElementById(`velocidadeRodando${i}`);
+
+                const peso = parseFloat(pesoInput ? pesoInput.value : 0);
+                const velocidade = parseFloat(velocidadeInput ? velocidadeInput.value : 0);
+
+                let resultadoGramas = 0;
+                if (!isNaN(peso) && !isNaN(velocidade)) {
+                    resultadoGramas = peso * velocidade * 1440;
+                }
+                const resultadoElement = document.getElementById(`resultadoRodando${i}`);
+                if (resultadoElement) {
+                    const toneladas = resultadoGramas / 1000000;
+                    resultadoElement.textContent = formatarNumeroBR(toneladas) + ' ton';
+                }
+                totalGeralGramas += resultadoGramas;
+            }
+
+            // Cálculos Drenando
+            for (let i = 0; i < drenandoRowCount; i++) {
+                const pesoInput = document.getElementById(`pesoDrenando${i}`);
+                const peso = parseFloat(pesoInput ? pesoInput.value : 0);
+
+                let resultadoGramas = 0;
+                if (!isNaN(peso)) {
+                    resultadoGramas = peso * 6 * 1440;
+                }
+                const resultadoElement = document.getElementById(`resultadoDrenando${i}`);
+                if (resultadoElement) {
+                    const toneladas = resultadoGramas / 1000000;
+                    resultadoElement.textContent = formatarNumeroBR(toneladas) + ' ton';
+                }
+                totalGeralGramas += resultadoGramas;
+            }
+
+            // Total em toneladas com 2 casas decimais
+            const totalToneladas = totalGeralGramas / 1000000;
+            document.getElementById('totalResult').textContent = formatarNumeroBR(totalToneladas) + ' ton';
+        }
+
+        // Adiciona a primeira linha de cada tipo ao carregar a página
+        document.addEventListener('DOMContentLoaded', () => {
+            addRodandoRow(); // Adiciona a primeira linha Rodando
+            addDrenandoRow(); // Adiciona a primeira linha Drenando
+        });
+
+        /* ========================================
+           VOLUMETRIA — JavaScript original completo
+        ======================================== */
+
+        // --- Histórico (máx 5 entradas, memória da sessão) ---
+        var historico = [];
+        var histVisible = false;
+
+        function parseDecimal(str) {
+            if (!str) return NaN;
+            return parseFloat(str.replace(',', '.'));
+        }
+
+        function fmt(val) {
+            return val.toString();
+        }
+
+        // Permite dígitos, vírgula e ponto — somente nos inputs da volumetria
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('#panel-volumetria input').forEach(inp => {
+                inp.addEventListener('input', function() {
+                    this.value = this.value.replace(/[^0-9,.-]/g, '');
+                });
+            });
+        });
+
+        function showError(msg) {
+            const el = document.getElementById('errorMsg');
+            el.textContent = msg;
+            el.style.display = 'block';
+            document.getElementById('resultsPanel').classList.remove('visible');
+        }
+
+        function hideError() {
+            document.getElementById('errorMsg').style.display = 'none';
+        }
+
+        function calcular() {
+            hideError();
+
+            const vS  = parseDecimal(document.getElementById('volSilqual').value);
+            const vI  = parseDecimal(document.getElementById('volIdeal').value);
+            const pS  = parseDecimal(document.getElementById('pesoSilqual').value);
+            const vMx = parseDecimal(document.getElementById('volMax').value);
+            const vMn = parseDecimal(document.getElementById('volMin').value);
+
+            if ([vS, vI, pS, vMx, vMn].some(isNaN)) {
+                showError('⚠ Preencha todos os campos antes de calcular.');
+                return;
+            }
+
+            const idealCalculado = (vS - vI) * 2.5 + pS;
+            const ideal   = Math.round(idealCalculado);
+            const acima   = Math.round(ideal * 1.01);
+            const abaixo  = Math.round(ideal * 0.99);
+            const maxTrab = Math.round((((vMx - vI) * 2.5) * 0.70) + ideal);
+            const minTrab = Math.round(ideal - (((vI - vMn) * 2.5) * 0.70));
+
+            // Preenche cards
+            document.getElementById('rMax').textContent    = fmt(maxTrab);
+            document.getElementById('rAcima').textContent  = fmt(acima);
+            document.getElementById('rIdeal').textContent  = fmt(ideal);
+            document.getElementById('rAbaixo').textContent = fmt(abaixo);
+            document.getElementById('rMin').textContent    = fmt(minTrab);
+
+            // Desenha range visual
+            drawRange(minTrab, abaixo, ideal, acima, maxTrab);
+
+            // Salva no histórico
+            salvarHistorico({
+                inputs: { vS: vS, vI: vI, pS: pS, vMx: vMx, vMn: vMn },
+                results: { maxTrab: maxTrab, acima: acima, ideal: ideal, abaixo: abaixo, minTrab: minTrab },
+                hora: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+            });
+
+            document.getElementById('resultsPanel').classList.add('visible');
+            document.getElementById('resultsPanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function salvarHistorico(entrada) {
+            historico.unshift(entrada);
+            if (historico.length > 5) historico.pop();
+            document.getElementById('histCount').textContent = historico.length;
+            if (histVisible) renderHistorico();
+        }
+
+        function toggleHistorico() {
+            histVisible = !histVisible;
+            const panel = document.getElementById('historyPanel');
+            if (histVisible) {
+                renderHistorico();
+                panel.classList.add('visible');
+            } else {
+                panel.classList.remove('visible');
+            }
+        }
+
+        function renderHistorico() {
+            const container = document.getElementById('historyContent');
+            if (historico.length === 0) {
+                container.innerHTML = '<div class="hist-empty">Nenhum cálculo realizado ainda nesta sessão.</div>';
+                return;
+            }
+            container.innerHTML = historico.map(function(h, i) {
+                var label = i === 0 ? 'mais recente' : (i + 1) + 'º anterior';
+                return '<div class="hist-item">'
+                    + '<div class="hist-item-header">'
+                    +   '<span class="hist-item-num">Cálculo #' + (historico.length - i) + ' — ' + label + '</span>'
+                    +   '<span class="hist-item-time">' + h.hora + '</span>'
+                    + '</div>'
+                    + '<div class="hist-item-inputs">'
+                    +   '<span class="hist-inp">Vol. Silqual: <span>' + fmt(h.inputs.vS) + ' ml</span></span>'
+                    +   '<span class="hist-inp">Vol. Ideal: <span>' + fmt(h.inputs.vI) + ' ml</span></span>'
+                    +   '<span class="hist-inp">Peso Silqual: <span>' + fmt(h.inputs.pS) + ' g</span></span>'
+                    +   '<span class="hist-inp">Vol. Máx: <span>' + fmt(h.inputs.vMx) + ' ml</span></span>'
+                    +   '<span class="hist-inp">Vol. Mín: <span>' + fmt(h.inputs.vMn) + ' ml</span></span>'
+                    + '</div>'
+                    + '<div class="hist-item-results">'
+                    +   '<div class="hist-res hr-red"><div class="hr-label">Máx. trabalho</div><div class="hr-val">' + fmt(h.results.maxTrab) + ' g</div></div>'
+                    +   '<div class="hist-res hr-yellow"><div class="hr-label">Acima ideal</div><div class="hr-val">' + fmt(h.results.acima) + ' g</div></div>'
+                    +   '<div class="hist-res hr-blue"><div class="hr-label">Ideal</div><div class="hr-val">' + fmt(h.results.ideal) + ' g</div></div>'
+                    +   '<div class="hist-res hr-yellow"><div class="hr-label">Abaixo ideal</div><div class="hr-val">' + fmt(h.results.abaixo) + ' g</div></div>'
+                    +   '<div class="hist-res hr-red"><div class="hr-label">Mín. trabalho</div><div class="hr-val">' + fmt(h.results.minTrab) + ' g</div></div>'
+                    + '</div>'
+                    + '</div>';
+            }).join('');
+        }
+
+        function drawRange(rMin, rAbaixo, rIdeal, rAcima, rMax) {
+            const container = document.getElementById('rangeLines');
+            container.innerHTML = '';
+
+            // Posições fixas (%) dentro do quadro, de cima para baixo
+            const points = [
+                { val: rMax,    label: 'Máx. trabalho',   cls: 'r-red',    pct: 95 },
+                { val: rAcima,  label: 'Acima do ideal',  cls: 'r-yellow', pct: 70 },
+                { val: rIdeal,  label: 'Ideal trabalho',  cls: 'r-blue',   pct: 50 },
+                { val: rAbaixo, label: 'Abaixo do ideal', cls: 'r-yellow', pct: 30 },
+                { val: rMin,    label: 'Mín. trabalho',   cls: 'r-red',    pct: 5  },
+            ];
+
+            points.forEach(p => {
+                const line = document.createElement('div');
+                line.className = 'r-line ' + p.cls;
+                line.style.top = (100 - p.pct) + '%';
+                line.innerHTML = '<div class="bar"></div>'
+                    + '<div class="badge">' + p.label + '</div>'
+                    + '<div class="val">' + fmt(p.val) + ' g</div>';
+                container.appendChild(line);
+            });
+        }
+
+    </script>
+</body>
+</html>
